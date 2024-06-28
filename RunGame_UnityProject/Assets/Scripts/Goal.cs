@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 // ステージクリアー判定のためのゴールを表します。
 public class Goal : MonoBehaviour
@@ -10,7 +9,7 @@ public class Goal : MonoBehaviour
         // ステージクリアー判定
         if (collision.CompareTag("Player"))
         {
-            SceneManager.LoadScene("GameClear");
+            StageScene.Instance.StageClear();
         }
     }
 }
