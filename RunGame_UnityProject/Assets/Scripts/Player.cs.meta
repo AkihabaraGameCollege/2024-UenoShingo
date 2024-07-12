@@ -3,7 +3,11 @@ guid: d98e999ee6bf6ba42a5db9755bae15c9
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - groundChecker: {instanceID: 0}
+  - wallChecker: {instanceID: 0}
+  - effectAudio: {instanceID: 0}
+  - soundOnJump: {fileID: 8300000, guid: 69117bbbed90a324d86018406a4a52a0, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

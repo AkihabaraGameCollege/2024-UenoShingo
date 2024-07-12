@@ -1,18 +1,24 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 // ユーザー入力を受け取ってプレイヤーを操作します。
 public class Player : MonoBehaviour
 {
-    // 移動速度を指定します。
+    // 通常時の移動速度を指定します。
     [SerializeField]
-    [Tooltip("移動速度を指定します。")]
-    private float speed = 2;
+    [Tooltip("通常時の移動速度を指定します。")]
+    private float normalSpeed = 4;
+    // スプリント時の移動速度を指定します。
+    [SerializeField]
+    [Tooltip("スプリント時の移動速度を指定します。")]
+    private float sprintSpeed = 8;
+
     // ジャンプ力を指定します。
     [SerializeField]
     [Tooltip("ジャンプ力を指定します。")]
     private Vector2 jumpPower = new(0, 6);
+    [SerializeField]
+    [Tooltip("ジャンプに必要な速度を指定します。")]
+    private float requiredJumpSpeed = 0.1f;
     // 側面衝突時のノックバック力を指定します。
     [SerializeField]
     [Tooltip("側面衝突時のノックバック力を指定します。")]
@@ -26,43 +32,218 @@ public class Player : MonoBehaviour
     [Tooltip("壁との交差判定用のチェッカーを指定します。")]
     private BoxCaster2D wallChecker = null;
 
+    // エフェクト再生用の AudioSource を指定します。
+    [SerializeField]
+    private AudioSource effectAudio = null;
+    // ジャンプ時のサウンドを指定します。
+    [SerializeField]
+    private AudioClip soundOnJump = null;
+
+    // このキャラクターのスリープ状態を取得します。
+    public bool IsSleeping { get; private set; } = false;
+    // プレイヤーの状態を表します。
+    enum PlayerState
+    {
+        // 通常の走行状態
+        Walking,
+        // スプリント状態
+        Sprinting,
+        // ジャンプの予備動作
+        JumpStart,
+        // 地面から足が離れて上昇中
+        Jumping,
+        // 走行状態からの落下
+        Falling,
+    }
+    // 現在のプレイヤー状態
+    [SerializeField]
+    PlayerState currentState = PlayerState.Walking;
+
     // コンポーネントを参照しておく変数
     new Rigidbody2D rigidbody;
+    Animator animator;
+    // AnimatorのパラメーターID
+    static readonly int isSprintId = Animator.StringToHash("isSprint");
+    static readonly int jumpId = Animator.StringToHash("Jump");
+    static readonly int landId = Animator.StringToHash("Land");
 
     // Start is called before the first frame update
     void Start()
     {
         // コンポーネントを事前に参照
         rigidbody = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
+
+        currentState = PlayerState.Walking;
     }
 
     // 毎フレームに一度実行される更新処理です。
     void Update()
     {
-        // 接地状態の場合
-        if (groundChecker.IsCasted)
+        if (IsSleeping)
         {
-            // ジャンプ
-            if (Input.GetButtonDown("Jump"))
-            {
-                rigidbody.AddForce(jumpPower, ForceMode2D.Impulse);
-            }
+            return;
+        }
 
-            // 等速度運動
-            var velocity = rigidbody.velocity;
-            velocity.x = speed;
-            rigidbody.velocity = velocity;
+        switch (currentState)
+        {
+            case PlayerState.Walking:
+                // 落下判定
+                if (!groundChecker.IsCasted)
+                {
+                    currentState = PlayerState.Falling;
+                    animator.SetTrigger(jumpId);
+                    return;
+                }
+                // ジャンプ
+                if (Input.GetButtonDown("Jump"))
+                {
+                    Jump();
+                    return;
+                }
+                // スプリント
+                if (Input.GetButtonDown("Fire1"))
+                {
+                    Sprint();
+                    return;
+                }
+                Move();
+                break;
+            case PlayerState.Sprinting:
+                // 落下判定
+                if (!groundChecker.IsCasted)
+                {
+                    animator.SetBool(isSprintId, false);
+                    effectAudio.Stop();
+
+                    currentState = PlayerState.Falling;
+                    animator.SetTrigger(jumpId);
+                    return;
+                }
+                // スプリント解除
+                if (Input.GetButtonUp("Fire1"))
+                {
+                    Walk();
+                    return;
+                }
+                Move();
+                break;
+            case PlayerState.JumpStart:
+                // ジャンプの予備動作後、足が離れた場合
+                if (!groundChecker.IsCasted)
+                {
+                    currentState = PlayerState.Jumping;
+                    return;
+                }
+                // ジャンプ予備動作中に必要なジャンプ速度が得られなかった場合
+                else if (rigidbody.velocity.y < requiredJumpSpeed)
+                {
+                    animator.SetTrigger(landId);
+
+                    currentState = PlayerState.Walking;
+                    return;
+                }
+                break;
+            case PlayerState.Jumping:
+                // 着地判定
+                if (groundChecker.IsCasted)
+                {
+                    animator.SetTrigger(landId);
+
+                    currentState = PlayerState.Walking;
+                    return;
+                }
+                break;
+            case PlayerState.Falling:
+                // 着地判定
+                if (groundChecker.IsCasted)
+                {
+                    animator.SetTrigger(landId);
+
+                    currentState = PlayerState.Walking;
+                    return;
+                }
+                break;
+            default:
+                break;
         }
     }
 
     // 固定フレームレートで呼び出される更新処理です。
     void FixedUpdate()
     {
+        if (IsSleeping)
+        {
+            return;
+        }
+
         // 壁との衝突
         if (wallChecker.IsCasted)
         {
             // ノックバック
             rigidbody.AddForce(transform.TransformDirection(knockBackPower), ForceMode2D.Force);
         }
+    }
+
+    // プレイヤーをスリープ状態に設定します。
+    public void Sleep()
+    {
+        IsSleeping = true;
+        rigidbody.simulated = false;
+    }
+
+    // プレイヤーのスリープ状態を解除します。
+    public void WakeUp()
+    {
+        IsSleeping = false;
+        rigidbody.simulated = true;
+    }
+
+    // このキャラクターを移動させます。
+    public void Move()
+    {
+        // 等速度運動
+        var velocity = rigidbody.velocity;
+        switch (currentState)
+        {
+            case PlayerState.Walking:
+                velocity.x = normalSpeed;
+                break;
+            case PlayerState.Sprinting:
+                velocity.x = sprintSpeed;
+                break;
+            case PlayerState.JumpStart:
+            case PlayerState.Jumping:
+            case PlayerState.Falling:
+            default:
+                break;
+        }
+        rigidbody.velocity = velocity;
+    }
+
+    // このキャラクターのスプリント状態を解除します。
+    public void Walk()
+    {
+        animator.SetBool(isSprintId, false);
+        effectAudio.Stop();
+
+        currentState = PlayerState.Walking;
+    }
+
+    // このキャラクターをスプリント状態に設定します。
+    public void Sprint()
+    {
+        currentState = PlayerState.Sprinting;
+        animator.SetBool(isSprintId, true);
+        effectAudio.Play();
+    }
+
+    // このキャラクターをジャンプさせます。
+    public void Jump()
+    {
+        currentState = PlayerState.JumpStart;
+        animator.SetTrigger(jumpId);
+        effectAudio.PlayOneShot(soundOnJump);
+        rigidbody.AddForce(jumpPower, ForceMode2D.Impulse);
     }
 }

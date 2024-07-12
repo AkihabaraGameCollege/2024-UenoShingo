@@ -9,15 +9,22 @@ public class StageScene : MonoBehaviour
     [SerializeField]
     private string nextStage = "GameClear";
 
+    // プレイヤーを指定します。
+    [SerializeField]
+    private Player player = null;
+
     // ステージ イントロ表示用のUIを指定します。
     [SerializeField]
     private StageIntroUI stageIntroUI = null;
     // ゲームオーバー表示用のUIを指定します。
     [SerializeField]
-    private GameObject gameOverUI = null;
+    private GameOverUI gameOverUI = null;
     // ステージクリアー表示用のUIを指定します。
     [SerializeField]
     private StageClearUI stageClearUI = null;
+    // 楽曲再生用の AudioSource を指定します。
+    [SerializeField]
+    private AudioSource musicAudio = null;
 
     // コンポーネントを事前に参照しておく変数
     Animator animator;
@@ -54,19 +61,21 @@ public class StageScene : MonoBehaviour
         // コンポーネントを事前に取得
         animator = GetComponent<Animator>();
 
-        // UIを非表示
-        gameOverUI.SetActive(false);
         // UnityEvent を追加
         stageIntroUI.onPlayGame.AddListener(PlayGame);
+        gameOverUI.onRetryButtonClick.AddListener(Retry);
+        gameOverUI.onExitButtonClick.AddListener(Exit);
         stageClearUI.onNextButtonClick.AddListener(LoadNextStage);
 
         gameState = SceneState.Intro;
+        player.Sleep();
     }
 
     // ステージを開始します。
     public void PlayGame()
     {
         gameState = SceneState.Play;
+        player.WakeUp();
     }
 
     // このステージをゲームオーバーとします。
@@ -76,33 +85,22 @@ public class StageScene : MonoBehaviour
         if (gameState == SceneState.Play)
         {
             gameState = SceneState.GameOver;
-            StartCoroutine(OnGameOver());
+            musicAudio.Stop();
+            // ゲームオーバーUIを表示
+            gameOverUI.Show();
         }
     }
 
-    // ゲームオーバー演出を実行します。
-    IEnumerator OnGameOver()
+    // このステージを再読み込みします。
+    public void Retry()
     {
-        // ゲームオーバーUIを表示
-        gameOverUI.SetActive(true);
-        // 2秒間待機
-        yield return new WaitForSeconds(2);
-        // 決定ボタンの入力を待機
-        while (true)
-        {
-            // 決定ボタンが押された場合、待機ループを抜ける
-            if (Input.GetButtonDown("Submit"))
-            {
-                break;
-            }
-            yield return null;
-        }
-        // アウトロ アニメーションへ切り替える
-        animator.SetTrigger(outroId);
-        // アニメーションが終了するまで1秒待機
-        yield return new WaitForSeconds(1);
-        // Stage 0シーンをリロードする
-        SceneManager.LoadScene("Stage 0");
+        StartCoroutine(OnLoadScene(SceneManager.GetActiveScene().name));
+    }
+
+    // このステージを抜けてタイトル画面を読み込みます。
+    public void Exit()
+    {
+        StartCoroutine(OnLoadScene("Title"));
     }
 
     // このステージをステージクリアーとします。
@@ -112,6 +110,7 @@ public class StageScene : MonoBehaviour
         if (gameState == SceneState.Play)
         {
             gameState = SceneState.StageClear;
+            musicAudio.Stop();
             // ステージクリアーUIを表示
             stageClearUI.Show();
         }
