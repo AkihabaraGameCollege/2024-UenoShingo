@@ -278,6 +278,10 @@ MonoBehaviour:
   jumpPower: {x: 0, y: 6}
   requiredJumpSpeed: 0.1
   knockBackPower: {x: -16, y: 4}
+  minStandAngle: -60
+  maxStandAngle: 60
+  minMoveVelocity: 0.001
+  uncontrollableTimeout: 1
   groundChecker: {fileID: 2742715323597577298}
   wallChecker: {fileID: 2555517481060462070}
   effectAudio: {fileID: 7536061606329544079}

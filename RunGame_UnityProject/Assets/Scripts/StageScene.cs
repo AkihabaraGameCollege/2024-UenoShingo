@@ -22,6 +22,9 @@ public class StageScene : MonoBehaviour
     // ステージクリアー表示用のUIを指定します。
     [SerializeField]
     private StageClearUI stageClearUI = null;
+    // ポーズUIを指定します。
+    [SerializeField]
+    private PauseUI pauseUI = null;
     // 楽曲再生用の AudioSource を指定します。
     [SerializeField]
     private AudioSource musicAudio = null;
@@ -45,6 +48,9 @@ public class StageScene : MonoBehaviour
     }
     SceneState gameState = SceneState.Intro;
 
+    // ポーズ状態の場合はtrue、プレイ状態の場合はfalse
+    public bool IsPaused { get; private set; } = false;
+
     // 自分自身のインスタンスを取得します。
     public static StageScene Instance { get; private set; } = null;
 
@@ -66,9 +72,42 @@ public class StageScene : MonoBehaviour
         gameOverUI.onRetryButtonClick.AddListener(Retry);
         gameOverUI.onExitButtonClick.AddListener(Exit);
         stageClearUI.onNextButtonClick.AddListener(LoadNextStage);
+        pauseUI.onResumeButtonClick.AddListener(Resume);
+        pauseUI.onRetryButtonClick.AddListener(Retry);
+        pauseUI.onExitButtonClick.AddListener(Exit);
 
         gameState = SceneState.Intro;
         player.Sleep();
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        switch (gameState)
+        {
+            case SceneState.Intro:
+                break;
+            case SceneState.Play:
+                // ポーズのトグル操作
+                if (Input.GetButtonDown("Cancel"))
+                {
+                    if (!IsPaused)
+                    {
+                        Pause();
+                    }
+                    else
+                    {
+                        Resume();
+                    }
+                }
+                break;
+            case SceneState.GameOver:
+                break;
+            case SceneState.StageClear:
+                break;
+            default:
+                break;
+        }
     }
 
     // ステージを開始します。
@@ -76,6 +115,28 @@ public class StageScene : MonoBehaviour
     {
         gameState = SceneState.Play;
         player.WakeUp();
+    }
+
+    // ゲームを一時停止します。
+    public void Pause()
+    {
+        if (!IsPaused)
+        {
+            IsPaused = true;
+            Time.timeScale = 0;
+            pauseUI.Show();
+        }
+    }
+
+    // ゲームの一時停止を解除します。
+    public void Resume()
+    {
+        if (IsPaused)
+        {
+            IsPaused = false;
+            Time.timeScale = 1;
+            pauseUI.Hide();
+        }
     }
 
     // このステージをゲームオーバーとします。
@@ -125,6 +186,12 @@ public class StageScene : MonoBehaviour
     // 指定したシーンを読み込みます。
     IEnumerator OnLoadScene(string sceneName)
     {
+        // ポーズ状態の場合は、コルーチン内で処理が
+        // 流れなくなるためポーズ解除する
+        if (IsPaused)
+        {
+            Resume();
+        }
         // アウトロ アニメーションへ切り替える
         animator.SetTrigger(outroId);
         // アニメーションが終了するまで1秒待機

@@ -23,6 +23,28 @@ public class Player : MonoBehaviour
     [SerializeField]
     [Tooltip("側面衝突時のノックバック力を指定します。")]
     private Vector2 knockBackPower = new Vector2(-16, 4);
+
+    // 転倒していないと判定する最小の角度を指定します。
+    [SerializeField]
+    private float minStandAngle = -60;
+    // 転倒していないと判定する最大の角度を指定します。
+    [SerializeField]
+    private float maxStandAngle = 60;
+    // 転倒状態の場合は true、それ以外は false
+    bool isTumbled = false;
+
+    // 接地状態の場合は true、それ以外は false
+    bool isGrounded = true;
+
+    // 静止していないと判定する最小速度(2乗値)
+    [SerializeField]
+    private float minMoveVelocity = 0.001f;
+    // 制御不能状態の継続でゲームオーバーと判定する時間(秒)
+    [SerializeField]
+    private float uncontrollableTimeout = 1;
+    // 制御不能状態の累積時間(秒)
+    float uncontrollableTime = 0;
+
     // 地面との交差判定用のチェッカーを指定します。
     [SerializeField]
     [Tooltip("地面との交差判定用のチェッカーを指定します。")]
@@ -75,6 +97,7 @@ public class Player : MonoBehaviour
         animator = GetComponent<Animator>();
 
         currentState = PlayerState.Walking;
+        UpdatePhysicParameters();
     }
 
     // 毎フレームに一度実行される更新処理です。
@@ -89,7 +112,7 @@ public class Player : MonoBehaviour
         {
             case PlayerState.Walking:
                 // 落下判定
-                if (!groundChecker.IsCasted)
+                if (!isGrounded)
                 {
                     currentState = PlayerState.Falling;
                     animator.SetTrigger(jumpId);
@@ -111,7 +134,7 @@ public class Player : MonoBehaviour
                 break;
             case PlayerState.Sprinting:
                 // 落下判定
-                if (!groundChecker.IsCasted)
+                if (!isGrounded)
                 {
                     animator.SetBool(isSprintId, false);
                     effectAudio.Stop();
@@ -130,7 +153,7 @@ public class Player : MonoBehaviour
                 break;
             case PlayerState.JumpStart:
                 // ジャンプの予備動作後、足が離れた場合
-                if (!groundChecker.IsCasted)
+                if (!isGrounded)
                 {
                     currentState = PlayerState.Jumping;
                     return;
@@ -146,7 +169,7 @@ public class Player : MonoBehaviour
                 break;
             case PlayerState.Jumping:
                 // 着地判定
-                if (groundChecker.IsCasted)
+                if (isGrounded)
                 {
                     animator.SetTrigger(landId);
 
@@ -156,7 +179,7 @@ public class Player : MonoBehaviour
                 break;
             case PlayerState.Falling:
                 // 着地判定
-                if (groundChecker.IsCasted)
+                if (isGrounded)
                 {
                     animator.SetTrigger(landId);
 
@@ -177,12 +200,38 @@ public class Player : MonoBehaviour
             return;
         }
 
+        UpdatePhysicParameters();
+        // 制御不能によるゲームオーバー判定
+        if (!isGrounded && rigidbody.velocity.sqrMagnitude < minMoveVelocity)
+        {
+            uncontrollableTime += Time.fixedDeltaTime;
+            if (uncontrollableTime >= uncontrollableTimeout)
+            {
+                StageScene.Instance.GameOver();
+            }
+        }
+        else
+        {
+            uncontrollableTime = 0;
+        }
+
         // 壁との衝突
-        if (wallChecker.IsCasted)
+        if (!isTumbled && wallChecker.IsCasted)
         {
             // ノックバック
             rigidbody.AddForce(transform.TransformDirection(knockBackPower), ForceMode2D.Force);
         }
+    }
+
+    // Physics に依存したパラメーターを更新します。
+    void UpdatePhysicParameters()
+    {
+        // 転倒判定
+        // z軸角度を正規化[-180, 180]
+        var normalizedAngle = Mathf.Repeat(rigidbody.rotation + 180, 360) - 180;
+        isTumbled = (normalizedAngle < minStandAngle || normalizedAngle > maxStandAngle);
+        // 接地判定
+        isGrounded = (groundChecker.IsCasted && !isTumbled);
     }
 
     // プレイヤーをスリープ状態に設定します。
