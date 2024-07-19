@@ -1,15 +1,18 @@
 using UnityEngine;
 
-// マップからの落下を判定します。
-public class DeadArea : MonoBehaviour
+namespace RunGame
 {
-    // このオブジェクトのトリガーに他のオブジェクトが侵入した際に呼び出されます。
-    private void OnTriggerEnter2D(Collider2D collision)
+    // マップからの落下を判定します。
+    public class DeadArea : MonoBehaviour
     {
-        // ゲームオーバー判定
-        if (collision.CompareTag("Player"))
+        // このオブジェクトのトリガーに他のオブジェクトが侵入した際に呼び出されます。
+        private void OnTriggerEnter2D(Collider2D collision)
         {
-            StageScene.Instance.GameOver();
+            // ゲームオーバー判定
+            if (collision.CompareTag("Player"))
+            {
+                StageScene.Instance.GameOver();
+            }
         }
     }
 }

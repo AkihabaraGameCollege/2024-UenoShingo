@@ -2,48 +2,51 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-// ゲームクリア―画面の進行を制御します。
-public class GameClearScene : MonoBehaviour
+namespace RunGame
 {
-    // 次のシーンを読み込み可能な場合はtrue、それ以外はfalse
-    bool isLoadable = false;
-
-    // コンポーネントを事前に参照しておく変数
-    Animator animator;
-    // AnimatorパラメーターID
-    static readonly int outroId = Animator.StringToHash("Outro");
-
-    void Start()
+    // ゲームクリア―画面の進行を制御します。
+    public class GameClearScene : MonoBehaviour
     {
-        // コンポーネントを事前に取得
-        animator = GetComponent<Animator>();
+        // 次のシーンを読み込み可能な場合はtrue、それ以外はfalse
+        bool isLoadable = false;
 
-        StartCoroutine(OnStart());
-    }
+        // コンポーネントを事前に参照しておく変数
+        Animator animator;
+        // AnimatorパラメーターID
+        static readonly int outroId = Animator.StringToHash("Outro");
 
-    // ２秒待機後に次のシーンを読込み可能にします。
-    IEnumerator OnStart()
-    {
-        yield return new WaitForSeconds(2);
-        isLoadable = true;
-    }
-
-    // 決定ボタン操作の際に呼び出され、次のシーンを読み込みます。
-    public void LoadNextScene()
-    {
-        if (isLoadable)
+        void Start()
         {
-            StartCoroutine(OnLoadNextScene());
-        }
-    }
+            // コンポーネントを事前に取得
+            animator = GetComponent<Animator>();
 
-    IEnumerator OnLoadNextScene()
-    {
-        // アウトロ アニメーションへ切り替える
-        animator.SetTrigger(outroId);
-        // アニメーションが終了するまで1秒待機
-        yield return new WaitForSeconds(1);
-        // 次のシーンを読み込む
-        SceneManager.LoadScene("Title");
+            StartCoroutine(OnStart());
+        }
+
+        // ２秒待機後に次のシーンを読込み可能にします。
+        IEnumerator OnStart()
+        {
+            yield return new WaitForSeconds(2);
+            isLoadable = true;
+        }
+
+        // 決定ボタン操作の際に呼び出され、次のシーンを読み込みます。
+        public void LoadNextScene()
+        {
+            if (isLoadable)
+            {
+                StartCoroutine(OnLoadNextScene());
+            }
+        }
+
+        IEnumerator OnLoadNextScene()
+        {
+            // アウトロ アニメーションへ切り替える
+            animator.SetTrigger(outroId);
+            // アニメーションが終了するまで1秒待機
+            yield return new WaitForSeconds(1);
+            // 次のシーンを読み込む
+            SceneManager.LoadScene("Title");
+        }
     }
 }

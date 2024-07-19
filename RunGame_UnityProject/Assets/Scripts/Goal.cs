@@ -1,15 +1,18 @@
 using UnityEngine;
 
-// ステージクリアー判定のためのゴールを表します。
-public class Goal : MonoBehaviour
+namespace RunGame
 {
-    // トリガー内に他のオブジェクトが侵入してきた際に呼び出されます。
-    private void OnTriggerEnter2D(Collider2D collision)
+    // ステージクリアー判定のためのゴールを表します。
+    public class Goal : MonoBehaviour
     {
-        // ステージクリアー判定
-        if (collision.CompareTag("Player"))
+        // トリガー内に他のオブジェクトが侵入してきた際に呼び出されます。
+        private void OnTriggerEnter2D(Collider2D collision)
         {
-            StageScene.Instance.StageClear();
+            // ステージクリアー判定
+            if (collision.CompareTag("Player"))
+            {
+                StageScene.Instance.StageClear();
+            }
         }
     }
 }
