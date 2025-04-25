@@ -4,12 +4,8 @@ int WINAPI wWinMain(
 	_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR lpCmdLine,_In_ int nCmdShow)
 {
-	CHAR str[] = "ABCあいう\n";
-	OutputDebugStringA(str);
-
-	WCHAR strW[] = L"ABCあいう\n";
-	OutputDebugStringW(strW);
-	OutputDebugString(strW);
+	// メッセージボックスを表示
+	MessageBoxW(NULL,L"ここにメッセージが表示されます。",L"タイトル", MB_ABORTRETRYIGNORE);
 
 	return 0;
 }
