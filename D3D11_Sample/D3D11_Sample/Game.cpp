@@ -4,6 +4,9 @@
 // ウィンドウを作成してメッセージループを開始する機能が含まれます。
 //=============================================================================
 #include "Game.h"
+#include <wrl/client.h>
+#include <d3d11_4.h>
+#pragma comment(lib, "D3D11.lib")
 
 namespace
 {
@@ -85,6 +88,44 @@ int Game::Run()
 		return 0;
 	}
 
+
+	// Direct3D 11のデバイス
+	Microsoft::WRL::ComPtr<ID3D11Device> graphicsDevice;
+	// Direct3D 11のデバイス コンテキスト
+	Microsoft::WRL::ComPtr < ID3D11DeviceContext> immediateContext;
+	// Direct3D 11の機能レベル
+	D3D_FEATURE_LEVEL featureLevel = {};
+
+	HRESULT hr = S_OK;
+
+	// デバイス作成時のオプションフラグ
+	UINT creationFlags = 0;
+#if defined(_DEBUG)
+	// DEBUGビルドの際にDirect3Dのデバッグ表示機能を持たせる
+	creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
+
+	const D3D_FEATURE_LEVEL featureLevels[] = {
+		D3D_FEATURE_LEVEL_11_0,
+		D3D_FEATURE_LEVEL_10_1,
+		D3D_FEATURE_LEVEL_10_0,
+		D3D_FEATURE_LEVEL_9_3,
+		D3D_FEATURE_LEVEL_9_2,
+		D3D_FEATURE_LEVEL_9_1,
+	};
+	// デバイス、デバイスコンテキストを作成
+	hr = D3D11CreateDevice(
+		NULL, D3D_DRIVER_TYPE_HARDWARE, 0,
+		creationFlags,
+		featureLevels, 6,
+		D3D11_SDK_VERSION,
+		&graphicsDevice, &featureLevel, &immediateContext);
+	if (FAILED(hr)) {
+		MessageBoxW(hWnd, L"Direct3D 11デバイスを作成できませんでした。", L"エラー", MB_OK);
+		return 0;
+	}
+
+
 	// メッセージループを実行
 	MSG msg = {};
 	while (msg.message != WM_QUIT) {
@@ -98,6 +139,7 @@ int Game::Run()
 			DispatchMessageW(&msg);
 		}
 	}
+
 
 	return (int)msg.wParam;
 }
