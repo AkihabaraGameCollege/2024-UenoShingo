@@ -5,28 +5,39 @@
 //=============================================================================
 #include "Game.h"
 
-// ウィンドウ・メッセージを処理するプロシージャー
-LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+namespace
 {
-	switch (uMsg) {
-	case WM_CLOSE:
-		// ウィンドウを閉じる
-		if (MessageBox(hWnd, L"ウィンドウを閉じますか？", L"情報", MB_OKCANCEL) == IDOK) {
-			DestroyWindow(hWnd);
+	// ウィンドウ・メッセージを処理するプロシージャー
+	LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+	{
+		switch (uMsg) {
+		case WM_CLOSE:
+			// ウィンドウを閉じる
+			if (MessageBox(hWnd, L"ウィンドウを閉じますか？", L"情報", MB_OKCANCEL) == IDOK) {
+				DestroyWindow(hWnd);
+			}
+			return 0;
+
+		case WM_DESTROY:
+			// アプリケーションを終了
+			PostQuitMessage(0);
+			return 0;
 		}
-		return 0;
 
-	case WM_DESTROY:
-		// アプリケーションを終了
-		PostQuitMessage(0);
-		return 0;
+		return DefWindowProc(hWnd, uMsg, wParam, lParam);
 	}
+}
 
-	return DefWindowProc(hWnd, uMsg, wParam, lParam);
+// このクラスを初期化します。
+Game::Game(const std::wstring& windowTitle, int screenWidth, int screenHeight)
+{
+	this->windowTitle = windowTitle;
+	this->screenWidth = screenWidth;
+	this->screenHeight = screenHeight;
 }
 
 // ウィンドウを作成します。
-bool InitWindow(Game* game)
+bool Game::InitWindow()
 {
 	const auto hInstance = GetModuleHandleW(NULL);
 
@@ -44,32 +55,32 @@ bool InitWindow(Game* game)
 	}
 
 	// ウィンドウサイズを計算
-	RECT rect = { 0, 0, game->ScreenWidth, game->ScreenHeight };
+	RECT rect = { 0, 0, this->screenWidth, this->screenHeight };
 	AdjustWindowRectEx(&rect, WS_OVERLAPPEDWINDOW, FALSE, 0);
 	// ウィンドウを作成する
-	game->hWnd = CreateWindowExW(
-		0, CLASS_NAME, game->WindowTitle.c_str(), WS_OVERLAPPEDWINDOW,
+	this->hWnd = CreateWindowExW(
+		0, CLASS_NAME, this->windowTitle.c_str(), WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		rect.right - rect.left, rect.bottom - rect.top,
 		NULL, NULL, hInstance, NULL);
-	if (game->hWnd == NULL) {
+	if (this->hWnd == NULL) {
 		OutputDebugStringW(L"ERROR: ウィンドウを作成できませんでした。\n");
 		return false;
 	}
 
 	// ウィンドウの表示指示を出すためにウィンドウ ハンドルを指定する
-	ShowWindow(game->hWnd, SW_SHOWNORMAL);
-	UpdateWindow(game->hWnd);
+	ShowWindow(this->hWnd, SW_SHOWNORMAL);
+	UpdateWindow(this->hWnd);
 
 	return true;
 }
 
 // アプリケーションのエントリーポイントです。
 // ウィンドウの作成からメッセージのループ処理を開始します。
-int Run(Game* game)
+int Game::Run()
 {
 	// メインウィンドウを作成
-	if (!InitWindow(game)) {
+	if (!InitWindow()) {
 		MessageBoxW(NULL, L"ウィンドウを作成できませんでした。", L"エラー", MB_OK);
 		return 0;
 	}

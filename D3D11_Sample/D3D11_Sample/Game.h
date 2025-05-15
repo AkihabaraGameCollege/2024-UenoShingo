@@ -9,17 +9,23 @@
 #include <string>
 
 // アプリケーション全体を表します。
-struct Game
+class Game
 {
+public:
+	// コンストラクター
+	Game(const std::wstring& windowTitle, int screenWidth, int screenHeight);
+
+	int Run();
+
+private:
 	// ウィンドウのタイトル
-	std::wstring WindowTitle = L"タイトル";
+	std::wstring windowTitle = L"タイトル";
 	// ウィンドウの幅
-	int ScreenWidth = 640;
+	int screenWidth = 640;
 	// ウィンドウの高さ
-	int ScreenHeight = 480;
+	int screenHeight = 480;
 	// ウィンドウのハンドル
 	HWND hWnd = NULL;
-};
 
-// 関数のプロトタイプ宣言
-int Run(Game* game);
+	bool InitWindow();
+};
