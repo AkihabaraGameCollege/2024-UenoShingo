@@ -1,21 +1,23 @@
+//=============================================================================
+// Game.cpp
+//
+// ウィンドウを作成してメッセージループを開始する機能が含まれます。
+//=============================================================================
 #include "Game.h"
-#include <Windows.h>
 
-HWND hWnd = NULL;
-std::wstring WindowTitle = L"タイトル";
-int ScreenWidth = 640;
-int ScreenHeight = 480;
-
+// ウィンドウ・メッセージを処理するプロシージャー
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg) {
 	case WM_CLOSE:
+		// ウィンドウを閉じる
 		if (MessageBox(hWnd, L"ウィンドウを閉じますか？", L"情報", MB_OKCANCEL) == IDOK) {
 			DestroyWindow(hWnd);
 		}
 		return 0;
 
 	case WM_DESTROY:
+		// アプリケーションを終了
 		PostQuitMessage(0);
 		return 0;
 	}
@@ -23,13 +25,12 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
-bool InitWindow(const std::wstring& windowTitle, int screenWidth, int screenHeight)
+// ウィンドウを作成します。
+bool InitWindow(Game* game)
 {
 	const auto hInstance = GetModuleHandleW(NULL);
-	WindowTitle = windowTitle;
-	ScreenWidth = screenWidth;
-	ScreenHeight = screenHeight;
 
+	// ウィンドウ クラスを登録する
 	const wchar_t CLASS_NAME[] = L"GameWindow";
 	WNDCLASSEXW wndClass = {};
 	wndClass.cbSize = sizeof(WNDCLASSEXW);
@@ -42,34 +43,43 @@ bool InitWindow(const std::wstring& windowTitle, int screenWidth, int screenHeig
 		return false;
 	}
 
-	RECT rect = { 0, 0, ScreenWidth, ScreenHeight };
+	// ウィンドウサイズを計算
+	RECT rect = { 0, 0, game->ScreenWidth, game->ScreenHeight };
 	AdjustWindowRectEx(&rect, WS_OVERLAPPEDWINDOW, FALSE, 0);
-	hWnd = CreateWindowExW(
-		0, CLASS_NAME, WindowTitle.c_str(), WS_OVERLAPPEDWINDOW,
+	// ウィンドウを作成する
+	game->hWnd = CreateWindowExW(
+		0, CLASS_NAME, game->WindowTitle.c_str(), WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		rect.right - rect.left, rect.bottom - rect.top,
 		NULL, NULL, hInstance, NULL);
-	if (hWnd == NULL) {
+	if (game->hWnd == NULL) {
 		OutputDebugStringW(L"ERROR: ウィンドウを作成できませんでした。\n");
 		return false;
 	}
 
-	ShowWindow(hWnd, SW_SHOWNORMAL);
-	UpdateWindow(hWnd);
+	// ウィンドウの表示指示を出すためにウィンドウ ハンドルを指定する
+	ShowWindow(game->hWnd, SW_SHOWNORMAL);
+	UpdateWindow(game->hWnd);
 
 	return true;
 }
 
-int Run(const std::wstring& windowTitle, int screenWidth, int screenHeight)
+// アプリケーションのエントリーポイントです。
+// ウィンドウの作成からメッセージのループ処理を開始します。
+int Run(Game* game)
 {
-	if (!InitWindow(windowTitle, screenWidth, screenHeight)) {
+	// メインウィンドウを作成
+	if (!InitWindow(game)) {
 		MessageBoxW(NULL, L"ウィンドウを作成できませんでした。", L"エラー", MB_OK);
 		return 0;
 	}
 
+	// メッセージループを実行
 	MSG msg = {};
 	while (msg.message != WM_QUIT) {
+		// このウィンドウのメッセージが存在するかを確認
 		if (PeekMessageW(&msg, NULL, 0, 0, PM_NOREMOVE)) {
+			// メッセージを取得
 			if (!GetMessageW(&msg, NULL, 0, 0)) {
 				break;
 			}

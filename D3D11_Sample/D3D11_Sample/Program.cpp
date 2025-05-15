@@ -1,9 +1,18 @@
+//=============================================================================
+// Program.cpp
+//
+// アプリケーションのエントリーポイントが含まれます。
+//=============================================================================
 #include "Game.h"
-#include <Windows.h>
 
+// エントリーポイント
 int WINAPI wWinMain(
 	_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
 {
-	return Run(L"Gameタイトル", 640, 480);
+	Game game;
+	game.WindowTitle = L"タイトル";
+	game.ScreenWidth = 1280;
+	game.ScreenHeight = 720;
+	return Run(&game);
 }

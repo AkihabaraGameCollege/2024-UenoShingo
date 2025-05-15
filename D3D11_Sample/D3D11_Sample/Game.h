@@ -1,5 +1,25 @@
+//=============================================================================
+// Game.h
+//
+// ウィンドウを作成してメッセージループを開始する機能が含まれます。
+//=============================================================================
 #pragma once
 
+#include <Windows.h>
 #include <string>
 
-int Run(const std::wstring& windowTitle, int screenWidth, int screenHeight);
+// アプリケーション全体を表します。
+struct Game
+{
+	// ウィンドウのタイトル
+	std::wstring WindowTitle = L"タイトル";
+	// ウィンドウの幅
+	int ScreenWidth = 640;
+	// ウィンドウの高さ
+	int ScreenHeight = 480;
+	// ウィンドウのハンドル
+	HWND hWnd = NULL;
+};
+
+// 関数のプロトタイプ宣言
+int Run(Game* game);
