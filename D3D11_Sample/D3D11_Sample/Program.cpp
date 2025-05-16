@@ -3,6 +3,12 @@
 //
 // アプリケーションのエントリーポイントが含まれます。
 //=============================================================================
+#ifdef _DEBUG
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#endif
+
 #include "Game.h"
 
 // エントリーポイント
@@ -10,6 +16,18 @@ int WINAPI wWinMain(
 	_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
 {
-	Game game(L"タイトル", 1280, 720);
+#ifdef _DEBUG
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
+
+	////メモリリークをわざと発生させる
+	//int* p = new int;
+	int* p1 = (int*)malloc(sizeof(int));
+
+	Game game(L"タイトル", 640, 480);
+
+	//delete p;
+	//free(p1);
+
 	return game.Run();
 }

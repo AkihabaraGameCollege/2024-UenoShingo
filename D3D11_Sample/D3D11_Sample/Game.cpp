@@ -5,7 +5,7 @@
 //=============================================================================
 #include "Game.h"
 #include <wrl/client.h>
-#include <d3d11_4.h>
+#include <d3d11.h>
 #pragma comment(lib, "D3D11.lib")
 
 namespace
@@ -92,9 +92,11 @@ int Game::Run()
 	// Direct3D 11のデバイス
 	Microsoft::WRL::ComPtr<ID3D11Device> graphicsDevice;
 	// Direct3D 11のデバイス コンテキスト
-	Microsoft::WRL::ComPtr < ID3D11DeviceContext> immediateContext;
+	Microsoft::WRL::ComPtr<ID3D11DeviceContext> immediateContext;
 	// Direct3D 11の機能レベル
 	D3D_FEATURE_LEVEL featureLevel = {};
+	// スワップチェーン
+	Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain;
 
 	HRESULT hr = S_OK;
 
@@ -106,6 +108,7 @@ int Game::Run()
 #endif
 
 	const D3D_FEATURE_LEVEL featureLevels[] = {
+		D3D_FEATURE_LEVEL_11_1,
 		D3D_FEATURE_LEVEL_11_0,
 		D3D_FEATURE_LEVEL_10_1,
 		D3D_FEATURE_LEVEL_10_0,
@@ -113,12 +116,27 @@ int Game::Run()
 		D3D_FEATURE_LEVEL_9_2,
 		D3D_FEATURE_LEVEL_9_1,
 	};
+
+	// 作成するスワップチェーンについての記述
+	DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
+	swapChainDesc.BufferDesc.Width = screenWidth;
+	swapChainDesc.BufferDesc.Height = screenHeight;
+	swapChainDesc.BufferDesc.RefreshRate = { 60, 1 };
+	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	swapChainDesc.SampleDesc = { 1, 0 };
+	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	swapChainDesc.BufferCount = 2;
+	swapChainDesc.OutputWindow = hWnd;
+	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+	swapChainDesc.Windowed = TRUE;
+
 	// デバイス、デバイスコンテキストを作成
-	hr = D3D11CreateDevice(
+	hr = D3D11CreateDeviceAndSwapChain(
 		NULL, D3D_DRIVER_TYPE_HARDWARE, 0,
 		creationFlags,
-		featureLevels, 6,
+		featureLevels, std::size(featureLevels),
 		D3D11_SDK_VERSION,
+		&swapChainDesc, &swapChain,
 		&graphicsDevice, &featureLevel, &immediateContext);
 	if (FAILED(hr)) {
 		MessageBoxW(hWnd, L"Direct3D 11デバイスを作成できませんでした。", L"エラー", MB_OK);
@@ -137,6 +155,17 @@ int Game::Run()
 			}
 			TranslateMessage(&msg);
 			DispatchMessageW(&msg);
+		}
+
+		//TODO: 3D描画
+
+		// バックバッファーに描画したイメージをディスプレイに表示
+		hr = swapChain->Present(1, 0);
+		if (FAILED(hr)) {
+			MessageBoxW(hWnd,
+				L"グラフィックデバイスが物理的に取り外されたか、ドライバーがアップデートされました。",
+				L"エラー", MB_OK);
+			return 0;
 		}
 	}
 
