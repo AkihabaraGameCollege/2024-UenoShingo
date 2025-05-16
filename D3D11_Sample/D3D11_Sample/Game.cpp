@@ -97,6 +97,10 @@ int Game::Run()
 	D3D_FEATURE_LEVEL featureLevel = {};
 	// スワップチェーン
 	Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain;
+	// レンダーターゲット
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> renderTargetView;
+	// 画面クリアーに使用するカラー
+	FLOAT clearColor[] = { 53 / 255.0f, 70 / 255.0f, 166 / 255.0f, 1.0f };
 
 	HRESULT hr = S_OK;
 
@@ -143,6 +147,21 @@ int Game::Run()
 		return 0;
 	}
 
+	// スワップチェーンからバックバッファーを取得
+	ID3D11Texture2D* backBuffer = nullptr;
+	hr = swapChain->GetBuffer(0, IID_PPV_ARGS(&backBuffer));
+	if (FAILED(hr)) {
+		MessageBoxW(hWnd, L"バックバッファーを取得できませんでした。", L"エラー", MB_OK);
+		return 0;
+	}
+	// バックバッファーにアクセスするためのレンダーターゲット ビューを作成
+	hr = graphicsDevice->CreateRenderTargetView(backBuffer, NULL, &renderTargetView);
+	if (FAILED(hr)) {
+		MessageBoxW(hWnd, L"レンダーターゲット ビューを作成できませんでした。", L"エラー", MB_OK);
+		return 0;
+	}
+	backBuffer->Release();
+
 
 	// メッセージループを実行
 	MSG msg = {};
@@ -157,7 +176,13 @@ int Game::Run()
 			DispatchMessageW(&msg);
 		}
 
-		//TODO: 3D描画
+		// レンダーターゲットを設定
+		ID3D11RenderTargetView* renderTargetViews[1] = { renderTargetView.Get(), };
+		immediateContext->OMSetRenderTargets(std::size(renderTargetViews), renderTargetViews, nullptr);
+		// 画面をクリアー
+		immediateContext->ClearRenderTargetView(renderTargetView.Get(), clearColor);
+
+		// Direct3Dによる描画処理
 
 		// バックバッファーに描画したイメージをディスプレイに表示
 		hr = swapChain->Present(1, 0);
