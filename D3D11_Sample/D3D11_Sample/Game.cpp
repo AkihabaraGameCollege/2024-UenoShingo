@@ -189,6 +189,7 @@ int Game::Run()
 	case DXGI_FORMAT_D24_UNORM_S8_UINT:
 		textureFormat = DXGI_FORMAT_R24G8_TYPELESS;
 		resourceFormat = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+		//resourceFormat = DXGI_FORMAT_X24_TYPELESS_G8_UINT;
 		break;
 	case DXGI_FORMAT_D32_FLOAT:
 		textureFormat = DXGI_FORMAT_R32_TYPELESS;
@@ -197,6 +198,7 @@ int Game::Run()
 	case DXGI_FORMAT_D32_FLOAT_S8X24_UINT:
 		textureFormat = DXGI_FORMAT_R32G8X24_TYPELESS;
 		resourceFormat = DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS;
+		//resourceFormat = DXGI_FORMAT_X32_TYPELESS_G8X24_UINT;
 		break;
 	}
 	// 深度ステンシルを作成
