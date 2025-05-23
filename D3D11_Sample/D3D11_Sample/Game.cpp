@@ -106,6 +106,8 @@ int Game::Run()
 	const DXGI_FORMAT depthStencilFormat = DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
 	// 深度ステンシル
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depthStencilView;
+	// 深度ステンシルをシェーダーで利用するためのリソース ビュー
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> depthStencilResourceView;
 	// 画面クリアーに使用するカラー
 	FLOAT clearColor[] = { 53 / 255.0f, 70 / 255.0f, 166 / 255.0f, 1.0f };
 
@@ -135,9 +137,7 @@ int Game::Run()
 	swapChainDesc.BufferDesc.RefreshRate = { 60, 1 };
 	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	swapChainDesc.SampleDesc = { 1, 0 };
-	swapChainDesc.BufferUsage =
-		DXGI_USAGE_RENDER_TARGET_OUTPUT |
-		DXGI_USAGE_SHADER_INPUT;	// シェーダーリソースとして使用することを設定
+	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
 	swapChainDesc.BufferCount = 2;
 	swapChainDesc.OutputWindow = hWnd;
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
@@ -180,18 +180,23 @@ int Game::Run()
 
 	// テクスチャのフォーマットを設定
 	DXGI_FORMAT textureFormat = depthStencilFormat;
+	DXGI_FORMAT resourceFormat = depthStencilFormat;
 	switch (depthStencilFormat) {
 	case DXGI_FORMAT_D16_UNORM:
 		textureFormat = DXGI_FORMAT_R16_TYPELESS;
+		resourceFormat = DXGI_FORMAT_R16_UNORM;
 		break;
 	case DXGI_FORMAT_D24_UNORM_S8_UINT:
 		textureFormat = DXGI_FORMAT_R24G8_TYPELESS;
+		resourceFormat = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
 		break;
 	case DXGI_FORMAT_D32_FLOAT:
 		textureFormat = DXGI_FORMAT_R32_TYPELESS;
+		resourceFormat = DXGI_FORMAT_R32_FLOAT;
 		break;
 	case DXGI_FORMAT_D32_FLOAT_S8X24_UINT:
 		textureFormat = DXGI_FORMAT_R32G8X24_TYPELESS;
+		resourceFormat = DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS;
 		break;
 	}
 	// 深度ステンシルを作成
@@ -204,7 +209,7 @@ int Game::Run()
 	depthStencilDesc.Format = textureFormat;
 	depthStencilDesc.SampleDesc = swapChainDesc.SampleDesc;
 	depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
-	depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
 	depthStencilDesc.CPUAccessFlags = 0;
 	depthStencilDesc.MiscFlags = 0;
 	hr = graphicsDevice->CreateTexture2D(&depthStencilDesc, NULL, &depthStencil);
@@ -226,6 +231,25 @@ int Game::Run()
 	hr = graphicsDevice->CreateDepthStencilView(depthStencil.Get(), &depthStencilViewDesc, &depthStencilView);
 	if (FAILED(hr)) {
 		MessageBoxW(hWnd, L"深度ステンシル ビューを作成できませんでした。", L"エラー", MB_OK);
+		return 0;
+	}
+	// 深度ステンシルにシェーダーからアクセスするためのリソース ビューを作成
+	D3D11_SHADER_RESOURCE_VIEW_DESC depthStencilResourceViewDesc = {};
+	depthStencilResourceViewDesc.Format = resourceFormat;
+	if (depthStencilDesc.SampleDesc.Count > 0) {
+		depthStencilResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
+	}
+	else {
+		depthStencilResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		depthStencilResourceViewDesc.Texture2D.MostDetailedMip = 0;
+		depthStencilResourceViewDesc.Texture2D.MipLevels = 1;
+	}
+	hr = graphicsDevice->CreateShaderResourceView(
+		depthStencil.Get(),
+		&depthStencilResourceViewDesc,
+		&depthStencilResourceView);
+	if (FAILED(hr)) {
+		MessageBoxW(hWnd, L"深度ステンシル リソース ビューを作成できませんでした。", L"エラー", MB_OK);
 		return 0;
 	}
 	depthStencil.Reset();
