@@ -4,9 +4,6 @@
 // ウィンドウを作成してメッセージループを開始する機能が含まれます。
 //=============================================================================
 #include "Game.h"
-#include <wrl/client.h>
-#include <d3d11.h>
-#pragma comment(lib, "D3D11.lib")
 
 namespace
 {
@@ -78,39 +75,9 @@ bool Game::InitWindow()
 	return true;
 }
 
-// アプリケーションのエントリーポイントです。
-// ウィンドウの作成からメッセージのループ処理を開始します。
-int Game::Run()
+// グラフィックデバイスを初期化します。
+bool Game::InitGraphicsDevice()
 {
-	// メインウィンドウを作成
-	if (!InitWindow()) {
-		MessageBoxW(NULL, L"ウィンドウを作成できませんでした。", L"エラー", MB_OK);
-		return 0;
-	}
-
-
-	// Direct3D 11のデバイス
-	Microsoft::WRL::ComPtr<ID3D11Device> graphicsDevice;
-	// Direct3D 11のデバイス コンテキスト
-	Microsoft::WRL::ComPtr<ID3D11DeviceContext> immediateContext;
-	// Direct3D 11の機能レベル
-	D3D_FEATURE_LEVEL featureLevel = {};
-	// スワップチェーン
-	Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain;
-	// レンダーターゲット
-	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> renderTargetView;
-	// バックバッファーをシェーダーで利用するためのリソース ビュー
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> renderTargetResourceView;
-	// 深度ステンシルのフォーマット
-	//const DXGI_FORMAT depthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	const DXGI_FORMAT depthStencilFormat = DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
-	// 深度ステンシル
-	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depthStencilView;
-	// 深度ステンシルをシェーダーで利用するためのリソース ビュー
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> depthStencilResourceView;
-	// 画面クリアーに使用するカラー
-	FLOAT clearColor[] = { 53 / 255.0f, 70 / 255.0f, 166 / 255.0f, 1.0f };
-
 	HRESULT hr = S_OK;
 
 	// デバイス作成時のオプションフラグ
@@ -153,7 +120,7 @@ int Game::Run()
 		&graphicsDevice, &featureLevel, &immediateContext);
 	if (FAILED(hr)) {
 		MessageBoxW(hWnd, L"Direct3D 11デバイスを作成できませんでした。", L"エラー", MB_OK);
-		return 0;
+		return false;
 	}
 
 	// スワップチェーンからバックバッファーを取得
@@ -161,22 +128,21 @@ int Game::Run()
 	hr = swapChain->GetBuffer(0, IID_PPV_ARGS(&backBuffer));
 	if (FAILED(hr)) {
 		MessageBoxW(hWnd, L"バックバッファーを取得できませんでした。", L"エラー", MB_OK);
-		return 0;
+		return false;
 	}
 	// バックバッファーにアクセスするためのレンダーターゲット ビューを作成
 	hr = graphicsDevice->CreateRenderTargetView(backBuffer.Get(), NULL, &renderTargetView);
 	if (FAILED(hr)) {
 		MessageBoxW(hWnd, L"レンダーターゲット ビューを作成できませんでした。", L"エラー", MB_OK);
-		return 0;
+		return false;
 	}
 	// バックバッファーにシェーダーからアクセスするためのリソース ビューを作成
 	hr = graphicsDevice->CreateShaderResourceView(backBuffer.Get(), NULL, &renderTargetResourceView);
 	if (FAILED(hr)) {
 		MessageBoxW(hWnd, L"レンダーターゲット リソース ビューを作成できませんでした。", L"エラー", MB_OK);
-		return 0;
+		return false;
 	}
 	backBuffer.Reset();
-
 
 	// テクスチャのフォーマットを設定
 	DXGI_FORMAT textureFormat = depthStencilFormat;
@@ -217,7 +183,7 @@ int Game::Run()
 	hr = graphicsDevice->CreateTexture2D(&depthStencilDesc, NULL, &depthStencil);
 	if (FAILED(hr)) {
 		MessageBoxW(hWnd, L"深度ステンシルを作成できませんでした。", L"エラー", MB_OK);
-		return 0;
+		return false;
 	}
 	// 深度ステンシルにアクセスするためのビューを作成
 	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc = {};
@@ -233,7 +199,7 @@ int Game::Run()
 	hr = graphicsDevice->CreateDepthStencilView(depthStencil.Get(), &depthStencilViewDesc, &depthStencilView);
 	if (FAILED(hr)) {
 		MessageBoxW(hWnd, L"深度ステンシル ビューを作成できませんでした。", L"エラー", MB_OK);
-		return 0;
+		return false;
 	}
 	// 深度ステンシルにシェーダーからアクセスするためのリソース ビューを作成
 	D3D11_SHADER_RESOURCE_VIEW_DESC depthStencilResourceViewDesc = {};
@@ -246,15 +212,73 @@ int Game::Run()
 		depthStencilResourceViewDesc.Texture2D.MostDetailedMip = 0;
 		depthStencilResourceViewDesc.Texture2D.MipLevels = 1;
 	}
-	hr = graphicsDevice->CreateShaderResourceView(
-		depthStencil.Get(),
-		&depthStencilResourceViewDesc,
-		&depthStencilResourceView);
+	hr = graphicsDevice->CreateShaderResourceView(depthStencil.Get(), &depthStencilResourceViewDesc, &depthStencilResourceView);
 	if (FAILED(hr)) {
 		MessageBoxW(hWnd, L"深度ステンシル リソース ビューを作成できませんでした。", L"エラー", MB_OK);
-		return 0;
+		return false;
 	}
 	depthStencil.Reset();
+
+
+	// ビューポート
+	viewport.Width = static_cast<FLOAT>(screenWidth);
+	viewport.Height = static_cast<FLOAT>(screenHeight);
+	viewport.MinDepth = 0.0f;
+	viewport.MaxDepth = 1.0f;
+	viewport.TopLeftX = 0.0f;
+	viewport.TopLeftY = 0.0f;
+
+	return true;
+}
+
+// アプリケーションのエントリーポイントです。
+// ウィンドウの作成からメッセージのループ処理を開始します。
+int Game::Run()
+{
+	// メインウィンドウを作成
+	if (!InitWindow()) {
+		MessageBoxW(NULL, L"ウィンドウを作成できませんでした。", L"エラー", MB_OK);
+		return 0;
+	}
+	// グラフィックデバイスを作成
+	if (!InitGraphicsDevice()) {
+		MessageBoxW(NULL, L"グラフィックデバイスを初期化できませんでした。", L"メッセージ", MB_OK);
+		return 0;
+	}
+
+
+	HRESULT hr = S_OK;
+
+	// 一つの頂点に含まれるデータの型
+	struct VertexPosition
+	{
+		DirectX::XMFLOAT3 position;	// 位置座標
+	};
+	// 頂点データの配列
+	constexpr VertexPosition vertices[] = {
+		{ { -1.0f, 0.0f, 0.0f }, },
+		{ {  0.0f, 1.0f, 0.0f }, },
+		{ {  1.0f, 0.0f, 0.0f }, },
+	};
+
+	// 作成する頂点バッファーについての記述
+	constexpr auto bufferDesc = D3D11_BUFFER_DESC{
+		.ByteWidth = sizeof vertices,
+		.Usage = D3D11_USAGE::D3D11_USAGE_DEFAULT,
+		.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_VERTEX_BUFFER,
+		.CPUAccessFlags = 0,
+		.MiscFlags = 0,
+		.StructureByteStride = 0,
+	};
+	// バッファーを作成
+	Microsoft::WRL::ComPtr<ID3D11Buffer> vertexBuffer;
+	hr = graphicsDevice->CreateBuffer(&bufferDesc, NULL, &vertexBuffer);
+	if (FAILED(hr) || vertexBuffer == nullptr) {
+		OutputDebugStringW(L"頂点バッファーを作成できませんでした。");
+		return 0;
+	}
+	// バッファーにデータを転送
+	immediateContext->UpdateSubresource(vertexBuffer.Get(), 0, NULL, vertices, 0, 0);
 
 
 	// メッセージループを実行
@@ -278,9 +302,18 @@ int Game::Run()
 		immediateContext->ClearDepthStencilView(depthStencilView.Get(),
 			D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-		// Direct3Dによる描画処理
+		// ビューポートを設定
+		D3D11_VIEWPORT viewports[] = { viewport, };
+		immediateContext->RSSetViewports(std::size(viewports), viewports);
+
+		// 頂点バッファーを設定
+		ID3D11Buffer* const vertexBuffers[1] = { vertexBuffer.Get(), };
+		const UINT strides[1] = { sizeof(VertexPosition), };
+		const UINT offsets[1] = { 0, };
+		immediateContext->IASetVertexBuffers(0, std::size(vertexBuffers), vertexBuffers, strides, offsets);
 
 		// バックバッファーに描画したイメージをディスプレイに表示
+		HRESULT hr = S_OK;
 		hr = swapChain->Present(1, 0);
 		if (FAILED(hr)) {
 			MessageBoxW(hWnd,
@@ -289,7 +322,6 @@ int Game::Run()
 			return 0;
 		}
 	}
-
 
 	return (int)msg.wParam;
 }
