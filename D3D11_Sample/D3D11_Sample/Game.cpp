@@ -4,6 +4,10 @@
 // ウィンドウを作成してメッセージループを開始する機能が含まれます。
 //=============================================================================
 #include "Game.h"
+#include <d3dcompiler.h>
+#pragma comment(lib, "D3DCompiler.lib")
+
+using namespace Microsoft::WRL;
 
 namespace
 {
@@ -280,6 +284,26 @@ int Game::Run()
 	// バッファーにデータを転送
 	immediateContext->UpdateSubresource(vertexBuffer.Get(), 0, NULL, vertices, 0, 0);
 
+	ComPtr<ID3DBlob> bytecode;
+	ComPtr<ID3DBlob> errorMessage;
+	// 頂点シェーダーをコンパイル
+	hr = D3DCompileFromFile(
+		L"StandardVertexShader.hlsl",
+		NULL,
+		D3D_COMPILE_STANDARD_FILE_INCLUDE,
+		"main", "vs_5_0",
+		D3DCOMPILE_DEBUG, 0,
+		&bytecode, &errorMessage);
+	if (FAILED(hr) || bytecode == nullptr) {
+		if (errorMessage != nullptr) {
+			LPCSTR message = nullptr;
+			message = static_cast<LPCSTR>(errorMessage->GetBufferPointer());
+			OutputDebugStringA(message);
+		}
+		return 0;
+	}
+	errorMessage.Reset();
+	bytecode.Reset();
 
 	// メッセージループを実行
 	MSG msg = {};
