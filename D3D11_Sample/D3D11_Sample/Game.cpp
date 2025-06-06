@@ -4,8 +4,8 @@
 // ウィンドウを作成してメッセージループを開始する機能が含まれます。
 //=============================================================================
 #include "Game.h"
-#include <d3dcompiler.h>
-#pragma comment(lib, "D3DCompiler.lib")
+#include "StandardVertexShader.h"
+#include "StandardPixelShader.h"
 
 using namespace Microsoft::WRL;
 
@@ -254,16 +254,19 @@ int Game::Run()
 	HRESULT hr = S_OK;
 
 	// 一つの頂点に含まれるデータの型
-	struct VertexPosition
+	struct VertexPositionNormalTexture
 	{
 		DirectX::XMFLOAT3 position;	// 位置座標
+		DirectX::XMFLOAT3 normal;	// 法線ベクトル
+		DirectX::XMFLOAT2 texCoord;	// テクスチャUV座標
 	};
 	// 頂点データの配列
-	constexpr VertexPosition vertices[] = {
-		{ { -1.0f, 0.0f, 0.0f }, },
-		{ {  0.0f, 1.0f, 0.0f }, },
-		{ {  1.0f, 0.0f, 0.0f }, },
+	constexpr VertexPositionNormalTexture vertices[] = {
+		{ { -1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, -1.0f }, { 0.0f, 1.0f }, },
+		{ {  0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, -1.0f }, { 0.0f, 0.0f }, },
+		{ {  1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, -1.0f }, { 1.0f, 0.0f }, },
 	};
+	UINT vertexCount = std::size(vertices);
 
 	// 作成する頂点バッファーについての記述
 	constexpr auto bufferDesc = D3D11_BUFFER_DESC{
@@ -284,26 +287,42 @@ int Game::Run()
 	// バッファーにデータを転送
 	immediateContext->UpdateSubresource(vertexBuffer.Get(), 0, NULL, vertices, 0, 0);
 
-	ComPtr<ID3DBlob> bytecode;
-	ComPtr<ID3DBlob> errorMessage;
-	// 頂点シェーダーをコンパイル
-	hr = D3DCompileFromFile(
-		L"StandardVertexShader.hlsl",
+	// 頂点シェーダーを作成
+	Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
+	hr = graphicsDevice->CreateVertexShader(
+		g_StandardVertexShader, std::size(g_StandardVertexShader),
 		NULL,
-		D3D_COMPILE_STANDARD_FILE_INCLUDE,
-		"main", "vs_5_0",
-		D3DCOMPILE_DEBUG, 0,
-		&bytecode, &errorMessage);
-	if (FAILED(hr) || bytecode == nullptr) {
-		if (errorMessage != nullptr) {
-			LPCSTR message = nullptr;
-			message = static_cast<LPCSTR>(errorMessage->GetBufferPointer());
-			OutputDebugStringA(message);
-		}
+		&vertexShader);
+	if (FAILED(hr) || vertexShader == nullptr) {
+		OutputDebugStringW(L"頂点シェーダーを作成できませんでした。");
 		return 0;
 	}
-	errorMessage.Reset();
-	bytecode.Reset();
+	// ピクセル シェーダーを作成
+	Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader;
+	hr = graphicsDevice->CreatePixelShader(
+		g_StandardPixelShader, std::size(g_StandardPixelShader),
+		NULL,
+		&pixelShader);
+	if (FAILED(hr) || pixelShader == nullptr) {
+		OutputDebugStringW(L"ピクセル シェーダーを作成できませんでした。");
+		return 0;
+	}
+
+	// 入力レイアウトを作成
+	D3D11_INPUT_ELEMENT_DESC inputElementDescs[] = {
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,                            0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0,    DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+	Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
+	hr = graphicsDevice->CreateInputLayout(
+		inputElementDescs, std::size(inputElementDescs),
+		g_StandardVertexShader, std::size(g_StandardVertexShader),
+		&inputLayout);
+	if (FAILED(hr)) {
+		OutputDebugStringW(L"入力レイアウトを作成できませんでした。");
+		return 0;
+	}
 
 	// メッセージループを実行
 	MSG msg = {};
@@ -332,9 +351,19 @@ int Game::Run()
 
 		// 頂点バッファーを設定
 		ID3D11Buffer* const vertexBuffers[1] = { vertexBuffer.Get(), };
-		const UINT strides[1] = { sizeof(VertexPosition), };
+		const UINT strides[1] = { sizeof(VertexPositionNormalTexture), };
 		const UINT offsets[1] = { 0, };
 		immediateContext->IASetVertexBuffers(0, std::size(vertexBuffers), vertexBuffers, strides, offsets);
+		// 頂点バッファーと頂点シェーダーの組合せに対応した入力レイアウトを設定
+		immediateContext->IASetInputLayout(inputLayout.Get());
+		immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		// シェーダーを設定
+		immediateContext->VSSetShader(vertexShader.Get(), NULL, 0);
+		immediateContext->PSSetShader(pixelShader.Get(), NULL, 0);
+
+		// メッシュを描画
+		immediateContext->Draw(vertexCount, 0);
 
 		// バックバッファーに描画したイメージをディスプレイに表示
 		HRESULT hr = S_OK;
