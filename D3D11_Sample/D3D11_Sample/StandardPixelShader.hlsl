@@ -1,10 +1,4 @@
-// ピクセル シェーダーへの入力
-struct PixelShaderInput
-{
-    float4 position : SV_POSITION;
-    float4 normal : NORMAL;
-    float2 texCoord : TEXCOORD;
-};
+#include "StandardShader.hlsli"
 
 float4 main(PixelShaderInput input) : SV_TARGET
 {
