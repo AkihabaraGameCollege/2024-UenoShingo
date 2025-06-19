@@ -1,3 +1,11 @@
+// 毎フレーム更新する定数バッファー
+cbuffer ConstanBufferPerFrame
+{
+    float4x4 WorldMatrix;
+    float4x4 ViewMatrix;
+    float4 MaterialColor;
+};
+
 // 頂点シェーダーへの入力
 struct VertexShaderInput
 {

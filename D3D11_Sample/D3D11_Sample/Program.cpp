@@ -20,14 +20,6 @@ int WINAPI wWinMain(
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
-	////メモリリークをわざと発生させる
-	//int* p = new int;
-	int* p1 = (int*)malloc(sizeof(int));
-
 	Game game(L"タイトル", 640, 480);
-
-	//delete p;
-	//free(p1);
-
 	return game.Run();
 }

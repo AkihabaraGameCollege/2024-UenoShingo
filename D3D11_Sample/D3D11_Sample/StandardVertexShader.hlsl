@@ -3,10 +3,8 @@
 VertexShaderOutput main(VertexShaderInput input)
 {
     VertexShaderOutput output;
-    //output.position = input.position;
-    //output.normal = input.normal;
-    //output.texCoord = input.texCoord;
-    output.position = input.position;
+    output.position = mul(input.position, WorldMatrix);
+    output.position = mul(output.position, ViewMatrix);
     output.color = input.color;
     return output;
 }

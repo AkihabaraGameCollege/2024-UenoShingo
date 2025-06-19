@@ -8,6 +8,7 @@
 #include "StandardPixelShader.h"
 
 using namespace Microsoft::WRL;
+using namespace DirectX;
 
 namespace
 {
@@ -253,24 +254,11 @@ int Game::Run()
 
 	HRESULT hr = S_OK;
 
-	// 一つの頂点に含まれるデータの型
-	struct VertexPositionColor
-	{
-		DirectX::XMFLOAT3 position;	// 位置座標
-		DirectX::XMFLOAT4 color;	// 頂点カラー
-	};
-	// 一つの頂点に含まれるデータの型
-	struct VertexPositionNormalTexture
-	{
-		DirectX::XMFLOAT3 position;	// 位置座標
-		DirectX::XMFLOAT3 normal;	// 法線ベクトル
-		DirectX::XMFLOAT2 texCoord;	// テクスチャUV座標
-	};
 	// 頂点データの配列
 	constexpr VertexPositionColor vertices[] = {
-		{ { -1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f }, },
-		{ {  0.0f, 1.0f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f }, },
-		{ {  1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f }, },
+		{ { -1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f, 1.0f }, },
+		{ {  0.0f, 1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f, 1.0f }, },
+		{ {  1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f, 1.0f }, },
 	};
 	//constexpr VertexPositionNormalTexture vertices[] = {
 	//	{ { -1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, -1.0f }, { 0.0f, 1.0f }, },
@@ -320,18 +308,9 @@ int Game::Run()
 	}
 
 	// 入力レイアウトを作成
-	D3D11_INPUT_ELEMENT_DESC inputElementDescs[] = {
-		{ "POSITION", 0,    DXGI_FORMAT_R32G32B32_FLOAT, 0,                            0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	};
-	//D3D11_INPUT_ELEMENT_DESC inputElementDescs[] = {
-	//	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,                            0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	//	{ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	//	{ "TEXCOORD", 0,    DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	//};
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
 	hr = graphicsDevice->CreateInputLayout(
-		inputElementDescs, std::size(inputElementDescs),
+		VertexPositionColor::InputElementDescs, std::size(VertexPositionColor::InputElementDescs),
 		g_StandardVertexShader, std::size(g_StandardVertexShader),
 		&inputLayout);
 	if (FAILED(hr)) {
@@ -339,9 +318,46 @@ int Game::Run()
 		return 0;
 	}
 
+	// 定数バッファーを介してシェーダーに毎フレーム送るデータを表します。
+	struct ConstanBufferPerFrame
+	{
+		DirectX::XMFLOAT4X4 worldMatrix;	// ワールド変換行列
+		DirectX::XMFLOAT4X4 viewMatrix;	// ビュー変換行列
+		DirectX::XMFLOAT4 materialColor;
+	};
+	ConstanBufferPerFrame constanBufferPerFrame = {};
+	// 定数バッファーを作成
+	Microsoft::WRL::ComPtr<ID3D11Buffer> constantBuffer;
+	{
+		// 作成するバッファーについての記述
+		constexpr auto bufferDesc = D3D11_BUFFER_DESC{
+			.ByteWidth = sizeof(ConstanBufferPerFrame),
+			.Usage = D3D11_USAGE_DEFAULT,
+			.BindFlags = D3D11_BIND_CONSTANT_BUFFER,
+			.CPUAccessFlags = 0,
+			.MiscFlags = 0,
+			.StructureByteStride = 0,
+		};
+		// バッファーを作成
+		auto hr = graphicsDevice->CreateBuffer(&bufferDesc, nullptr, &constantBuffer);
+		if (FAILED(hr)) {
+			OutputDebugStringW(L"定数バッファーを作成できませんでした。");
+			return 0;
+		}
+	}
+	// 定数バッファーを更新
+	XMStoreFloat4x4(&constanBufferPerFrame.worldMatrix, XMMatrixTranspose(XMMatrixIdentity()));
+	XMStoreFloat4x4(&constanBufferPerFrame.viewMatrix, XMMatrixTranspose(XMMatrixIdentity()));
+	constanBufferPerFrame.materialColor = XMFLOAT4(1, 238 / 255.0f, 0, 1);
+	immediateContext->UpdateSubresource(constantBuffer.Get(), 0, NULL, &constanBufferPerFrame, 0, 0);
+
+	float time = 0;
+
 	// メッセージループを実行
 	MSG msg = {};
 	while (msg.message != WM_QUIT) {
+		time += 0.1f;
+
 		// このウィンドウのメッセージが存在するかを確認
 		if (PeekMessageW(&msg, NULL, 0, 0, PM_NOREMOVE)) {
 			// メッセージを取得
@@ -351,6 +367,43 @@ int Game::Run()
 			TranslateMessage(&msg);
 			DispatchMessageW(&msg);
 		}
+
+		// フレーム更新処理
+		// 位置座標
+		XMFLOAT3 position = { 0, 0, 0 };
+		// 回転
+		XMFLOAT4 rotation = {};
+		XMStoreFloat4(&rotation, XMQuaternionIdentity());
+		// スケール
+		XMFLOAT3 scale = { 1, 1, 1 };
+
+		// 定数バッファーを更新
+		const auto worldMatrix = XMMatrixTransformation(
+			XMVectorZero(), XMQuaternionIdentity(), XMLoadFloat3(&scale),
+			XMVectorZero(), XMLoadFloat4(&rotation),
+			XMLoadFloat3(&position));
+		XMStoreFloat4x4(&constanBufferPerFrame.worldMatrix, XMMatrixTranspose(worldMatrix));
+
+
+		// カメラの位置座標
+		// ※現段階ではカメラとオブジェクトのz軸距離が1.0f以上離れると描画されない
+		constexpr XMFLOAT3 eyePosition = { 0.0f, 0.5f, -0.9f };
+
+		// カメラのTransformからビュー変換行列を計算する
+		XMMATRIX viewMatrix = XMMatrixIdentity();
+		// カメラ位置行列の逆行列を求める
+		// ※これによってカメラ位置を原点とした座標系に変換できる
+		viewMatrix = XMMATRIX(
+			1.0f, 0.0f, 0.0f, 0.0f,
+			0.0f, 1.0f, 0.0f, 0.0f,
+			0.0f, 0.0f, 1.0f, 0.0f,
+			-eyePosition.x, -eyePosition.y, -eyePosition.z, 1.0f
+		);
+
+
+		// 定数バッファーを更新
+		XMStoreFloat4x4(&constanBufferPerFrame.viewMatrix, XMMatrixTranspose(viewMatrix));
+
 
 		// レンダーターゲットを設定
 		ID3D11RenderTargetView* renderTargetViews[] = { renderTargetView.Get(), };
@@ -377,6 +430,13 @@ int Game::Run()
 		// シェーダーを設定
 		immediateContext->VSSetShader(vertexShader.Get(), NULL, 0);
 		immediateContext->PSSetShader(pixelShader.Get(), NULL, 0);
+
+		// 定数バッファーを設定
+		immediateContext->UpdateSubresource(constantBuffer.Get(), 0, NULL, &constanBufferPerFrame, 0, 0);
+		ID3D11Buffer* constantBuffers[] = { constantBuffer.Get(), };
+		immediateContext->VSSetConstantBuffers(0, std::size(constantBuffers), constantBuffers);
+		immediateContext->PSSetConstantBuffers(0, std::size(constantBuffers), constantBuffers);
+
 
 		// メッシュを描画
 		immediateContext->Draw(vertexCount, 0);
