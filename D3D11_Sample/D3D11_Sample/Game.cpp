@@ -257,7 +257,7 @@ int Game::Run()
 	// 頂点データの配列
 	constexpr VertexPositionColor vertices[] = {
 		{ { -1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f, 1.0f }, },
-		{ {  0.0f, 1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f, 1.0f }, },
+		{ {  0.0f, 1.0f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f }, },
 		{ {  1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f, 1.0f }, },
 	};
 	//constexpr VertexPositionNormalTexture vertices[] = {
@@ -388,20 +388,21 @@ int Game::Run()
 		// カメラの位置座標
 		// ※現段階ではカメラとオブジェクトのz軸距離が1.0f以上離れると描画されない
 		constexpr XMFLOAT3 eyePosition = { 0.0f, 0.5f, -0.9f };
+		// カメラの回転
+		XMFLOAT4 cameraRotation = {};
+		XMStoreFloat4(&cameraRotation, XMQuaternionIdentity());
 
-		// カメラのTransformからビュー変換行列を計算する
-		XMMATRIX viewMatrix = XMMatrixIdentity();
-		// カメラ位置行列の逆行列を求める
-		// ※これによってカメラ位置を原点とした座標系に変換できる
-		viewMatrix = XMMATRIX(
-			1.0f, 0.0f, 0.0f, 0.0f,
-			0.0f, 1.0f, 0.0f, 0.0f,
-			0.0f, 0.0f, 1.0f, 0.0f,
-			-eyePosition.x, -eyePosition.y, -eyePosition.z, 1.0f
-		);
-
+		// カメラのz軸回転
+		// ※現段階ではz軸以外で回転させると描画されない部分が発生する
+		const float zAngle = XMConvertToRadians(time);
+		XMStoreFloat4(&cameraRotation,
+			XMQuaternionRotationRollPitchYaw(0, 0, zAngle));
 
 		// 定数バッファーを更新
+		const auto eyeDirection = XMVector3Rotate(XMVectorSet(0, 0, 1, 0), XMLoadFloat4(&cameraRotation));
+		const auto eyeUpDirection = XMVector3Rotate(XMVectorSet(0, 1, 0, 0), XMLoadFloat4(&cameraRotation));
+		const auto viewMatrix = XMMatrixLookToLH(
+			XMLoadFloat3(&eyePosition), eyeDirection, eyeUpDirection);
 		XMStoreFloat4x4(&constanBufferPerFrame.viewMatrix, XMMatrixTranspose(viewMatrix));
 
 
