@@ -6,22 +6,21 @@ VertexShaderOutput main(VertexShaderInput input)
     output.position = mul(input.position, WorldMatrix);
     output.position = mul(output.position, ViewMatrix);
     
-	// nearクリップ面
-	// プロジェクション変換後はz座標が[0.0f, 1.0f]の範囲だけを表示するため、
-	// ここではnearをオブジェクトのz座標(10.0f)に近づけている
-    const float near = 9.5f;
-	// nearクリップ面が原点になるように平行移動変換
+	// プロジェクション変換後のz座標が[0.0f, 1.0f]の範囲となるようにスケーリング
+    const float near = 0.3f; // nearクリップ面
+    const float far = 1000.0f; // farクリップ面
     output.position.x = output.position.x;
     output.position.y = output.position.y;
-    output.position.z = output.position.z - near;
+    output.position.z = (output.position.z - near) / (far - near);
     output.position.w = output.position.w;
 	/*
 	// 行列で計算する場合
+	//output.position.z = output.position.z / (far - near) - near / (far - near);
 	const float4x4 Projection = {
-		1.0f, 0.0f,  0.0f, 0.0f,
-		0.0f, 1.0f,  0.0f, 0.0f,
-		0.0f, 0.0f,  1.0f, 0.0f,
-		0.0f, 0.0f, -near, 1.0f,
+		1.0f, 0.0f,                 0.0f, 0.0f,
+		0.0f, 1.0f,                 0.0f, 0.0f,
+		0.0f, 0.0f,     1 / (far - near), 0.0f,
+		0.0f, 0.0f, -near / (far - near), 1.0f,
 	};
 	output.position = mul(output.position, Projection);
 	*/
