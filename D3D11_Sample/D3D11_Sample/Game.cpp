@@ -257,7 +257,7 @@ int Game::Run()
 	// 頂点データの配列
 	constexpr VertexPositionColor vertices[] = {
 		{ { -1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f, 1.0f }, },
-		{ {  0.0f, 1.0f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f }, },
+		{ {  0.0f, 1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f, 1.0f }, },
 		{ {  1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f, 1.0f }, },
 	};
 	//constexpr VertexPositionNormalTexture vertices[] = {
@@ -387,7 +387,7 @@ int Game::Run()
 
 		// カメラの位置座標
 		// ※現段階ではカメラとオブジェクトのz軸距離が1.0f以上離れると描画されない
-		constexpr XMFLOAT3 eyePosition = { 0.0f, 0.5f, -0.9f };
+		constexpr XMFLOAT3 eyePosition = { 0.0f, 0.0f, -10.0f };
 		// カメラの回転
 		XMFLOAT4 cameraRotation = {};
 		XMStoreFloat4(&cameraRotation, XMQuaternionIdentity());
