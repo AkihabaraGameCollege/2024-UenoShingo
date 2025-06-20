@@ -324,6 +324,7 @@ int Game::Run()
 		DirectX::XMFLOAT4X4 worldMatrix;		// ワールド変換行列
 		DirectX::XMFLOAT4X4 viewMatrix;			// ビュー変換行列
 		DirectX::XMFLOAT4X4 projectionMatrix;	// プロジェクション変換行列
+		DirectX::XMFLOAT4X4 wvpMatrix;			// ワールド × ビュー × プロジェクション変換行列
 		DirectX::XMFLOAT4 materialColor;
 	};
 	ConstanBufferPerFrame constanBufferPerFrame = {};
@@ -350,6 +351,7 @@ int Game::Run()
 	XMStoreFloat4x4(&constanBufferPerFrame.worldMatrix, XMMatrixTranspose(XMMatrixIdentity()));
 	XMStoreFloat4x4(&constanBufferPerFrame.viewMatrix, XMMatrixTranspose(XMMatrixIdentity()));
 	XMStoreFloat4x4(&constanBufferPerFrame.projectionMatrix, XMMatrixTranspose(XMMatrixIdentity()));
+	XMStoreFloat4x4(&constanBufferPerFrame.wvpMatrix, XMMatrixTranspose(XMMatrixIdentity()));
 	constanBufferPerFrame.materialColor = XMFLOAT4(1, 238 / 255.0f, 0, 1);
 	immediateContext->UpdateSubresource(constantBuffer.Get(), 0, NULL, &constanBufferPerFrame, 0, 0);
 
@@ -425,6 +427,10 @@ int Game::Run()
 
 		// 定数バッファーを更新
 		XMStoreFloat4x4(&constanBufferPerFrame.projectionMatrix, XMMatrixTranspose(projectionMatrix));
+
+		// ワールド × ビュー × プロジェクションをCPU側で計算してシェーダーへ送る
+		XMStoreFloat4x4(&constanBufferPerFrame.wvpMatrix,
+			XMMatrixTranspose(worldMatrix * viewMatrix * projectionMatrix));
 
 
 		// レンダーターゲットを設定

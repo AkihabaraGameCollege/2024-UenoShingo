@@ -4,6 +4,7 @@ cbuffer ConstanBufferPerFrame
     float4x4 WorldMatrix;
     float4x4 ViewMatrix;
     float4x4 ProjectionMatrix;
+    float4x4 WVP_Matrix;
     float4 MaterialColor;
 };
 
