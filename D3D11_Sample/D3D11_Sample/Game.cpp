@@ -321,8 +321,9 @@ int Game::Run()
 	// 定数バッファーを介してシェーダーに毎フレーム送るデータを表します。
 	struct ConstanBufferPerFrame
 	{
-		DirectX::XMFLOAT4X4 worldMatrix;	// ワールド変換行列
-		DirectX::XMFLOAT4X4 viewMatrix;	// ビュー変換行列
+		DirectX::XMFLOAT4X4 worldMatrix;		// ワールド変換行列
+		DirectX::XMFLOAT4X4 viewMatrix;			// ビュー変換行列
+		DirectX::XMFLOAT4X4 projectionMatrix;	// プロジェクション変換行列
 		DirectX::XMFLOAT4 materialColor;
 	};
 	ConstanBufferPerFrame constanBufferPerFrame = {};
@@ -348,6 +349,7 @@ int Game::Run()
 	// 定数バッファーを更新
 	XMStoreFloat4x4(&constanBufferPerFrame.worldMatrix, XMMatrixTranspose(XMMatrixIdentity()));
 	XMStoreFloat4x4(&constanBufferPerFrame.viewMatrix, XMMatrixTranspose(XMMatrixIdentity()));
+	XMStoreFloat4x4(&constanBufferPerFrame.projectionMatrix, XMMatrixTranspose(XMMatrixIdentity()));
 	constanBufferPerFrame.materialColor = XMFLOAT4(1, 238 / 255.0f, 0, 1);
 	immediateContext->UpdateSubresource(constantBuffer.Get(), 0, NULL, &constanBufferPerFrame, 0, 0);
 
@@ -377,6 +379,11 @@ int Game::Run()
 		// スケール
 		XMFLOAT3 scale = { 1, 1, 1 };
 
+		// y軸回転
+		const float yAngle = XMConvertToRadians(time);
+		XMStoreFloat4(&rotation,
+			XMQuaternionRotationRollPitchYaw(0, yAngle, 0));
+
 		// 定数バッファーを更新
 		const auto worldMatrix = XMMatrixTransformation(
 			XMVectorZero(), XMQuaternionIdentity(), XMLoadFloat3(&scale),
@@ -384,19 +391,11 @@ int Game::Run()
 			XMLoadFloat3(&position));
 		XMStoreFloat4x4(&constanBufferPerFrame.worldMatrix, XMMatrixTranspose(worldMatrix));
 
-
 		// カメラの位置座標
-		// ※現段階ではカメラとオブジェクトのz軸距離が1.0f以上離れると描画されない
 		constexpr XMFLOAT3 eyePosition = { 0.0f, 0.0f, -10.0f };
 		// カメラの回転
 		XMFLOAT4 cameraRotation = {};
 		XMStoreFloat4(&cameraRotation, XMQuaternionIdentity());
-
-		// カメラのz軸回転
-		// ※現段階ではz軸以外で回転させると描画されない部分が発生する
-		const float zAngle = XMConvertToRadians(time);
-		XMStoreFloat4(&cameraRotation,
-			XMQuaternionRotationRollPitchYaw(0, 0, zAngle));
 
 		// 定数バッファーを更新
 		const auto eyeDirection = XMVector3Rotate(XMVectorSet(0, 0, 1, 0), XMLoadFloat4(&cameraRotation));
@@ -404,6 +403,28 @@ int Game::Run()
 		const auto viewMatrix = XMMatrixLookToLH(
 			XMLoadFloat3(&eyePosition), eyeDirection, eyeUpDirection);
 		XMStoreFloat4x4(&constanBufferPerFrame.viewMatrix, XMMatrixTranspose(viewMatrix));
+
+
+		// スクリーン画面のアスペクト比
+		const auto aspectRatio = screenWidth / static_cast<float>(screenHeight);
+		constexpr auto nearZ = 0.3f;	// nearクリップ面
+		constexpr auto farZ = 1000.0f;	// farクリップ面
+
+		// 【正射影変換の場合】
+		constexpr auto orthographicSize = 5.0f;	// ビュー空間の垂直方向の半分のサイズ
+		// 定数バッファーを更新
+		const auto projectionMatrix = XMMatrixOrthographicLH(
+			2 * orthographicSize * aspectRatio,
+			2 * orthographicSize, nearZ, farZ);
+
+		//// 【パースペクティブ射影変換の場合】
+		//// 視錐台の垂直方向の角度
+		//constexpr auto fieldOfView = XMConvertToRadians(60);
+		//const auto projectionMatrix = XMMatrixPerspectiveFovLH(
+		//	fieldOfView, aspectRatio, nearZ, farZ);
+
+		// 定数バッファーを更新
+		XMStoreFloat4x4(&constanBufferPerFrame.projectionMatrix, XMMatrixTranspose(projectionMatrix));
 
 
 		// レンダーターゲットを設定
