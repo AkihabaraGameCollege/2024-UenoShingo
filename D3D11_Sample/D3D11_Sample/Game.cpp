@@ -256,35 +256,56 @@ int Game::Run()
 
 	// 頂点データの配列
 	constexpr VertexPositionColor vertices[] = {
-		{ { -1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f, 1.0f }, },
-		{ {  0.0f, 1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f, 1.0f }, },
-		{ {  1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f, 1.0f }, },
+		{ { -0.5f,  0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f, 1.0f } },	// 0
+		{ {  0.5f,  0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f, 1.0f } },	// 1
+		{ { -0.5f, -0.5f, 0.0f }, { 0.0f, 0.0f, 0.0f, 1.0f } },	// 2
+		{ {  0.5f, -0.5f, 0.0f }, { 0.0f, 0.0f, 0.0f, 1.0f } },	// 3
 	};
-	//constexpr VertexPositionNormalTexture vertices[] = {
-	//	{ { -1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, -1.0f }, { 0.0f, 1.0f }, },
-	//	{ {  0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, -1.0f }, { 0.0f, 0.0f }, },
-	//	{ {  1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, -1.0f }, { 1.0f, 0.0f }, },
-	//};
-	UINT vertexCount = std::size(vertices);
+	// インデックスデータの配列
+	constexpr UINT32 indices[] = { 0, 1, 2, 3, 2, 1 };
+	constexpr UINT indexCount = std::size(indices);
 
-	// 作成する頂点バッファーについての記述
-	constexpr auto bufferDesc = D3D11_BUFFER_DESC{
-		.ByteWidth = sizeof vertices,
-		.Usage = D3D11_USAGE::D3D11_USAGE_DEFAULT,
-		.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_VERTEX_BUFFER,
-		.CPUAccessFlags = 0,
-		.MiscFlags = 0,
-		.StructureByteStride = 0,
-	};
-	// バッファーを作成
 	Microsoft::WRL::ComPtr<ID3D11Buffer> vertexBuffer;
-	hr = graphicsDevice->CreateBuffer(&bufferDesc, NULL, &vertexBuffer);
-	if (FAILED(hr) || vertexBuffer == nullptr) {
-		OutputDebugStringW(L"頂点バッファーを作成できませんでした。");
-		return 0;
+	{
+		// 作成する頂点バッファーについての記述
+		constexpr auto bufferDesc = D3D11_BUFFER_DESC{
+			.ByteWidth = sizeof vertices,
+			.Usage = D3D11_USAGE::D3D11_USAGE_DEFAULT,
+			.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_VERTEX_BUFFER,
+			.CPUAccessFlags = 0,
+			.MiscFlags = 0,
+			.StructureByteStride = 0,
+		};
+		// バッファーを作成
+		hr = graphicsDevice->CreateBuffer(&bufferDesc, NULL, &vertexBuffer);
+		if (FAILED(hr) || vertexBuffer == nullptr) {
+			OutputDebugStringW(L"頂点バッファーを作成できませんでした。");
+			return 0;
+		}
 	}
 	// バッファーにデータを転送
 	immediateContext->UpdateSubresource(vertexBuffer.Get(), 0, NULL, vertices, 0, 0);
+
+	Microsoft::WRL::ComPtr<ID3D11Buffer> indexBuffer;
+	{
+		// 作成するインデックス バッファーについての記述
+		constexpr auto bufferDesc = D3D11_BUFFER_DESC{
+			.ByteWidth = sizeof vertices,
+			.Usage = D3D11_USAGE::D3D11_USAGE_DEFAULT,
+			.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_INDEX_BUFFER,
+			.CPUAccessFlags = 0,
+			.MiscFlags = 0,
+			.StructureByteStride = 0,
+		};
+		// バッファーを作成
+		hr = graphicsDevice->CreateBuffer(&bufferDesc, NULL, &indexBuffer);
+		if (FAILED(hr) || vertexBuffer == nullptr) {
+			OutputDebugStringW(L"インデックス バッファーを作成できませんでした。");
+			return 0;
+		}
+	}
+	// バッファーにデータを転送
+	immediateContext->UpdateSubresource(indexBuffer.Get(), 0, NULL, indices, 0, 0);
 
 	// 頂点シェーダーを作成
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
@@ -319,7 +340,7 @@ int Game::Run()
 	}
 
 	// 定数バッファーを介してシェーダーに毎フレーム送るデータを表します。
-	struct ConstanBufferPerFrame
+	struct ConstantBufferPerFrame
 	{
 		DirectX::XMFLOAT4X4 worldMatrix;		// ワールド変換行列
 		DirectX::XMFLOAT4X4 viewMatrix;			// ビュー変換行列
@@ -327,13 +348,13 @@ int Game::Run()
 		DirectX::XMFLOAT4X4 wvpMatrix;			// ワールド × ビュー × プロジェクション変換行列
 		DirectX::XMFLOAT4 materialColor;
 	};
-	ConstanBufferPerFrame constanBufferPerFrame = {};
+	ConstantBufferPerFrame constantBufferPerFrame = {};
 	// 定数バッファーを作成
 	Microsoft::WRL::ComPtr<ID3D11Buffer> constantBuffer;
 	{
 		// 作成するバッファーについての記述
 		constexpr auto bufferDesc = D3D11_BUFFER_DESC{
-			.ByteWidth = sizeof(ConstanBufferPerFrame),
+			.ByteWidth = sizeof(ConstantBufferPerFrame),
 			.Usage = D3D11_USAGE_DEFAULT,
 			.BindFlags = D3D11_BIND_CONSTANT_BUFFER,
 			.CPUAccessFlags = 0,
@@ -348,12 +369,12 @@ int Game::Run()
 		}
 	}
 	// 定数バッファーを更新
-	XMStoreFloat4x4(&constanBufferPerFrame.worldMatrix, XMMatrixTranspose(XMMatrixIdentity()));
-	XMStoreFloat4x4(&constanBufferPerFrame.viewMatrix, XMMatrixTranspose(XMMatrixIdentity()));
-	XMStoreFloat4x4(&constanBufferPerFrame.projectionMatrix, XMMatrixTranspose(XMMatrixIdentity()));
-	XMStoreFloat4x4(&constanBufferPerFrame.wvpMatrix, XMMatrixTranspose(XMMatrixIdentity()));
-	constanBufferPerFrame.materialColor = XMFLOAT4(1, 238 / 255.0f, 0, 1);
-	immediateContext->UpdateSubresource(constantBuffer.Get(), 0, NULL, &constanBufferPerFrame, 0, 0);
+	XMStoreFloat4x4(&constantBufferPerFrame.worldMatrix, XMMatrixTranspose(XMMatrixIdentity()));
+	XMStoreFloat4x4(&constantBufferPerFrame.viewMatrix, XMMatrixTranspose(XMMatrixIdentity()));
+	XMStoreFloat4x4(&constantBufferPerFrame.projectionMatrix, XMMatrixTranspose(XMMatrixIdentity()));
+	XMStoreFloat4x4(&constantBufferPerFrame.wvpMatrix, XMMatrixTranspose(XMMatrixIdentity()));
+	constantBufferPerFrame.materialColor = XMFLOAT4(1, 238 / 255.0f, 0, 1);
+	immediateContext->UpdateSubresource(constantBuffer.Get(), 0, NULL, &constantBufferPerFrame, 0, 0);
 
 	float time = 0;
 
@@ -391,7 +412,7 @@ int Game::Run()
 			XMVectorZero(), XMQuaternionIdentity(), XMLoadFloat3(&scale),
 			XMVectorZero(), XMLoadFloat4(&rotation),
 			XMLoadFloat3(&position));
-		XMStoreFloat4x4(&constanBufferPerFrame.worldMatrix, XMMatrixTranspose(worldMatrix));
+		XMStoreFloat4x4(&constantBufferPerFrame.worldMatrix, XMMatrixTranspose(worldMatrix));
 
 		// カメラの位置座標
 		constexpr XMFLOAT3 eyePosition = { 0.0f, 0.0f, -10.0f };
@@ -404,7 +425,7 @@ int Game::Run()
 		const auto eyeUpDirection = XMVector3Rotate(XMVectorSet(0, 1, 0, 0), XMLoadFloat4(&cameraRotation));
 		const auto viewMatrix = XMMatrixLookToLH(
 			XMLoadFloat3(&eyePosition), eyeDirection, eyeUpDirection);
-		XMStoreFloat4x4(&constanBufferPerFrame.viewMatrix, XMMatrixTranspose(viewMatrix));
+		XMStoreFloat4x4(&constantBufferPerFrame.viewMatrix, XMMatrixTranspose(viewMatrix));
 
 
 		// スクリーン画面のアスペクト比
@@ -426,10 +447,10 @@ int Game::Run()
 		//	fieldOfView, aspectRatio, nearZ, farZ);
 
 		// 定数バッファーを更新
-		XMStoreFloat4x4(&constanBufferPerFrame.projectionMatrix, XMMatrixTranspose(projectionMatrix));
+		XMStoreFloat4x4(&constantBufferPerFrame.projectionMatrix, XMMatrixTranspose(projectionMatrix));
 
 		// ワールド × ビュー × プロジェクションをCPU側で計算してシェーダーへ送る
-		XMStoreFloat4x4(&constanBufferPerFrame.wvpMatrix,
+		XMStoreFloat4x4(&constantBufferPerFrame.wvpMatrix,
 			XMMatrixTranspose(worldMatrix * viewMatrix * projectionMatrix));
 
 
@@ -451,6 +472,8 @@ int Game::Run()
 		//const UINT strides[1] = { sizeof(VertexPositionNormalTexture), };
 		const UINT offsets[1] = { 0, };
 		immediateContext->IASetVertexBuffers(0, std::size(vertexBuffers), vertexBuffers, strides, offsets);
+		// インデックス バッファーを設定
+		immediateContext->IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
 		// 頂点バッファーと頂点シェーダーの組合せに対応した入力レイアウトを設定
 		immediateContext->IASetInputLayout(inputLayout.Get());
 		immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -460,14 +483,13 @@ int Game::Run()
 		immediateContext->PSSetShader(pixelShader.Get(), NULL, 0);
 
 		// 定数バッファーを設定
-		immediateContext->UpdateSubresource(constantBuffer.Get(), 0, NULL, &constanBufferPerFrame, 0, 0);
+		immediateContext->UpdateSubresource(constantBuffer.Get(), 0, NULL, &constantBufferPerFrame, 0, 0);
 		ID3D11Buffer* constantBuffers[] = { constantBuffer.Get(), };
 		immediateContext->VSSetConstantBuffers(0, std::size(constantBuffers), constantBuffers);
 		immediateContext->PSSetConstantBuffers(0, std::size(constantBuffers), constantBuffers);
 
-
 		// メッシュを描画
-		immediateContext->Draw(vertexCount, 0);
+		immediateContext->DrawIndexed(indexCount, 0, 0);
 
 		// バックバッファーに描画したイメージをディスプレイに表示
 		HRESULT hr = S_OK;
