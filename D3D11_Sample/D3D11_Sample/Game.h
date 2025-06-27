@@ -43,21 +43,18 @@ class Game
 {
 public:
 	// コンストラクター
-	Game(const std::wstring& windowTitle, int screenWidth, int screenHeight);
+	Game(int screenWidth, int screenHeight);
 
 	int Run();
 
+	int GetWidth();
+	int GetHeight();
+
 private:
-	// ウィンドウのタイトル
-	std::wstring windowTitle = L"タイトル";
 	// ウィンドウの幅
 	int screenWidth = 640;
 	// ウィンドウの高さ
 	int screenHeight = 480;
-	// ウィンドウのハンドル
-	HWND hWnd = NULL;
-
-	bool InitWindow();
 
 	// Direct3D 11のデバイス
 	Microsoft::WRL::ComPtr<ID3D11Device> graphicsDevice;
@@ -84,4 +81,22 @@ private:
 	D3D11_VIEWPORT viewport = {};
 
 	bool InitGraphicsDevice();
+};
+
+/// <summary>
+/// ウィンドウを作成してメッセージループを処理します。
+/// </summary>
+class Application
+{
+public:
+	static int Run(
+		Game* game, HINSTANCE hInstance, int nCmdShow, const std::wstring& title);
+	static HWND GetWindowHandle();
+
+private:
+	static bool InitializeWindow(
+		HINSTANCE hInstance, int nCmdShow, const std::wstring& title,
+		int width, int height);
+
+	static HWND hWnd;
 };

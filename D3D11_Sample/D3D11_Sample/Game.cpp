@@ -35,50 +35,10 @@ namespace
 }
 
 // このクラスを初期化します。
-Game::Game(const std::wstring& windowTitle, int screenWidth, int screenHeight)
+Game::Game(int screenWidth, int screenHeight)
 {
-	this->windowTitle = windowTitle;
 	this->screenWidth = screenWidth;
 	this->screenHeight = screenHeight;
-}
-
-// ウィンドウを作成します。
-bool Game::InitWindow()
-{
-	const auto hInstance = GetModuleHandleW(NULL);
-
-	// ウィンドウ クラスを登録する
-	const wchar_t CLASS_NAME[] = L"GameWindow";
-	WNDCLASSEXW wndClass = {};
-	wndClass.cbSize = sizeof(WNDCLASSEXW);
-	wndClass.lpfnWndProc = WindowProc;
-	wndClass.hInstance = hInstance;
-	wndClass.hbrBackground = (HBRUSH)COLOR_BACKGROUND;
-	wndClass.lpszClassName = CLASS_NAME;
-	if (!RegisterClassExW(&wndClass)) {
-		OutputDebugStringW(L"ERROR: ウィンドウ クラスを登録できませんでした。\n");
-		return false;
-	}
-
-	// ウィンドウサイズを計算
-	RECT rect = { 0, 0, this->screenWidth, this->screenHeight };
-	AdjustWindowRectEx(&rect, WS_OVERLAPPEDWINDOW, FALSE, 0);
-	// ウィンドウを作成する
-	this->hWnd = CreateWindowExW(
-		0, CLASS_NAME, this->windowTitle.c_str(), WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT, CW_USEDEFAULT,
-		rect.right - rect.left, rect.bottom - rect.top,
-		NULL, NULL, hInstance, NULL);
-	if (this->hWnd == NULL) {
-		OutputDebugStringW(L"ERROR: ウィンドウを作成できませんでした。\n");
-		return false;
-	}
-
-	// ウィンドウの表示指示を出すためにウィンドウ ハンドルを指定する
-	ShowWindow(this->hWnd, SW_SHOWNORMAL);
-	UpdateWindow(this->hWnd);
-
-	return true;
 }
 
 // グラフィックデバイスを初期化します。
@@ -112,7 +72,7 @@ bool Game::InitGraphicsDevice()
 	swapChainDesc.SampleDesc = { 1, 0 };
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
 	swapChainDesc.BufferCount = 2;
-	swapChainDesc.OutputWindow = hWnd;
+	swapChainDesc.OutputWindow = Application::GetWindowHandle();
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
 	swapChainDesc.Windowed = TRUE;
 
@@ -125,7 +85,7 @@ bool Game::InitGraphicsDevice()
 		&swapChainDesc, &swapChain,
 		&graphicsDevice, &featureLevel, &immediateContext);
 	if (FAILED(hr)) {
-		MessageBoxW(hWnd, L"Direct3D 11デバイスを作成できませんでした。", L"エラー", MB_OK);
+		MessageBoxW(Application::GetWindowHandle(), L"Direct3D 11デバイスを作成できませんでした。", L"エラー", MB_OK);
 		return false;
 	}
 
@@ -133,19 +93,19 @@ bool Game::InitGraphicsDevice()
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
 	hr = swapChain->GetBuffer(0, IID_PPV_ARGS(&backBuffer));
 	if (FAILED(hr)) {
-		MessageBoxW(hWnd, L"バックバッファーを取得できませんでした。", L"エラー", MB_OK);
+		MessageBoxW(Application::GetWindowHandle(), L"バックバッファーを取得できませんでした。", L"エラー", MB_OK);
 		return false;
 	}
 	// バックバッファーにアクセスするためのレンダーターゲット ビューを作成
 	hr = graphicsDevice->CreateRenderTargetView(backBuffer.Get(), NULL, &renderTargetView);
 	if (FAILED(hr)) {
-		MessageBoxW(hWnd, L"レンダーターゲット ビューを作成できませんでした。", L"エラー", MB_OK);
+		MessageBoxW(Application::GetWindowHandle(), L"レンダーターゲット ビューを作成できませんでした。", L"エラー", MB_OK);
 		return false;
 	}
 	// バックバッファーにシェーダーからアクセスするためのリソース ビューを作成
 	hr = graphicsDevice->CreateShaderResourceView(backBuffer.Get(), NULL, &renderTargetResourceView);
 	if (FAILED(hr)) {
-		MessageBoxW(hWnd, L"レンダーターゲット リソース ビューを作成できませんでした。", L"エラー", MB_OK);
+		MessageBoxW(Application::GetWindowHandle(), L"レンダーターゲット リソース ビューを作成できませんでした。", L"エラー", MB_OK);
 		return false;
 	}
 	backBuffer.Reset();
@@ -188,7 +148,7 @@ bool Game::InitGraphicsDevice()
 	depthStencilDesc.MiscFlags = 0;
 	hr = graphicsDevice->CreateTexture2D(&depthStencilDesc, NULL, &depthStencil);
 	if (FAILED(hr)) {
-		MessageBoxW(hWnd, L"深度ステンシルを作成できませんでした。", L"エラー", MB_OK);
+		MessageBoxW(Application::GetWindowHandle(), L"深度ステンシルを作成できませんでした。", L"エラー", MB_OK);
 		return false;
 	}
 	// 深度ステンシルにアクセスするためのビューを作成
@@ -204,7 +164,7 @@ bool Game::InitGraphicsDevice()
 	depthStencilViewDesc.Texture2D.MipSlice = 0;
 	hr = graphicsDevice->CreateDepthStencilView(depthStencil.Get(), &depthStencilViewDesc, &depthStencilView);
 	if (FAILED(hr)) {
-		MessageBoxW(hWnd, L"深度ステンシル ビューを作成できませんでした。", L"エラー", MB_OK);
+		MessageBoxW(Application::GetWindowHandle(), L"深度ステンシル ビューを作成できませんでした。", L"エラー", MB_OK);
 		return false;
 	}
 	// 深度ステンシルにシェーダーからアクセスするためのリソース ビューを作成
@@ -220,7 +180,7 @@ bool Game::InitGraphicsDevice()
 	}
 	hr = graphicsDevice->CreateShaderResourceView(depthStencil.Get(), &depthStencilResourceViewDesc, &depthStencilResourceView);
 	if (FAILED(hr)) {
-		MessageBoxW(hWnd, L"深度ステンシル リソース ビューを作成できませんでした。", L"エラー", MB_OK);
+		MessageBoxW(Application::GetWindowHandle(), L"深度ステンシル リソース ビューを作成できませんでした。", L"エラー", MB_OK);
 		return false;
 	}
 	depthStencil.Reset();
@@ -241,11 +201,6 @@ bool Game::InitGraphicsDevice()
 // ウィンドウの作成からメッセージのループ処理を開始します。
 int Game::Run()
 {
-	// メインウィンドウを作成
-	if (!InitWindow()) {
-		MessageBoxW(NULL, L"ウィンドウを作成できませんでした。", L"エラー", MB_OK);
-		return 0;
-	}
 	// グラフィックデバイスを作成
 	if (!InitGraphicsDevice()) {
 		MessageBoxW(NULL, L"グラフィックデバイスを初期化できませんでした。", L"メッセージ", MB_OK);
@@ -508,7 +463,7 @@ int Game::Run()
 		HRESULT hr = S_OK;
 		hr = swapChain->Present(1, 0);
 		if (FAILED(hr)) {
-			MessageBoxW(hWnd,
+			MessageBoxW(Application::GetWindowHandle(),
 				L"グラフィックデバイスが物理的に取り外されたか、ドライバーがアップデートされました。",
 				L"エラー", MB_OK);
 			return 0;
@@ -516,4 +471,22 @@ int Game::Run()
 	}
 
 	return (int)msg.wParam;
+}
+
+/// <summary>
+/// ウィンドウの幅を取得します。
+/// </summary>
+/// <returns>ウィンドウの幅</returns>
+int Game::GetWidth()
+{
+	return screenWidth;
+}
+
+/// <summary>
+/// ウィンドウの高さを取得します。
+/// </summary>
+/// <returns>ウィンドウの高さ</returns>
+int Game::GetHeight()
+{
+	return screenHeight;
 }
