@@ -5,6 +5,7 @@
 //=============================================================================
 #include "Game.h"
 #include "StandardVertexShader.h"
+#include "StandardGeometryShader.h"
 #include "StandardPixelShader.h"
 
 using namespace Microsoft::WRL;
@@ -317,6 +318,16 @@ int Game::Run()
 		OutputDebugStringW(L"頂点シェーダーを作成できませんでした。");
 		return 0;
 	}
+	// ジオメトリー シェーダーを作成
+	Microsoft::WRL::ComPtr<ID3D11GeometryShader> geometryShader;
+	hr = graphicsDevice->CreateGeometryShader(
+		g_StandardGeometryShader, std::size(g_StandardGeometryShader),
+		NULL,
+		&geometryShader);
+	if (FAILED(hr) || geometryShader == nullptr) {
+		OutputDebugStringW(L"ジオメトリー シェーダーを作成できませんでした。");
+		return 0;
+	}
 	// ピクセル シェーダーを作成
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader;
 	hr = graphicsDevice->CreatePixelShader(
@@ -480,12 +491,14 @@ int Game::Run()
 
 		// シェーダーを設定
 		immediateContext->VSSetShader(vertexShader.Get(), NULL, 0);
+		immediateContext->GSSetShader(geometryShader.Get(), NULL, 0);
 		immediateContext->PSSetShader(pixelShader.Get(), NULL, 0);
 
 		// 定数バッファーを設定
 		immediateContext->UpdateSubresource(constantBuffer.Get(), 0, NULL, &constantBufferPerFrame, 0, 0);
 		ID3D11Buffer* constantBuffers[] = { constantBuffer.Get(), };
 		immediateContext->VSSetConstantBuffers(0, std::size(constantBuffers), constantBuffers);
+		immediateContext->GSSetConstantBuffers(0, std::size(constantBuffers), constantBuffers);
 		immediateContext->PSSetConstantBuffers(0, std::size(constantBuffers), constantBuffers);
 
 		// メッシュを描画

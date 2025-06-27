@@ -28,5 +28,15 @@ struct VertexShaderOutput
     float4 color : COLOR;
 };
 
+// ジオメトリー シェーダーへの入力
+typedef VertexShaderOutput GeometryShaderInput;
+
+// ジオメトリー シェーダーからの出力
+struct GeometryShaderOutput
+{
+    float4 position : SV_POSITION;
+    float4 color : COLOR;
+};
+
 // ピクセル シェーダーへの入力
-typedef VertexShaderOutput PixelShaderInput;
+typedef GeometryShaderOutput PixelShaderInput;
