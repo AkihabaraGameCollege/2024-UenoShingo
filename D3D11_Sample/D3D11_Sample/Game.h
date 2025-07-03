@@ -45,7 +45,10 @@ public:
 	// コンストラクター
 	Game(int screenWidth, int screenHeight);
 
-	int Run();
+	void Initialize();
+	void Update();
+	void Render();
+	void Release();
 
 	int GetWidth();
 	int GetHeight();
@@ -79,6 +82,28 @@ private:
 	FLOAT clearColor[4] = { 53 / 255.0f, 70 / 255.0f, 166 / 255.0f, 1.0f };
 	// ビューポート
 	D3D11_VIEWPORT viewport = {};
+
+	float time = 0;
+
+	// 定数バッファーを介してシェーダーに毎フレーム送るデータを表します。
+	struct ConstantBufferPerFrame
+	{
+		DirectX::XMFLOAT4X4 worldMatrix;		// ワールド変換行列
+		DirectX::XMFLOAT4X4 viewMatrix;			// ビュー変換行列
+		DirectX::XMFLOAT4X4 projectionMatrix;	// プロジェクション変換行列
+		DirectX::XMFLOAT4X4 wvpMatrix;			// ワールド × ビュー × プロジェクション変換行列
+		DirectX::XMFLOAT4 materialColor;
+	};
+	ConstantBufferPerFrame constantBufferPerFrame = {};
+
+	Microsoft::WRL::ComPtr<ID3D11Buffer> vertexBuffer;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> indexBuffer;
+	UINT indexCount = 0;
+	Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
+	Microsoft::WRL::ComPtr<ID3D11GeometryShader> geometryShader;
+	Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> constantBuffer;
+	Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
 
 	bool InitGraphicsDevice();
 };

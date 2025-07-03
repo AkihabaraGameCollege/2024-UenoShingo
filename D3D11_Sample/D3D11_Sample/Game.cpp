@@ -8,7 +8,6 @@
 #include "StandardGeometryShader.h"
 #include "StandardPixelShader.h"
 
-using namespace Microsoft::WRL;
 using namespace DirectX;
 
 namespace
@@ -197,16 +196,16 @@ bool Game::InitGraphicsDevice()
 	return true;
 }
 
-// アプリケーションのエントリーポイントです。
-// ウィンドウの作成からメッセージのループ処理を開始します。
-int Game::Run()
+/// <summary>
+/// このクラスのインスタンスを初期化します。
+/// </summary>
+void Game::Initialize()
 {
 	// グラフィックデバイスを作成
 	if (!InitGraphicsDevice()) {
 		MessageBoxW(NULL, L"グラフィックデバイスを初期化できませんでした。", L"メッセージ", MB_OK);
-		return 0;
+		return;
 	}
-
 
 	HRESULT hr = S_OK;
 
@@ -219,9 +218,8 @@ int Game::Run()
 	};
 	// インデックスデータの配列
 	constexpr UINT32 indices[] = { 0, 1, 2, 3, 2, 1 };
-	constexpr UINT indexCount = std::size(indices);
+	indexCount = std::size(indices);
 
-	Microsoft::WRL::ComPtr<ID3D11Buffer> vertexBuffer;
 	{
 		// 作成する頂点バッファーについての記述
 		constexpr auto bufferDesc = D3D11_BUFFER_DESC{
@@ -236,13 +234,12 @@ int Game::Run()
 		hr = graphicsDevice->CreateBuffer(&bufferDesc, NULL, &vertexBuffer);
 		if (FAILED(hr) || vertexBuffer == nullptr) {
 			OutputDebugStringW(L"頂点バッファーを作成できませんでした。");
-			return 0;
+			//return 0;
 		}
 	}
 	// バッファーにデータを転送
 	immediateContext->UpdateSubresource(vertexBuffer.Get(), 0, NULL, vertices, 0, 0);
 
-	Microsoft::WRL::ComPtr<ID3D11Buffer> indexBuffer;
 	{
 		// 作成するインデックス バッファーについての記述
 		constexpr auto bufferDesc = D3D11_BUFFER_DESC{
@@ -257,52 +254,48 @@ int Game::Run()
 		hr = graphicsDevice->CreateBuffer(&bufferDesc, NULL, &indexBuffer);
 		if (FAILED(hr) || vertexBuffer == nullptr) {
 			OutputDebugStringW(L"インデックス バッファーを作成できませんでした。");
-			return 0;
+			//return 0;
 		}
 	}
 	// バッファーにデータを転送
 	immediateContext->UpdateSubresource(indexBuffer.Get(), 0, NULL, indices, 0, 0);
 
 	// 頂点シェーダーを作成
-	Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
 	hr = graphicsDevice->CreateVertexShader(
 		g_StandardVertexShader, std::size(g_StandardVertexShader),
 		NULL,
 		&vertexShader);
 	if (FAILED(hr) || vertexShader == nullptr) {
 		OutputDebugStringW(L"頂点シェーダーを作成できませんでした。");
-		return 0;
+		//return 0;
 	}
 	// ジオメトリー シェーダーを作成
-	Microsoft::WRL::ComPtr<ID3D11GeometryShader> geometryShader;
 	hr = graphicsDevice->CreateGeometryShader(
 		g_StandardGeometryShader, std::size(g_StandardGeometryShader),
 		NULL,
 		&geometryShader);
 	if (FAILED(hr) || geometryShader == nullptr) {
 		OutputDebugStringW(L"ジオメトリー シェーダーを作成できませんでした。");
-		return 0;
+		//return 0;
 	}
 	// ピクセル シェーダーを作成
-	Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader;
 	hr = graphicsDevice->CreatePixelShader(
 		g_StandardPixelShader, std::size(g_StandardPixelShader),
 		NULL,
 		&pixelShader);
 	if (FAILED(hr) || pixelShader == nullptr) {
 		OutputDebugStringW(L"ピクセル シェーダーを作成できませんでした。");
-		return 0;
+		//return 0;
 	}
 
 	// 入力レイアウトを作成
-	Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
 	hr = graphicsDevice->CreateInputLayout(
 		VertexPositionColor::InputElementDescs, std::size(VertexPositionColor::InputElementDescs),
 		g_StandardVertexShader, std::size(g_StandardVertexShader),
 		&inputLayout);
 	if (FAILED(hr)) {
 		OutputDebugStringW(L"入力レイアウトを作成できませんでした。");
-		return 0;
+		//return 0;
 	}
 
 	// 定数バッファーを介してシェーダーに毎フレーム送るデータを表します。
@@ -316,7 +309,6 @@ int Game::Run()
 	};
 	ConstantBufferPerFrame constantBufferPerFrame = {};
 	// 定数バッファーを作成
-	Microsoft::WRL::ComPtr<ID3D11Buffer> constantBuffer;
 	{
 		// 作成するバッファーについての記述
 		constexpr auto bufferDesc = D3D11_BUFFER_DESC{
@@ -331,7 +323,7 @@ int Game::Run()
 		auto hr = graphicsDevice->CreateBuffer(&bufferDesc, nullptr, &constantBuffer);
 		if (FAILED(hr)) {
 			OutputDebugStringW(L"定数バッファーを作成できませんでした。");
-			return 0;
+			//return 0;
 		}
 	}
 	// 定数バッファーを更新
@@ -341,136 +333,133 @@ int Game::Run()
 	XMStoreFloat4x4(&constantBufferPerFrame.wvpMatrix, XMMatrixTranspose(XMMatrixIdentity()));
 	constantBufferPerFrame.materialColor = XMFLOAT4(1, 238 / 255.0f, 0, 1);
 	immediateContext->UpdateSubresource(constantBuffer.Get(), 0, NULL, &constantBufferPerFrame, 0, 0);
+}
 
-	float time = 0;
+/// <summary>
+/// フレーム更新処理を実行します。
+/// </summary>
+void Game::Update()
+{
+	// フレーム更新処理
+	// 位置座標
+	XMFLOAT3 position = { 0, 0, 0 };
+	// 回転
+	XMFLOAT4 rotation = {};
+	XMStoreFloat4(&rotation, XMQuaternionIdentity());
+	// スケール
+	XMFLOAT3 scale = { 1, 1, 1 };
 
-	// メッセージループを実行
-	MSG msg = {};
-	while (msg.message != WM_QUIT) {
-		time += 0.1f;
+	// y軸回転
+	const float yAngle = XMConvertToRadians(time);
+	XMStoreFloat4(&rotation,
+		XMQuaternionRotationRollPitchYaw(0, yAngle, 0));
 
-		// このウィンドウのメッセージが存在するかを確認
-		if (PeekMessageW(&msg, NULL, 0, 0, PM_NOREMOVE)) {
-			// メッセージを取得
-			if (!GetMessageW(&msg, NULL, 0, 0)) {
-				break;
-			}
-			TranslateMessage(&msg);
-			DispatchMessageW(&msg);
-		}
+	// 定数バッファーを更新
+	const auto worldMatrix = XMMatrixTransformation(
+		XMVectorZero(), XMQuaternionIdentity(), XMLoadFloat3(&scale),
+		XMVectorZero(), XMLoadFloat4(&rotation),
+		XMLoadFloat3(&position));
+	XMStoreFloat4x4(&constantBufferPerFrame.worldMatrix, XMMatrixTranspose(worldMatrix));
 
-		// フレーム更新処理
-		// 位置座標
-		XMFLOAT3 position = { 0, 0, 0 };
-		// 回転
-		XMFLOAT4 rotation = {};
-		XMStoreFloat4(&rotation, XMQuaternionIdentity());
-		// スケール
-		XMFLOAT3 scale = { 1, 1, 1 };
+	// カメラの位置座標
+	constexpr XMFLOAT3 eyePosition = { 0.0f, 0.0f, -10.0f };
+	// カメラの回転
+	XMFLOAT4 cameraRotation = {};
+	XMStoreFloat4(&cameraRotation, XMQuaternionIdentity());
 
-		// y軸回転
-		const float yAngle = XMConvertToRadians(time);
-		XMStoreFloat4(&rotation,
-			XMQuaternionRotationRollPitchYaw(0, yAngle, 0));
+	// 定数バッファーを更新
+	const auto eyeDirection = XMVector3Rotate(XMVectorSet(0, 0, 1, 0), XMLoadFloat4(&cameraRotation));
+	const auto eyeUpDirection = XMVector3Rotate(XMVectorSet(0, 1, 0, 0), XMLoadFloat4(&cameraRotation));
+	const auto viewMatrix = XMMatrixLookToLH(
+		XMLoadFloat3(&eyePosition), eyeDirection, eyeUpDirection);
+	XMStoreFloat4x4(&constantBufferPerFrame.viewMatrix, XMMatrixTranspose(viewMatrix));
 
-		// 定数バッファーを更新
-		const auto worldMatrix = XMMatrixTransformation(
-			XMVectorZero(), XMQuaternionIdentity(), XMLoadFloat3(&scale),
-			XMVectorZero(), XMLoadFloat4(&rotation),
-			XMLoadFloat3(&position));
-		XMStoreFloat4x4(&constantBufferPerFrame.worldMatrix, XMMatrixTranspose(worldMatrix));
+	// スクリーン画面のアスペクト比
+	const auto aspectRatio = screenWidth / static_cast<float>(screenHeight);
+	constexpr auto nearZ = 0.3f;	// nearクリップ面
+	constexpr auto farZ = 1000.0f;	// farクリップ面
 
-		// カメラの位置座標
-		constexpr XMFLOAT3 eyePosition = { 0.0f, 0.0f, -10.0f };
-		// カメラの回転
-		XMFLOAT4 cameraRotation = {};
-		XMStoreFloat4(&cameraRotation, XMQuaternionIdentity());
+	// 【正射影変換の場合】
+	constexpr auto orthographicSize = 5.0f;	// ビュー空間の垂直方向の半分のサイズ
+	// 定数バッファーを更新
+	const auto projectionMatrix = XMMatrixOrthographicLH(
+		2 * orthographicSize * aspectRatio,
+		2 * orthographicSize, nearZ, farZ);
 
-		// 定数バッファーを更新
-		const auto eyeDirection = XMVector3Rotate(XMVectorSet(0, 0, 1, 0), XMLoadFloat4(&cameraRotation));
-		const auto eyeUpDirection = XMVector3Rotate(XMVectorSet(0, 1, 0, 0), XMLoadFloat4(&cameraRotation));
-		const auto viewMatrix = XMMatrixLookToLH(
-			XMLoadFloat3(&eyePosition), eyeDirection, eyeUpDirection);
-		XMStoreFloat4x4(&constantBufferPerFrame.viewMatrix, XMMatrixTranspose(viewMatrix));
+	//// 【パースペクティブ射影変換の場合】
+	//// 視錐台の垂直方向の角度
+	//constexpr auto fieldOfView = XMConvertToRadians(60);
+	//const auto projectionMatrix = XMMatrixPerspectiveFovLH(
+	//	fieldOfView, aspectRatio, nearZ, farZ);
 
+	// 定数バッファーを更新
+	XMStoreFloat4x4(&constantBufferPerFrame.projectionMatrix, XMMatrixTranspose(projectionMatrix));
 
-		// スクリーン画面のアスペクト比
-		const auto aspectRatio = screenWidth / static_cast<float>(screenHeight);
-		constexpr auto nearZ = 0.3f;	// nearクリップ面
-		constexpr auto farZ = 1000.0f;	// farクリップ面
+	// ワールド × ビュー × プロジェクションをCPU側で計算してシェーダーへ送る
+	XMStoreFloat4x4(&constantBufferPerFrame.wvpMatrix,
+		XMMatrixTranspose(worldMatrix * viewMatrix * projectionMatrix));
+}
 
-		// 【正射影変換の場合】
-		constexpr auto orthographicSize = 5.0f;	// ビュー空間の垂直方向の半分のサイズ
-		// 定数バッファーを更新
-		const auto projectionMatrix = XMMatrixOrthographicLH(
-			2 * orthographicSize * aspectRatio,
-			2 * orthographicSize, nearZ, farZ);
+/// <summary>
+/// 描画処理を実行します。
+/// </summary>
+void Game::Render()
+{
+	// レンダーターゲットを設定
+	ID3D11RenderTargetView* renderTargetViews[] = { renderTargetView.Get(), };
+	immediateContext->OMSetRenderTargets(std::size(renderTargetViews), renderTargetViews, depthStencilView.Get());
+	// 画面をクリアー
+	immediateContext->ClearRenderTargetView(renderTargetView.Get(), clearColor);
+	immediateContext->ClearDepthStencilView(depthStencilView.Get(),
+		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-		//// 【パースペクティブ射影変換の場合】
-		//// 視錐台の垂直方向の角度
-		//constexpr auto fieldOfView = XMConvertToRadians(60);
-		//const auto projectionMatrix = XMMatrixPerspectiveFovLH(
-		//	fieldOfView, aspectRatio, nearZ, farZ);
+	// ビューポートを設定
+	D3D11_VIEWPORT viewports[] = { viewport, };
+	immediateContext->RSSetViewports(std::size(viewports), viewports);
 
-		// 定数バッファーを更新
-		XMStoreFloat4x4(&constantBufferPerFrame.projectionMatrix, XMMatrixTranspose(projectionMatrix));
+	// 頂点バッファーを設定
+	ID3D11Buffer* const vertexBuffers[1] = { vertexBuffer.Get(), };
+	const UINT strides[1] = { sizeof(VertexPositionColor), };
+	//const UINT strides[1] = { sizeof(VertexPositionNormalTexture), };
+	const UINT offsets[1] = { 0, };
+	immediateContext->IASetVertexBuffers(0, std::size(vertexBuffers), vertexBuffers, strides, offsets);
+	// インデックス バッファーを設定
+	immediateContext->IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
+	// 頂点バッファーと頂点シェーダーの組合せに対応した入力レイアウトを設定
+	immediateContext->IASetInputLayout(inputLayout.Get());
+	immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		// ワールド × ビュー × プロジェクションをCPU側で計算してシェーダーへ送る
-		XMStoreFloat4x4(&constantBufferPerFrame.wvpMatrix,
-			XMMatrixTranspose(worldMatrix * viewMatrix * projectionMatrix));
+	// シェーダーを設定
+	immediateContext->VSSetShader(vertexShader.Get(), NULL, 0);
+	immediateContext->GSSetShader(geometryShader.Get(), NULL, 0);
+	immediateContext->PSSetShader(pixelShader.Get(), NULL, 0);
 
+	// 定数バッファーを設定
+	immediateContext->UpdateSubresource(constantBuffer.Get(), 0, NULL, &constantBufferPerFrame, 0, 0);
+	ID3D11Buffer* constantBuffers[] = { constantBuffer.Get(), };
+	immediateContext->VSSetConstantBuffers(0, std::size(constantBuffers), constantBuffers);
+	immediateContext->GSSetConstantBuffers(0, std::size(constantBuffers), constantBuffers);
+	immediateContext->PSSetConstantBuffers(0, std::size(constantBuffers), constantBuffers);
 
-		// レンダーターゲットを設定
-		ID3D11RenderTargetView* renderTargetViews[] = { renderTargetView.Get(), };
-		immediateContext->OMSetRenderTargets(std::size(renderTargetViews), renderTargetViews, depthStencilView.Get());
-		// 画面をクリアー
-		immediateContext->ClearRenderTargetView(renderTargetView.Get(), clearColor);
-		immediateContext->ClearDepthStencilView(depthStencilView.Get(),
-			D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	// メッシュを描画
+	immediateContext->DrawIndexed(indexCount, 0, 0);
 
-		// ビューポートを設定
-		D3D11_VIEWPORT viewports[] = { viewport, };
-		immediateContext->RSSetViewports(std::size(viewports), viewports);
-
-		// 頂点バッファーを設定
-		ID3D11Buffer* const vertexBuffers[1] = { vertexBuffer.Get(), };
-		const UINT strides[1] = { sizeof(VertexPositionColor), };
-		//const UINT strides[1] = { sizeof(VertexPositionNormalTexture), };
-		const UINT offsets[1] = { 0, };
-		immediateContext->IASetVertexBuffers(0, std::size(vertexBuffers), vertexBuffers, strides, offsets);
-		// インデックス バッファーを設定
-		immediateContext->IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
-		// 頂点バッファーと頂点シェーダーの組合せに対応した入力レイアウトを設定
-		immediateContext->IASetInputLayout(inputLayout.Get());
-		immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		// シェーダーを設定
-		immediateContext->VSSetShader(vertexShader.Get(), NULL, 0);
-		immediateContext->GSSetShader(geometryShader.Get(), NULL, 0);
-		immediateContext->PSSetShader(pixelShader.Get(), NULL, 0);
-
-		// 定数バッファーを設定
-		immediateContext->UpdateSubresource(constantBuffer.Get(), 0, NULL, &constantBufferPerFrame, 0, 0);
-		ID3D11Buffer* constantBuffers[] = { constantBuffer.Get(), };
-		immediateContext->VSSetConstantBuffers(0, std::size(constantBuffers), constantBuffers);
-		immediateContext->GSSetConstantBuffers(0, std::size(constantBuffers), constantBuffers);
-		immediateContext->PSSetConstantBuffers(0, std::size(constantBuffers), constantBuffers);
-
-		// メッシュを描画
-		immediateContext->DrawIndexed(indexCount, 0, 0);
-
-		// バックバッファーに描画したイメージをディスプレイに表示
-		HRESULT hr = S_OK;
-		hr = swapChain->Present(1, 0);
-		if (FAILED(hr)) {
-			MessageBoxW(Application::GetWindowHandle(),
-				L"グラフィックデバイスが物理的に取り外されたか、ドライバーがアップデートされました。",
-				L"エラー", MB_OK);
-			return 0;
-		}
+	// バックバッファーに描画したイメージをディスプレイに表示
+	HRESULT hr = S_OK;
+	hr = swapChain->Present(1, 0);
+	if (FAILED(hr)) {
+		MessageBoxW(Application::GetWindowHandle(),
+			L"グラフィックデバイスが物理的に取り外されたか、ドライバーがアップデートされました。",
+			L"エラー", MB_OK);
+		return;
 	}
+}
 
-	return (int)msg.wParam;
+/// <summary>
+/// リソースを解放します。
+/// </summary>
+void Game::Release()
+{
 }
 
 /// <summary>

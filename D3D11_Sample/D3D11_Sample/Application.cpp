@@ -43,6 +43,8 @@ int Application::Run(
 		return 0;
 	}
 
+	game->Initialize();
+
 	// メッセージループを実行
 	MSG msg = {};
 	while (msg.message != WM_QUIT) {
@@ -55,7 +57,12 @@ int Application::Run(
 			TranslateMessage(&msg);
 			DispatchMessageW(&msg);
 		}
+
+		game->Update();
+		game->Render();
 	}
+
+	game->Release();
 
 	return static_cast<int>(msg.wParam);
 }
