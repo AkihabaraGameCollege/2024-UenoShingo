@@ -6,11 +6,17 @@
 #pragma once
 
 #include <Windows.h>
+
+#include <system_error>
+#include <source_location>
+#include <string>
+#include <format>
+
+#include <comdef.h>
 #include <wrl/client.h>
 #include <d3d11.h>
 #pragma comment(lib, "D3D11.lib")
 #include <DirectXMath.h>
-#include <string>
 
 // 一つの頂点に含まれるデータの型
 struct VertexPositionColor
@@ -45,15 +51,20 @@ public:
 	// コンストラクター
 	Game(int screenWidth, int screenHeight);
 
-	void Initialize();
-	void Update();
-	void Render();
-	void Release();
-
 	int GetWidth();
 	int GetHeight();
 
-private:
+	void Initialize(HWND hWnd);
+	void Release();
+	void Update();
+	void Render();
+
+protected:
+	virtual void OnInitialize() {};
+	virtual void OnRelease() {};
+	virtual void OnUpdate() {};
+	virtual void OnRender() {};
+
 	// ウィンドウの幅
 	int screenWidth = 640;
 	// ウィンドウの高さ
@@ -83,29 +94,8 @@ private:
 	// ビューポート
 	D3D11_VIEWPORT viewport = {};
 
-	float time = 0;
-
-	// 定数バッファーを介してシェーダーに毎フレーム送るデータを表します。
-	struct ConstantBufferPerFrame
-	{
-		DirectX::XMFLOAT4X4 worldMatrix;		// ワールド変換行列
-		DirectX::XMFLOAT4X4 viewMatrix;			// ビュー変換行列
-		DirectX::XMFLOAT4X4 projectionMatrix;	// プロジェクション変換行列
-		DirectX::XMFLOAT4X4 wvpMatrix;			// ワールド × ビュー × プロジェクション変換行列
-		DirectX::XMFLOAT4 materialColor;
-	};
-	ConstantBufferPerFrame constantBufferPerFrame = {};
-
-	Microsoft::WRL::ComPtr<ID3D11Buffer> vertexBuffer;
-	Microsoft::WRL::ComPtr<ID3D11Buffer> indexBuffer;
-	UINT indexCount = 0;
-	Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
-	Microsoft::WRL::ComPtr<ID3D11GeometryShader> geometryShader;
-	Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader;
-	Microsoft::WRL::ComPtr<ID3D11Buffer> constantBuffer;
-	Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
-
-	bool InitGraphicsDevice();
+private:
+	void InitGraphicsDevice(HWND hWnd);
 };
 
 /// <summary>
@@ -119,9 +109,60 @@ public:
 	static HWND GetWindowHandle();
 
 private:
-	static bool InitializeWindow(
+	static void InitializeWindow(
+		Game* game,
 		HINSTANCE hInstance, int nCmdShow, const std::wstring& title,
 		int width, int height);
 
 	static HWND hWnd;
 };
+
+/// <summary>
+/// 直前のシステムエラーを例外としてスローします。
+/// </summary>
+inline void ThrowLastError(const std::source_location& location = std::source_location::current())
+{
+	const auto errorCode = GetLastError();
+
+	const auto message = std::format(
+		"{0}({1},{2}): error {3}",
+		location.file_name(), location.line(), location.column(), errorCode);
+	OutputDebugStringA(message.c_str());
+	OutputDebugStringA(": ");
+
+	LPSTR buffer = nullptr;
+	FormatMessageA(
+		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, errorCode, LANG_USER_DEFAULT,
+		reinterpret_cast<LPSTR>(&buffer), 0, NULL);
+	OutputDebugStringA(buffer);
+	LocalFree(buffer);
+
+	throw std::system_error(
+		std::error_code(errorCode, std::system_category()),
+		message);
+}
+
+/// <summary>
+/// 直前のシステムエラーを例外としてスローします。
+/// </summary>
+inline void ThrowIfFailed(HRESULT hr, const std::source_location& location = std::source_location::current())
+{
+	if (SUCCEEDED(hr)) {
+		return;
+	}
+
+	const auto error = _com_error(hr);
+
+	char message[512] = {};
+	sprintf_s(
+		message, std::size(message),
+		"%s(%d,%d): error 0x%X",
+		location.file_name(), location.line(), location.column(), hr);
+	OutputDebugStringA(message);
+	OutputDebugStringA(": ");
+
+	OutputDebugString(error.ErrorMessage());
+	OutputDebugString(TEXT("\n"));
+
+	throw error;
+}

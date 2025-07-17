@@ -132,9 +132,11 @@
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Program.cpp" />
+    <ClCompile Include="SampleGame.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h" />
+    <ClInclude Include="SampleGame.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="StandardGeometryShader.hlsl">

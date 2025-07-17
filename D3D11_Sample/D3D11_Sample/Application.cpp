@@ -1,4 +1,6 @@
 #include "Game.h"
+#include <system_error>
+#include <format>
 
 namespace
 {
@@ -38,12 +40,17 @@ HWND Application::hWnd = NULL;
 int Application::Run(
 	Game* game, HINSTANCE hInstance, int nCmdShow, const std::wstring& title)
 {
-	if (!InitializeWindow(hInstance, nCmdShow, title, game->GetWidth(), game->GetHeight())) {
-		OutputDebugStringW(L"ERROR: ウィンドウを作成できませんでした。\n");
+	try {
+		InitializeWindow(game, hInstance, nCmdShow, title, game->GetWidth(), game->GetHeight());
+	}
+	catch (const std::system_error& error) {
+		MessageBoxA(hWnd, error.what(), "ERROR: ウィンドウを初期化できませんでした", MB_OK | MB_ICONERROR);
 		return 0;
 	}
-
-	game->Initialize();
+	catch (const _com_error& error) {
+		MessageBox(hWnd, error.ErrorMessage(), TEXT("ERROR: グラフィックデバイスを初期化できませんでした。"), MB_OK);
+		return 0;
+	}
 
 	// メッセージループを実行
 	MSG msg = {};
@@ -85,7 +92,8 @@ HWND Application::GetWindowHandle()
 /// <param name="width">クライアント領域の幅</param>
 /// <param name="height">クライアント領域の高さ</param>
 /// <returns>関数の実行が成功した場合は true、失敗した場合は false</returns>
-bool Application::InitializeWindow(
+void Application::InitializeWindow(
+	Game* game,
 	HINSTANCE hInstance, int nCmdShow, const std::wstring& title,
 	int width, int height)
 {
@@ -98,8 +106,7 @@ bool Application::InitializeWindow(
 	wndClass.hbrBackground = (HBRUSH)COLOR_BACKGROUND;
 	wndClass.lpszClassName = CLASS_NAME;
 	if (!RegisterClassExW(&wndClass)) {
-		OutputDebugStringW(L"ERROR: ウィンドウ クラスを登録できませんでした。\n");
-		return false;
+		ThrowLastError();
 	}
 
 	// ウィンドウサイズを計算
@@ -112,13 +119,12 @@ bool Application::InitializeWindow(
 		rect.right - rect.left, rect.bottom - rect.top,
 		NULL, NULL, hInstance, NULL);
 	if (hWnd == NULL) {
-		OutputDebugStringW(L"ERROR: ウィンドウを作成できませんでした。\n");
-		return false;
+		ThrowLastError();
 	}
+
+	game->Initialize(hWnd);
 
 	// ウィンドウの表示指示を出すためにウィンドウ ハンドルを指定する
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
-
-	return true;
 }

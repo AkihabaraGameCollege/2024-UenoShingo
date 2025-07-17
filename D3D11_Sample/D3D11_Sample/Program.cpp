@@ -9,7 +9,7 @@
 #include <crtdbg.h>
 #endif
 
-#include "Game.h"
+#include "SampleGame.h"
 
 // エントリーポイント
 int WINAPI wWinMain(
@@ -20,6 +20,6 @@ int WINAPI wWinMain(
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
-	Game game(640, 480);
+	SampleGame game(640, 480);
 	return Application::Run(&game, hInstance, nCmdShow, L"タイトル");
 }
