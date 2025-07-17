@@ -42,6 +42,7 @@ int Application::Run(
 {
 	try {
 		InitializeWindow(game, hInstance, nCmdShow, title, game->GetWidth(), game->GetHeight());
+		Time::Initialize();
 	}
 	catch (const std::system_error& error) {
 		MessageBoxA(hWnd, error.what(), "ERROR: ウィンドウを初期化できませんでした", MB_OK | MB_ICONERROR);
@@ -55,6 +56,8 @@ int Application::Run(
 	// メッセージループを実行
 	MSG msg = {};
 	while (msg.message != WM_QUIT) {
+		Time::Update();
+
 		// このウィンドウのメッセージが存在するかを確認
 		if (PeekMessageW(&msg, NULL, 0, 0, PM_NOREMOVE)) {
 			// メッセージを取得
@@ -70,6 +73,7 @@ int Application::Run(
 	}
 
 	game->Release();
+	Time::Shutdown();
 
 	return static_cast<int>(msg.wParam);
 }

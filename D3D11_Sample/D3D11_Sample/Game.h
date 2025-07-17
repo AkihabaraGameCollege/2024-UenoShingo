@@ -5,6 +5,8 @@
 //=============================================================================
 #pragma once
 
+#include "Time.h"
+
 #include <Windows.h>
 
 #include <system_error>

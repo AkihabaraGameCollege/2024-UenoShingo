@@ -162,7 +162,7 @@ void SampleGame::OnInitialize()
 /// </summary>
 void SampleGame::OnUpdate()
 {
-	time += 0.1f;
+	time += Time::GetDeltaTime();
 
 	// à íuç¿ïW
 	XMFLOAT3 position = { 0, 0, 0 };
@@ -173,8 +173,8 @@ void SampleGame::OnUpdate()
 	XMFLOAT3 scale = { 1, 1, 1 };
 
 	// yé≤âÒì]
-	const float xAngle = 16 * XMConvertToRadians(time);
-	const float yAngle = 4 * XMConvertToRadians(time);
+	const float xAngle = XMConvertToRadians(45 * time);
+	const float yAngle = XMConvertToRadians(90 * time);
 	XMStoreFloat4(&rotation,
 		XMQuaternionRotationRollPitchYaw(xAngle, yAngle, 0));
 
