@@ -24,14 +24,53 @@ void SampleGame::OnInitialize()
 	HRESULT hr = S_OK;
 
 	// 頂点データの配列
-	constexpr VertexPositionColor vertices[] = {
-		{ { -0.5f,  0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f, 1.0f } },	// 0
-		{ {  0.5f,  0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f, 1.0f } },	// 1
-		{ { -0.5f, -0.5f, 0.0f }, { 0.0f, 0.0f, 0.0f, 1.0f } },	// 2
-		{ {  0.5f, -0.5f, 0.0f }, { 0.0f, 0.0f, 0.0f, 1.0f } },	// 3
+	constexpr VertexPositionNormal vertices[] = {
+		// Front
+		{ {  0.5f,  0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f } },
+		{ { -0.5f,  0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f } },
+		{ {  0.5f, -0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f } },
+		{ { -0.5f, -0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f } },
+		// Back
+		{ { -0.5f,  0.5f, -0.5f }, { 0.0f, 0.0f, -1.0f } },
+		{ {  0.5f,  0.5f, -0.5f }, { 0.0f, 0.0f, -1.0f } },
+		{ { -0.5f, -0.5f, -0.5f }, { 0.0f, 0.0f, -1.0f } },
+		{ {  0.5f, -0.5f, -0.5f }, { 0.0f, 0.0f, -1.0f } },
+		// Right
+		{ { 0.5f,  0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f } },
+		{ { 0.5f,  0.5f,  0.5f }, { 1.0f, 0.0f, 0.0f } },
+		{ { 0.5f, -0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f } },
+		{ { 0.5f, -0.5f,  0.5f }, { 1.0f, 0.0f, 0.0f } },
+		// Left
+		{ { -0.5f,  0.5f,  0.5f }, { -1.0f, 0.0f, 0.0f } },
+		{ { -0.5f,  0.5f, -0.5f }, { -1.0f, 0.0f, 0.0f } },
+		{ { -0.5f, -0.5f,  0.5f }, { -1.0f, 0.0f, 0.0f } },
+		{ { -0.5f, -0.5f, -0.5f }, { -1.0f, 0.0f, 0.0f } },
+		// Top
+		{ { -0.5f, 0.5f,  0.5f }, { 0.0f, 1.0f, 0.0f } },
+		{ {  0.5f, 0.5f,  0.5f }, { 0.0f, 1.0f, 0.0f } },
+		{ { -0.5f, 0.5f, -0.5f }, { 0.0f, 1.0f, 0.0f } },
+		{ {  0.5f, 0.5f, -0.5f }, { 0.0f, 1.0f, 0.0f } },
+		// Bottom
+		{ {  0.5f, -0.5f,  0.5f }, { 0.0f, -1.0f, 0.0f } },
+		{ { -0.5f, -0.5f,  0.5f }, { 0.0f, -1.0f, 0.0f } },
+		{ {  0.5f, -0.5f, -0.5f }, { 0.0f, -1.0f, 0.0f } },
+		{ { -0.5f, -0.5f, -0.5f }, { 0.0f, -1.0f, 0.0f } },
 	};
 	// インデックスデータの配列
-	constexpr UINT32 indices[] = { 0, 1, 2, 3, 2, 1 };
+	constexpr UINT32 indices[] = {
+		// Front
+		0, 1, 2, 3, 2, 1,
+		// Back
+		4, 5, 6, 7, 6, 5,
+		// Right
+		8, 9, 10, 11, 10, 9,
+		// Left
+		12, 13, 14, 15, 14, 13,
+		// Top
+		16, 17, 18, 19, 18, 17,
+		// Bottom
+		20, 21, 22, 23, 22, 21,
+	};
 
 	{
 		// 作成する頂点バッファーについての記述
@@ -89,7 +128,7 @@ void SampleGame::OnInitialize()
 
 	// 入力レイアウトを作成
 	hr = graphicsDevice->CreateInputLayout(
-		VertexPositionColor::InputElementDescs, std::size(VertexPositionColor::InputElementDescs),
+		VertexPositionNormal::InputElementDescs, std::size(VertexPositionNormal::InputElementDescs),
 		g_StandardVertexShader, std::size(g_StandardVertexShader),
 		&inputLayout);
 	ThrowIfFailed(hr);
@@ -134,9 +173,10 @@ void SampleGame::OnUpdate()
 	XMFLOAT3 scale = { 1, 1, 1 };
 
 	// y軸回転
-	const float yAngle = XMConvertToRadians(time);
+	const float xAngle = 16 * XMConvertToRadians(time);
+	const float yAngle = 4 * XMConvertToRadians(time);
 	XMStoreFloat4(&rotation,
-		XMQuaternionRotationRollPitchYaw(0, yAngle, 0));
+		XMQuaternionRotationRollPitchYaw(xAngle, yAngle, 0));
 
 	// 定数バッファーを更新
 	const auto worldMatrix = XMMatrixTransformation(
@@ -164,18 +204,18 @@ void SampleGame::OnUpdate()
 	constexpr auto nearZ = 0.3f;	// nearクリップ面
 	constexpr auto farZ = 1000.0f;	// farクリップ面
 
-	// 【正射影変換の場合】
-	constexpr auto orthographicSize = 5.0f;	// ビュー空間の垂直方向の半分のサイズ
-	// 定数バッファーを更新
-	const auto projectionMatrix = XMMatrixOrthographicLH(
-		2 * orthographicSize * aspectRatio,
-		2 * orthographicSize, nearZ, farZ);
+	//// 【正射影変換の場合】
+	//constexpr auto orthographicSize = 5.0f;	// ビュー空間の垂直方向の半分のサイズ
+	//// 定数バッファーを更新
+	//const auto projectionMatrix = XMMatrixOrthographicLH(
+	//	2 * orthographicSize * aspectRatio,
+	//	2 * orthographicSize, nearZ, farZ);
 
-	//// 【パースペクティブ射影変換の場合】
-	//// 視錐台の垂直方向の角度
-	//constexpr auto fieldOfView = XMConvertToRadians(60);
-	//const auto projectionMatrix = XMMatrixPerspectiveFovLH(
-	//	fieldOfView, aspectRatio, nearZ, farZ);
+	// 【パースペクティブ射影変換の場合】
+	// 視錐台の垂直方向の角度
+	constexpr auto fieldOfView = XMConvertToRadians(60);
+	const auto projectionMatrix = XMMatrixPerspectiveFovLH(
+		fieldOfView, aspectRatio, nearZ, farZ);
 
 	// 定数バッファーを更新
 	XMStoreFloat4x4(&constantBufferPerFrame.projectionMatrix, XMMatrixTranspose(projectionMatrix));
@@ -204,8 +244,7 @@ void SampleGame::OnRender()
 
 	// 頂点バッファーを設定
 	ID3D11Buffer* const vertexBuffers[1] = { vertexBuffer.Get(), };
-	const UINT strides[1] = { sizeof(VertexPositionColor), };
-	//const UINT strides[1] = { sizeof(VertexPositionNormalTexture), };
+	const UINT strides[1] = { sizeof(VertexPositionNormal), };
 	const UINT offsets[1] = { 0, };
 	immediateContext->IASetVertexBuffers(0, std::size(vertexBuffers), vertexBuffers, strides, offsets);
 	// インデックス バッファーを設定

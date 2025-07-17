@@ -14,8 +14,10 @@ struct VertexShaderInput
     //float4 position : POSITION;
     //float4 normal : NORMAL;
     //float2 texCoord : TEXCOORD;
+    //float4 position : POSITION;
+    //float4 color : COLOR;
     float4 position : POSITION;
-    float4 color : COLOR;
+    float4 normal : NORMAL;
 };
 
 // 頂点シェーダーからの出力
@@ -24,8 +26,10 @@ struct VertexShaderOutput
     //float4 position : SV_POSITION;
     //float4 normal : NORMAL;
     //float2 texCoord : TEXCOORD;
+    //float4 position : SV_POSITION;
+    //float4 color : COLOR;
     float4 position : SV_POSITION;
-    float4 color : COLOR;
+    float4 normal : NORMAL;
 };
 
 // ジオメトリー シェーダーへの入力

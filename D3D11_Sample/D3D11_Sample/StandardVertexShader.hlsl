@@ -4,6 +4,6 @@ VertexShaderOutput main(VertexShaderInput input)
 {
     VertexShaderOutput output;
     output.position = input.position;
-    output.color = input.color;
+    output.normal = input.normal;
     return output;
 }
