@@ -1,7 +1,7 @@
 #include "StandardShader.hlsli"
 
 // ライトの入射ベクトル(平行光源 w = 0)
-static const float4 lightPosition = float4(1.0f, 2.0f, -2.0f, 0.0f);
+static const float4 lightPosition = float4(0.0f, 0.0f, -1.0f, 0.0f);
 //// ライトの位置座標(点光源 w = 1)
 //static const float4 lightPosition = float4(1.0f, 2.0f, -2.0f, 1.0f);
 // マテリアルの表面カラー
