@@ -27,7 +27,7 @@ void SampleGame::OnInitialize()
 	// 球体の頂点・インデックス生成
 	constexpr int latitudeBands = 20;
 	constexpr int longitudeBands = 20;
-	constexpr float radius = 0.5f;
+	constexpr float radius = 1.5f;
 
 	std::vector<VertexPositionNormal> vertices;
 	std::vector<UINT32> indices;
@@ -177,7 +177,7 @@ void SampleGame::OnUpdate()
 	XMStoreFloat4x4(&constantBufferPerFrame.worldMatrix, XMMatrixTranspose(worldMatrix));
 
 	// カメラの位置座標
-	constexpr XMFLOAT3 eyePosition = { 0.0f, 0.0f, -10.0f };
+	constexpr XMFLOAT3 eyePosition = { 0.0f, 2.0f, -10.0f };
 	// カメラの回転
 	XMFLOAT4 cameraRotation = {};
 	XMStoreFloat4(&cameraRotation, XMQuaternionIdentity());
