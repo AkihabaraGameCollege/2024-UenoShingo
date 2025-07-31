@@ -1,7 +1,7 @@
 #include "StandardShader.hlsli"
 
 // ライトの入射ベクトル(平行光源 w = 0)
-static const float4 lightPosition = float4(0.5f, 1.0f, -1.0f, 0.0f);
+static const float4 lightPosition = float4(-0.5f, -1.0f, 1.0f, 0.0f);
 // マテリアルの表面カラー
 static const float4 diffuseColor = float4(1, 0.8, 0.2, 1); // 色を強調
 static const float3 ambientColor = float3(0.2, 0.2, 0.2); // 環境光
