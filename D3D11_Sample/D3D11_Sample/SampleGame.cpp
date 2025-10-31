@@ -2,17 +2,15 @@
 #include "StandardVertexShader.h"
 #include "StandardGeometryShader.h"
 #include "StandardPixelShader.h"
-#include <vector>
 
+using namespace GameLibrary;
 using namespace DirectX;
 
 /// <summary>
 /// このクラスのインスタンスを初期化します。
 /// </summary>
-/// <param name="screenWidth">スクリーンの幅</param>
-/// <param name="screenHeight">スクリーンの高さ</param>
-SampleGame::SampleGame(int screenWidth, int screenHeight)
-	: Game(screenWidth, screenHeight)
+SampleGame::SampleGame(const GameLibrary::ProjectSettings& settings)
+	: Game(settings)
 {
 
 }
@@ -24,81 +22,89 @@ void SampleGame::OnInitialize()
 {
 	HRESULT hr = S_OK;
 
-	// 球体の頂点・インデックス生成
-	constexpr int latitudeBands = 20;
-	constexpr int longitudeBands = 20;
-	constexpr float radius = 1.5f;
-
-	std::vector<VertexPositionNormal> vertices;
-	std::vector<UINT32> indices;
-
-	for (int lat = 0; lat <= latitudeBands; ++lat) {
-		const float theta = lat * DirectX::XM_PI / latitudeBands;
-		const float sinTheta = sinf(theta);
-		const float cosTheta = cosf(theta);
-
-		for (int lon = 0; lon <= longitudeBands; ++lon) {
-			const float phi = lon * 2.0f * DirectX::XM_PI / longitudeBands;
-			const float sinPhi = sinf(phi);
-			const float cosPhi = cosf(phi);
-
-			DirectX::XMFLOAT3 normal = {
-				cosPhi * sinTheta,
-				cosTheta,
-				sinPhi * sinTheta
-			};
-			DirectX::XMFLOAT3 position = {
-				radius * normal.x,
-				radius * normal.y,
-				radius * normal.z
-			};
-			vertices.push_back({ position, normal });
-		}
-	}
-
-	for (int lat = 0; lat < latitudeBands; ++lat) {
-		for (int lon = 0; lon < longitudeBands; ++lon) {
-			int first = (lat * (longitudeBands + 1)) + lon;
-			int second = first + longitudeBands + 1;
-
-			indices.push_back(first);
-			indices.push_back(second);
-			indices.push_back(first + 1);
-
-			indices.push_back(second);
-			indices.push_back(second + 1);
-			indices.push_back(first + 1);
-		}
-	}
+	// 頂点データの配列
+	constexpr VertexPositionNormal vertices[] = {
+		// Front
+		{ {  0.5f,  0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f } },
+		{ { -0.5f,  0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f } },
+		{ {  0.5f, -0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f } },
+		{ { -0.5f, -0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f } },
+		// Back
+		{ { -0.5f,  0.5f, -0.5f }, { 0.0f, 0.0f, -1.0f } },
+		{ {  0.5f,  0.5f, -0.5f }, { 0.0f, 0.0f, -1.0f } },
+		{ { -0.5f, -0.5f, -0.5f }, { 0.0f, 0.0f, -1.0f } },
+		{ {  0.5f, -0.5f, -0.5f }, { 0.0f, 0.0f, -1.0f } },
+		// Right
+		{ { 0.5f,  0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f } },
+		{ { 0.5f,  0.5f,  0.5f }, { 1.0f, 0.0f, 0.0f } },
+		{ { 0.5f, -0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f } },
+		{ { 0.5f, -0.5f,  0.5f }, { 1.0f, 0.0f, 0.0f } },
+		// Left
+		{ { -0.5f,  0.5f,  0.5f }, { -1.0f, 0.0f, 0.0f } },
+		{ { -0.5f,  0.5f, -0.5f }, { -1.0f, 0.0f, 0.0f } },
+		{ { -0.5f, -0.5f,  0.5f }, { -1.0f, 0.0f, 0.0f } },
+		{ { -0.5f, -0.5f, -0.5f }, { -1.0f, 0.0f, 0.0f } },
+		// Top
+		{ { -0.5f, 0.5f,  0.5f }, { 0.0f, 1.0f, 0.0f } },
+		{ {  0.5f, 0.5f,  0.5f }, { 0.0f, 1.0f, 0.0f } },
+		{ { -0.5f, 0.5f, -0.5f }, { 0.0f, 1.0f, 0.0f } },
+		{ {  0.5f, 0.5f, -0.5f }, { 0.0f, 1.0f, 0.0f } },
+		// Bottom
+		{ {  0.5f, -0.5f,  0.5f }, { 0.0f, -1.0f, 0.0f } },
+		{ { -0.5f, -0.5f,  0.5f }, { 0.0f, -1.0f, 0.0f } },
+		{ {  0.5f, -0.5f, -0.5f }, { 0.0f, -1.0f, 0.0f } },
+		{ { -0.5f, -0.5f, -0.5f }, { 0.0f, -1.0f, 0.0f } },
+	};
+	// インデックスデータの配列
+	constexpr UINT32 indices[] = {
+		// Front
+		0, 1, 2, 3, 2, 1,
+		// Back
+		4, 5, 6, 7, 6, 5,
+		// Right
+		8, 9, 10, 11, 10, 9,
+		// Left
+		12, 13, 14, 15, 14, 13,
+		// Top
+		16, 17, 18, 19, 18, 17,
+		// Bottom
+		20, 21, 22, 23, 22, 21,
+	};
 
 	{
-		D3D11_BUFFER_DESC bufferDesc = {
-			.ByteWidth = static_cast<UINT>(vertices.size() * sizeof(VertexPositionNormal)),
-			.Usage = D3D11_USAGE_DEFAULT,
-			.BindFlags = D3D11_BIND_VERTEX_BUFFER,
+		// 作成する頂点バッファーについての記述
+		constexpr auto bufferDesc = D3D11_BUFFER_DESC{
+			.ByteWidth = sizeof vertices,
+			.Usage = D3D11_USAGE::D3D11_USAGE_DEFAULT,
+			.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_VERTEX_BUFFER,
 			.CPUAccessFlags = 0,
 			.MiscFlags = 0,
 			.StructureByteStride = 0,
 		};
-		D3D11_SUBRESOURCE_DATA initData = { vertices.data(), 0, 0 };
-		hr = graphicsDevice->CreateBuffer(&bufferDesc, &initData, &vertexBuffer);
+		// バッファーを作成
+		hr = graphicsDevice->CreateBuffer(&bufferDesc, NULL, &vertexBuffer);
 		ThrowIfFailed(hr);
 	}
+	// バッファーにデータを転送
+	immediateContext->UpdateSubresource(vertexBuffer.Get(), 0, NULL, vertices, 0, 0);
 
 	{
-		D3D11_BUFFER_DESC bufferDesc = {
-			.ByteWidth = static_cast<UINT>(indices.size() * sizeof(UINT32)),
-			.Usage = D3D11_USAGE_DEFAULT,
-			.BindFlags = D3D11_BIND_INDEX_BUFFER,
+		// 作成するインデックス バッファーについての記述
+		constexpr auto bufferDesc = D3D11_BUFFER_DESC{
+			.ByteWidth = sizeof vertices,
+			.Usage = D3D11_USAGE::D3D11_USAGE_DEFAULT,
+			.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_INDEX_BUFFER,
 			.CPUAccessFlags = 0,
 			.MiscFlags = 0,
 			.StructureByteStride = 0,
 		};
-		D3D11_SUBRESOURCE_DATA initData = { indices.data(), 0, 0 };
-		hr = graphicsDevice->CreateBuffer(&bufferDesc, &initData, &indexBuffer);
+		// バッファーを作成
+		hr = graphicsDevice->CreateBuffer(&bufferDesc, NULL, &indexBuffer);
 		ThrowIfFailed(hr);
 	}
-	indexCount = static_cast<UINT>(indices.size());
+	// バッファーにデータを転送
+	immediateContext->UpdateSubresource(indexBuffer.Get(), 0, NULL, indices, 0, 0);
+	indexCount = std::size(indices);
 
 	// 頂点シェーダーを作成
 	hr = graphicsDevice->CreateVertexShader(
@@ -128,7 +134,8 @@ void SampleGame::OnInitialize()
 
 	// 定数バッファーを作成
 	{
-		D3D11_BUFFER_DESC bufferDesc = {
+		// 作成するバッファーについての記述
+		constexpr auto bufferDesc = D3D11_BUFFER_DESC{
 			.ByteWidth = sizeof(ConstantBufferPerFrame),
 			.Usage = D3D11_USAGE_DEFAULT,
 			.BindFlags = D3D11_BIND_CONSTANT_BUFFER,
@@ -136,7 +143,8 @@ void SampleGame::OnInitialize()
 			.MiscFlags = 0,
 			.StructureByteStride = 0,
 		};
-		hr = graphicsDevice->CreateBuffer(&bufferDesc, nullptr, &constantBuffer);
+		// バッファーを作成
+		auto hr = graphicsDevice->CreateBuffer(&bufferDesc, nullptr, &constantBuffer);
 		ThrowIfFailed(hr);
 	}
 	// 定数バッファーを更新
@@ -144,7 +152,8 @@ void SampleGame::OnInitialize()
 	XMStoreFloat4x4(&constantBufferPerFrame.viewMatrix, XMMatrixTranspose(XMMatrixIdentity()));
 	XMStoreFloat4x4(&constantBufferPerFrame.projectionMatrix, XMMatrixTranspose(XMMatrixIdentity()));
 	XMStoreFloat4x4(&constantBufferPerFrame.wvpMatrix, XMMatrixTranspose(XMMatrixIdentity()));
-	constantBufferPerFrame.materialColor = XMFLOAT4(1, 238 / 255.0f, 0, 1);
+	constantBufferPerFrame.lightPosition = XMFLOAT4(1, 2, -2, 1);
+	constantBufferPerFrame.materialDiffuseColor = XMFLOAT4(1, 238 / 255.0f, 0, 1);
 	immediateContext->UpdateSubresource(constantBuffer.Get(), 0, NULL, &constantBufferPerFrame, 0, 0);
 }
 
@@ -176,8 +185,26 @@ void SampleGame::OnUpdate()
 		XMLoadFloat3(&position));
 	XMStoreFloat4x4(&constantBufferPerFrame.worldMatrix, XMMatrixTranspose(worldMatrix));
 
+	// マテリアル
+	if (GetAsyncKeyState('D')) {
+		constantBufferPerFrame.materialDiffuseColor = DirectX::XMFLOAT4(1, 1, 0, 1);
+	}
+	else {
+		constantBufferPerFrame.materialDiffuseColor = DirectX::XMFLOAT4(0, 0, 0, 1);
+	}
+	if (GetAsyncKeyState('S')) {
+		constantBufferPerFrame.materialSpecularColor = DirectX::XMFLOAT3(1, 1, 1);
+		constantBufferPerFrame.materialSpecularPower = 1;
+	}
+	else {
+		constantBufferPerFrame.materialSpecularColor = DirectX::XMFLOAT3(0, 0, 0);
+	}
+
+	// ライト
+	constantBufferPerFrame.lightPosition = DirectX::XMFLOAT4(1.0f, 2.0f, -2.0f, 0.0f);
+
 	// カメラの位置座標
-	constexpr XMFLOAT3 eyePosition = { 0.0f, 2.0f, -10.0f };
+	constexpr XMFLOAT3 eyePosition = { 0.0f, 0.0f, -10.0f };
 	// カメラの回転
 	XMFLOAT4 cameraRotation = {};
 	XMStoreFloat4(&cameraRotation, XMQuaternionIdentity());
@@ -191,7 +218,7 @@ void SampleGame::OnUpdate()
 
 
 	// スクリーン画面のアスペクト比
-	const auto aspectRatio = screenWidth / static_cast<float>(screenHeight);
+	const auto aspectRatio = GetWidth() / static_cast<float>(GetHeight());
 	constexpr auto nearZ = 0.3f;	// nearクリップ面
 	constexpr auto farZ = 1000.0f;	// farクリップ面
 

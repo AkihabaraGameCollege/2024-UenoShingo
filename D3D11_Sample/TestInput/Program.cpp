@@ -1,19 +1,16 @@
-//=============================================================================
-// Program.cpp
-//
-// アプリケーションのエントリーポイントが含まれます。
-//=============================================================================
 #ifdef _DEBUG
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
 #endif
 
-#include "SampleGame.h"
+#include "TestInput.h"
 
 using namespace GameLibrary;
 
-// エントリーポイント
+/// <summary>
+/// エントリーポイント
+/// </summary>
 int WINAPI wWinMain(
 	_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR lpCmdLine, _In_ int nShowCmd)
@@ -23,10 +20,10 @@ int WINAPI wWinMain(
 #endif
 
 	const ProjectSettings settings = {
-		.Title = L"Direct3D 11 サンプル",
+		.Title = L"Input サンプル",
 		.Width = 1280,
 		.Height = 720,
 	};
-	Game game(settings);
+	TestInput game(settings);
 	return Application::Run(&game, hInstance, nShowCmd);
 }

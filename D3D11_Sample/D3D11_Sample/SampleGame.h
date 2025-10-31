@@ -1,14 +1,14 @@
 #pragma once
 
-#include "Game.h"
+#include <GameLibrary.h>
 
 /// <summary>
 /// サンプルのゲームを表します。
 /// </summary>
-class SampleGame : public Game
+class SampleGame : public GameLibrary::Game
 {
 public:
-	SampleGame(int screenWidth, int screenHeight);
+	SampleGame(const GameLibrary::ProjectSettings& settings);
 
 protected:
 	void OnInitialize() override;
@@ -31,7 +31,16 @@ private:
 		DirectX::XMFLOAT4X4 viewMatrix;			// ビュー変換行列
 		DirectX::XMFLOAT4X4 projectionMatrix;	// プロジェクション変換行列
 		DirectX::XMFLOAT4X4 wvpMatrix;			// ワールド × ビュー × プロジェクション変換行列
-		DirectX::XMFLOAT4 materialColor;
+		// カメラの位置座標
+		DirectX::XMFLOAT4 viewPosition = DirectX::XMFLOAT4(0, 1, -10, 1);
+		// ライトの位置座標(平行光源 w = 0, 点光源 w = 1)
+		DirectX::XMFLOAT4 lightPosition = DirectX::XMFLOAT4(1.0f, 2.0f, -2.0f, 1.0f);
+		// マテリアルの表面カラー
+		DirectX::XMFLOAT4 materialDiffuseColor = DirectX::XMFLOAT4(1, 1, 0, 1);
+		// 鏡面反射の色(r, g, b) = (x, y, z)
+		DirectX::XMFLOAT3 materialSpecularColor = DirectX::XMFLOAT3(1, 1, 1);
+		// 鏡面反射の強さ(float) = w
+		float materialSpecularPower = 1;
 	};
 	ConstantBufferPerFrame constantBufferPerFrame = {};
 	Microsoft::WRL::ComPtr<ID3D11Buffer> constantBuffer;

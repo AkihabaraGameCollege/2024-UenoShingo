@@ -5,31 +5,25 @@ cbuffer ConstanBufferPerFrame
     float4x4 ViewMatrix;
     float4x4 ProjectionMatrix;
     float4x4 WVP_Matrix;
-    float4 MaterialColor;
+    float4 ViewPosition;
+    float4 LightPosition;
+    float4 MaterialDiffuseColor;
+    float3 MaterialSpecularColor;
+    float MaterialSpecularPower;
 };
 
 // 頂点シェーダーへの入力
 struct VertexShaderInput
 {
-    //float4 position : POSITION;
-    //float4 normal : NORMAL;
-    //float2 texCoord : TEXCOORD;
-    //float4 position : POSITION;
-    //float4 color : COLOR;
     float4 position : POSITION;
-    float4 normal : NORMAL;
+    float3 normal : NORMAL;
 };
 
 // 頂点シェーダーからの出力
 struct VertexShaderOutput
 {
-    //float4 position : SV_POSITION;
-    //float4 normal : NORMAL;
-    //float2 texCoord : TEXCOORD;
-    //float4 position : SV_POSITION;
-    //float4 color : COLOR;
     float4 position : SV_POSITION;
-    float4 normal : NORMAL;
+    float3 normal : NORMAL;
 };
 
 // ジオメトリー シェーダーへの入力
@@ -39,7 +33,8 @@ typedef VertexShaderOutput GeometryShaderInput;
 struct GeometryShaderOutput
 {
     float4 position : SV_POSITION;
-    float4 color : COLOR;
+    float4 worldPosition : POSITION;
+    float3 worldNormal : NORMAL;
 };
 
 // ピクセル シェーダーへの入力
