@@ -4,6 +4,7 @@
 #include <GameLibrary/AnalogInput.h>
 #include "Keyboard.h"
 #include "Mouse.h"
+#include "GamePad.h"
 
 #include <Windows.h>
 #include <wrl/client.h>
@@ -43,5 +44,6 @@ namespace GameLibrary
 		Microsoft::WRL::ComPtr<IDirectInput8W> directInput;
 		Keyboard keyboard;
 		Mouse mouse;
+		GamePad gamePad;
 	};
 }

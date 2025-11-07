@@ -17,6 +17,7 @@ InputManager::InputManager(HINSTANCE hInstance, HWND hWnd)
 	ThrowIfFailed(DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8W, &directInput, NULL));
 	keyboard.Initialize(directInput.Get(), hWnd);
 	mouse.Initialize(directInput.Get(), hWnd);
+	gamePad.Initialize();
 }
 
 /// <summary>
@@ -29,6 +30,7 @@ void InputManager::Update() noexcept
 
 	keyboard.Update(*currentButtons);
 	mouse.Update(*currentButtons, analogs);
+	gamePad.Update(*currentButtons, analogs);
 }
 
 /// 現在のフレームでボタン入力が開始されたかを取得します。

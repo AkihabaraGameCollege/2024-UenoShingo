@@ -159,4 +159,37 @@ void TestInput::OnUpdate() noexcept
 			mousePosition.x, mousePosition.y);
 		OutputDebugStringW(message.c_str());
 	}
+
+	// Gamepad
+	OutputButton(DigitalInput::AButton);
+	OutputButton(DigitalInput::BButton);
+	OutputButton(DigitalInput::XButton);
+	OutputButton(DigitalInput::YButton);
+	OutputButton(DigitalInput::DPadUp);
+	OutputButton(DigitalInput::DPadDown);
+	OutputButton(DigitalInput::DPadLeft);
+	OutputButton(DigitalInput::DPadRight);
+	OutputButton(DigitalInput::StartButton);
+	OutputButton(DigitalInput::BackButton);
+	OutputButton(DigitalInput::LeftThumbClick);
+	OutputButton(DigitalInput::RightThumbClick);
+	OutputButton(DigitalInput::LShoulder);
+	OutputButton(DigitalInput::RShoulder);
+
+	const auto leftTrigger = Input::GetAxis(AnalogInput::LeftTrigger);
+	const auto rightTrigger = Input::GetAxis(AnalogInput::RightTrigger);
+	const auto leftStickX = Input::GetAxis(AnalogInput::LeftStickX);
+	const auto leftStickY = Input::GetAxis(AnalogInput::LeftStickY);
+	const auto rightStickX = Input::GetAxis(AnalogInput::RightStickX);
+	const auto rightStickY = Input::GetAxis(AnalogInput::RightStickY);
+	if (leftTrigger != 0 || rightTrigger != 0 ||
+		leftStickX != 0 || leftStickY != 0 ||
+		rightStickX != 0 || rightStickY != 0) {
+		const auto message = std::format(
+			L"(LeftTrigger, RightTrigger) = ({0:f}, {1:f}), LeftStick = ({2:f}, {3:f}), RightStick = ({4:f}, {5:f})\n",
+			leftTrigger, rightTrigger,
+			leftStickX, leftStickY,
+			rightStickX, rightStickY);
+		OutputDebugStringW(message.c_str());
+	}
 }
