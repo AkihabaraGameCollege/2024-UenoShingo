@@ -111,6 +111,7 @@ namespace GameLibrary
 		// メッセージループを実行
 		MSG msg = {};
 		while (msg.message != WM_QUIT) {
+			Input::Update();
 			Time::Update();
 
 			// このウィンドウのメッセージが存在するかを確認

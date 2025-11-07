@@ -15,6 +15,7 @@ InputManager::InputManager(HINSTANCE hInstance, HWND hWnd)
 	lastButtons = &buttons[1];
 
 	ThrowIfFailed(DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8W, &directInput, NULL));
+	keyboard.Initialize(directInput.Get(), hWnd);
 }
 
 /// <summary>
@@ -24,6 +25,8 @@ void InputManager::Update() noexcept
 {
 	// 前回フレームの状態を更新
 	std::swap(lastButtons, currentButtons);
+
+	keyboard.Update(*currentButtons);
 }
 
 /// 現在のフレームでボタン入力が開始されたかを取得します。

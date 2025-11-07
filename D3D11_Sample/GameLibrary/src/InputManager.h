@@ -2,6 +2,7 @@
 
 #include <GameLibrary/DigitalInput.h>
 #include <GameLibrary/AnalogInput.h>
+#include "Keyboard.h"
 
 #include <Windows.h>
 #include <wrl/client.h>
@@ -38,5 +39,6 @@ namespace GameLibrary
 		float analogs[AnalogInput::NumAnalogInputs] = {};
 
 		Microsoft::WRL::ComPtr<IDirectInput8W> directInput;
+		Keyboard keyboard;
 	};
 }
