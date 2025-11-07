@@ -16,6 +16,7 @@ InputManager::InputManager(HINSTANCE hInstance, HWND hWnd)
 
 	ThrowIfFailed(DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8W, &directInput, NULL));
 	keyboard.Initialize(directInput.Get(), hWnd);
+	mouse.Initialize(directInput.Get(), hWnd);
 }
 
 /// <summary>
@@ -27,6 +28,7 @@ void InputManager::Update() noexcept
 	std::swap(lastButtons, currentButtons);
 
 	keyboard.Update(*currentButtons);
+	mouse.Update(*currentButtons);
 }
 
 /// 現在のフレームでボタン入力が開始されたかを取得します。

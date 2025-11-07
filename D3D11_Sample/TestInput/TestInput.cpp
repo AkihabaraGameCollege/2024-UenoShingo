@@ -131,4 +131,14 @@ void TestInput::OnUpdate() noexcept
 	OutputButton(DigitalInput::Apostrophe);
 
 	OutputButton(DigitalInput::NumpadEnter);
+
+	// Mouse
+	OutputButton(DigitalInput::Mouse0);
+	OutputButton(DigitalInput::Mouse1);
+	OutputButton(DigitalInput::Mouse2);
+	OutputButton(DigitalInput::Mouse3);
+	OutputButton(DigitalInput::Mouse4);
+	OutputButton(DigitalInput::Mouse5);
+	OutputButton(DigitalInput::Mouse6);
+	OutputButton(DigitalInput::Mouse7);
 }
