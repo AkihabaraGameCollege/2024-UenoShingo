@@ -9,6 +9,30 @@
 namespace GameLibrary
 {
 	/// <summary>
+	/// 直前のシステムエラー メッセージをデバッグ出力に表示します。
+	/// </summary>
+	/// <return></return>
+	inline void OutputLastError(const std::source_location& location = std::source_location::current()) noexcept
+	{
+		const auto errorCode = GetLastError();
+
+		char message[512] = {};
+		sprintf_s(
+			message, std::size(message),
+			"%s(%d,%d): error %d",
+			location.file_name(), location.line(), location.column(), errorCode);
+		OutputDebugStringA(message);
+		OutputDebugStringA(": ");
+
+		LPWSTR buffer = nullptr;
+		FormatMessageW(
+			FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, errorCode, LANG_USER_DEFAULT,
+			reinterpret_cast<LPWSTR>(&buffer), 0, NULL);
+		OutputDebugStringW(buffer);
+		LocalFree(buffer);
+	}
+
+	/// <summary>
 	/// 直前のシステムエラーを例外としてスローします。
 	/// </summary>
 	inline void ThrowLastError(const std::source_location& location = std::source_location::current())

@@ -76,3 +76,12 @@ float Input::GetAxis(AnalogInput analogInput) noexcept
 {
 	return s_Manager->GetAxis(analogInput);
 }
+
+/// <summary>
+/// マウスのカーソル位置を取得します。
+/// </summary>
+/// <returns>位置座標</returns>
+const XMFLOAT2& Input::GetMousePosition() noexcept
+{
+	return s_Manager->GetMousePosition();
+}

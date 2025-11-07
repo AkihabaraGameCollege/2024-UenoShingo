@@ -28,7 +28,7 @@ void InputManager::Update() noexcept
 	std::swap(lastButtons, currentButtons);
 
 	keyboard.Update(*currentButtons);
-	mouse.Update(*currentButtons);
+	mouse.Update(*currentButtons, analogs);
 }
 
 /// 現在のフレームでボタン入力が開始されたかを取得します。
@@ -68,4 +68,13 @@ bool InputManager::GetButtonUp(DigitalInput digitalInput) const noexcept
 float InputManager::GetAxis(AnalogInput analogInput) const noexcept
 {
 	return analogs[analogInput];
+}
+
+/// <summary>
+/// マウスのカーソル位置を取得します。
+/// </summary>
+/// <returns>位置座標</returns>
+const XMFLOAT2& InputManager::GetMousePosition() const noexcept
+{
+	return mouse.GetMousePosition();
 }

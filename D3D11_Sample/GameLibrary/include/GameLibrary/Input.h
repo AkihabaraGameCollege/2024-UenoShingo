@@ -22,5 +22,6 @@ namespace GameLibrary
 		static bool GetButton(DigitalInput digitalInput) noexcept;
 		static bool GetButtonUp(DigitalInput digitalInput) noexcept;
 		static float GetAxis(AnalogInput analogInput) noexcept;
+		static const DirectX::XMFLOAT2& GetMousePosition() noexcept;
 	};
 }

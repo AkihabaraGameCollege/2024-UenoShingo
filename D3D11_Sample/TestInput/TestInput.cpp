@@ -141,4 +141,22 @@ void TestInput::OnUpdate() noexcept
 	OutputButton(DigitalInput::Mouse5);
 	OutputButton(DigitalInput::Mouse6);
 	OutputButton(DigitalInput::Mouse7);
+
+	const auto mouseX = Input::GetAxis(AnalogInput::MouseX);
+	const auto mouseY = Input::GetAxis(AnalogInput::MouseY);
+	const auto mouseScroll = Input::GetAxis(AnalogInput::MouseScroll);
+	if (mouseX != 0 || mouseY != 0 || mouseScroll != 0) {
+		const auto message = std::format(
+			L"(MouseX, MouseY, MouseScroll) = ({0:f}, {1:f}, {2:f})\n",
+			mouseX, mouseY, mouseScroll);
+		OutputDebugStringW(message.c_str());
+	}
+
+	if (Input::GetButtonDown(DigitalInput::Mouse0)) {
+		const auto& mousePosition = Input::GetMousePosition();
+		const auto message = std::format(
+			L"mousePosition: ({0:f}, {1:f})\n",
+			mousePosition.x, mousePosition.y);
+		OutputDebugStringW(message.c_str());
+	}
 }
