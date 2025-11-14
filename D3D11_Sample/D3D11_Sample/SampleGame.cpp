@@ -248,18 +248,6 @@ void SampleGame::OnUpdate()
 /// </summary>
 void SampleGame::OnRender()
 {
-	// レンダーターゲットを設定
-	ID3D11RenderTargetView* renderTargetViews[] = { renderTargetView.Get(), };
-	immediateContext->OMSetRenderTargets(std::size(renderTargetViews), renderTargetViews, depthStencilView.Get());
-	// 画面をクリアー
-	immediateContext->ClearRenderTargetView(renderTargetView.Get(), clearColor);
-	immediateContext->ClearDepthStencilView(depthStencilView.Get(),
-		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
-	// ビューポートを設定
-	D3D11_VIEWPORT viewports[] = { viewport, };
-	immediateContext->RSSetViewports(std::size(viewports), viewports);
-
 	// 頂点バッファーを設定
 	ID3D11Buffer* const vertexBuffers[1] = { vertexBuffer.Get(), };
 	const UINT strides[1] = { sizeof(VertexPositionNormal), };

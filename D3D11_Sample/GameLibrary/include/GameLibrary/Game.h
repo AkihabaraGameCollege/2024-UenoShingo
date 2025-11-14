@@ -11,6 +11,7 @@
 #include <format>
 
 #include <wrl/client.h>
+#include <dxgi1_6.h>
 #include <d3d11.h>
 #include <DirectXMath.h>
 
@@ -91,6 +92,8 @@ namespace GameLibrary
 		virtual void OnUpdate() {};
 		virtual void OnRender() {};
 
+		Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory;
+		Microsoft::WRL::ComPtr<IDXGIAdapter4> dxgiAdapter;
 		// Direct3D 11のデバイス
 		Microsoft::WRL::ComPtr<ID3D11Device> graphicsDevice;
 		// Direct3D 11のデバイス コンテキスト
@@ -113,10 +116,14 @@ namespace GameLibrary
 		// 画面クリアーに使用するカラー
 		FLOAT clearColor[4] = { 53 / 255.0f, 70 / 255.0f, 166 / 255.0f, 1.0f };
 		// ビューポート
-		D3D11_VIEWPORT viewport = {};
-
-	private:
-		void InitGraphicsDevice(HWND hWnd);
+		D3D11_VIEWPORT viewport = {
+			.TopLeftX = 0,
+			.TopLeftY = 0,
+			.Width = 0,
+			.Height = 0,
+			.MinDepth = 0.0f,
+			.MaxDepth = 1.0f,
+		};
 	};
 
 	/// <summary>

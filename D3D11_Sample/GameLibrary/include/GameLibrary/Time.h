@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Windows.h>
-
 namespace GameLibrary
 {
 	// ŠÔ‚ğŒv‘ª‚µ‚Ü‚·B
@@ -9,9 +7,10 @@ namespace GameLibrary
 	{
 	public:
 		static void Initialize();
-		static void Shutdown();
-		static void Update();
+		static void Shutdown() noexcept;
+		static void Update() noexcept;
 
-		static float GetDeltaTime();
+		static float GetTime() noexcept;
+		static float GetDeltaTime() noexcept;
 	};
 }

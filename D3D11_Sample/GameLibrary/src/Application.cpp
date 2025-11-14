@@ -129,6 +129,7 @@ namespace GameLibrary
 		}
 
 		game->Release();
+		Input::Shutdown();
 		Time::Shutdown();
 
 		return static_cast<int>(msg.wParam);

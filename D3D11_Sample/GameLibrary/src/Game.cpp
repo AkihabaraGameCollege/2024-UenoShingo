@@ -7,27 +7,54 @@
 #include <GameLibrary/Utility.h>
 
 using namespace GameLibrary;
+using Microsoft::WRL::ComPtr;
 
 namespace
 {
-	// ウィンドウ・メッセージを処理するプロシージャー
-	LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+#if defined(_DEBUG)
+	constexpr UINT creationFlags =
+		D3D11_CREATE_DEVICE_FLAG::D3D11_CREATE_DEVICE_BGRA_SUPPORT |
+		D3D11_CREATE_DEVICE_FLAG::D3D11_CREATE_DEVICE_DEBUG;
+#else
+	constexpr UINT creationFlags = D3D11_CREATE_DEVICE_FLAG::D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+#endif
+
+	constexpr D3D_FEATURE_LEVEL featureLevels[] = {
+		D3D_FEATURE_LEVEL::D3D_FEATURE_LEVEL_11_1,
+		D3D_FEATURE_LEVEL::D3D_FEATURE_LEVEL_11_0,
+	};
+
+	/// <summary>
+	/// ハードウェアで実装されているディスプレイ サブシステムを取得します。
+	/// </summary>
+	/// <param name="factory">IDXGIFactory7 インターフェイス</param>
+	/// <returns>ディスプレイ サブシステム</returns>
+	ComPtr<IDXGIAdapter4> GetHardwareAdapter(IDXGIFactory7* factory)
 	{
-		switch (uMsg) {
-		case WM_CLOSE:
-			// ウィンドウを閉じる
-			if (MessageBox(hWnd, L"ウィンドウを閉じますか？", L"情報", MB_OKCANCEL) == IDOK) {
-				DestroyWindow(hWnd);
+		ComPtr<IDXGIAdapter4> adapter;
+		for (
+			UINT adapterIndex = 0;
+			SUCCEEDED(factory->EnumAdapterByGpuPreference(adapterIndex, DXGI_GPU_PREFERENCE::DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&adapter)));
+			++adapterIndex)
+		{
+			auto desc = DXGI_ADAPTER_DESC3{};
+			ThrowIfFailed(adapter->GetDesc3(&desc));
+			if (desc.Flags & DXGI_ADAPTER_FLAG3::DXGI_ADAPTER_FLAG3_SOFTWARE) {
+				continue;
 			}
-			return 0;
 
-		case WM_DESTROY:
-			// アプリケーションを終了
-			PostQuitMessage(0);
-			return 0;
+			ComPtr<ID3D11Device> device;
+			ComPtr<ID3D11DeviceContext> deviceContext;
+			auto featureLevel = D3D_FEATURE_LEVEL{};
+			if (SUCCEEDED(D3D11CreateDevice(
+				adapter.Get(), D3D_DRIVER_TYPE::D3D_DRIVER_TYPE_UNKNOWN, NULL,
+				creationFlags, featureLevels, std::size(featureLevels),
+				D3D11_SDK_VERSION, &device, &featureLevel, &deviceContext)))
+			{
+				break;
+			}
 		}
-
-		return DefWindowProc(hWnd, uMsg, wParam, lParam);
+		return adapter;
 	}
 }
 
@@ -38,9 +65,24 @@ Game::Game(const ProjectSettings& settings)
 
 }
 
-// グラフィックデバイスを初期化します。
-void Game::InitGraphicsDevice(HWND hWnd)
+// ゲームを初期化します。
+void Game::Initialize(HWND hWnd)
 {
+	// DXGI ファクトリー
+#if defined(_DEBUG)
+	constexpr UINT factoryFlags = DXGI_CREATE_FACTORY_DEBUG;
+#else
+	constexpr UINT factoryFlags = 0;
+#endif
+	ThrowIfFailed(CreateDXGIFactory2(factoryFlags, IID_PPV_ARGS(&dxgiFactory)));
+
+	// HARDWARE アダプター
+	dxgiAdapter = GetHardwareAdapter(dxgiFactory.Get());
+	// WARP アダプター
+	if (dxgiAdapter == nullptr) {
+		ThrowIfFailed(dxgiFactory->EnumWarpAdapter(IID_PPV_ARGS(&dxgiAdapter)));
+	}
+
 	HRESULT hr = S_OK;
 
 	// デバイス作成時のオプションフラグ
@@ -161,21 +203,14 @@ void Game::InitGraphicsDevice(HWND hWnd)
 	ThrowIfFailed(hr);
 	depthStencil.Reset();
 
-
-	// ビューポート
-	viewport.Width = static_cast<FLOAT>(width);
-	viewport.Height = static_cast<FLOAT>(height);
-	viewport.MinDepth = 0.0f;
-	viewport.MaxDepth = 1.0f;
-	viewport.TopLeftX = 0.0f;
-	viewport.TopLeftY = 0.0f;
-}
-
-// ゲームを初期化します。
-void Game::Initialize(HWND hWnd)
-{
-	// グラフィックデバイスを作成
-	InitGraphicsDevice(hWnd);
+	viewport = {
+		.TopLeftX = 0.0f,
+		.TopLeftY = 0.0f,
+		.Width = static_cast<FLOAT>(swapChainDesc.BufferDesc.Width),
+		.Height = static_cast<FLOAT>(swapChainDesc.BufferDesc.Height),
+		.MinDepth = D3D11_MIN_DEPTH,
+		.MaxDepth = D3D11_MAX_DEPTH,
+	};
 
 	OnInitialize();
 }
@@ -195,6 +230,18 @@ void Game::Update() noexcept
 // フレームの描画処理を実行します。
 void Game::Render() noexcept
 {
+	// レンダーターゲットを設定
+	ID3D11RenderTargetView* renderTargetViews[] = { renderTargetView.Get(), };
+	immediateContext->OMSetRenderTargets(std::size(renderTargetViews), renderTargetViews, depthStencilView.Get());
+	// 画面をクリアー
+	immediateContext->ClearRenderTargetView(renderTargetView.Get(), clearColor);
+	immediateContext->ClearDepthStencilView(depthStencilView.Get(),
+		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+	// ビューポートを設定
+	D3D11_VIEWPORT viewports[] = { viewport, };
+	immediateContext->RSSetViewports(std::size(viewports), viewports);
+
 	OnRender();
 
 	// バックバッファーに描画したイメージをディスプレイに表示

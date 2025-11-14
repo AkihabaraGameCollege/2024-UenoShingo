@@ -1,6 +1,7 @@
 #pragma once
 
 #pragma comment(lib, "GameLibrary.lib")
+#pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "D3D11.lib")
 #pragma comment (lib, "Winmm.lib")
 #include <GameLibrary/Game.h>
@@ -11,3 +12,6 @@
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "xinput.lib")
 #include <GameLibrary/Input.h>
+// Time
+#pragma comment(lib, "winmm.lib")
+#include <GameLibrary/Time.h>
