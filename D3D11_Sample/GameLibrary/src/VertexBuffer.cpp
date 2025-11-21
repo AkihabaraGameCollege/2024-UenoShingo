@@ -4,7 +4,7 @@
 using namespace GameLibrary;
 
 VertexBuffer::VertexBuffer(ID3D11Device5* graphicsDevice, UINT vertexStride, UINT vertexCount, const void* source)
-	: graphicsDevice(graphicsDevice), stride(vertexStride), count(vertexCount)
+	: GraphicsResource(graphicsDevice), stride(vertexStride), count(vertexCount)
 {
 	const auto desc = D3D11_BUFFER_DESC{
 		.ByteWidth = vertexStride * vertexCount,
@@ -20,15 +20,6 @@ VertexBuffer::VertexBuffer(ID3D11Device5* graphicsDevice, UINT vertexStride, UIN
 		.SysMemSlicePitch = 0,
 	};
 	ThrowIfFailed(graphicsDevice->CreateBuffer(&desc, &initialData, &buffer));
-}
-
-/// <summary>
-/// このリソースを作成したグラフィックス デバイスを取得します。
-/// </summary>
-/// <returns>グラフィックス デバイス</returns>
-ID3D11Device5* VertexBuffer::GetDevice() noexcept
-{
-	return graphicsDevice.Get();
 }
 
 /// <summary>

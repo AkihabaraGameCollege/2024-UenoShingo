@@ -4,19 +4,10 @@
 using namespace GameLibrary;
 
 VertexShader::VertexShader(ID3D11Device5* graphicsDevice, const void* shaderBytecode, size_t bytecodeLength)
-	: graphicsDevice(graphicsDevice)
+	: GraphicsResource(graphicsDevice)
 {
 	ThrowIfFailed(graphicsDevice->CreateVertexShader(
 		shaderBytecode, bytecodeLength, NULL, &shader));
-}
-
-/// <summary>
-/// このリソースを作成したグラフィックス デバイスを取得します。
-/// </summary>
-/// <returns>グラフィックス デバイス</returns>
-ID3D11Device5* VertexShader::GetDevice() noexcept
-{
-	return graphicsDevice.Get();
 }
 
 ID3D11VertexShader* VertexShader::GetNativePointer() const noexcept

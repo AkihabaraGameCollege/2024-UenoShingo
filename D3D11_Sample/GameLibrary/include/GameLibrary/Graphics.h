@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Windows.h>
+#include <wrl/client.h>
 #include <d3d11_4.h>
 #include <DirectXMath.h>
 
@@ -50,5 +51,17 @@ namespace GameLibrary
 			{ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 			{ "TEXCOORD", 0,    DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		};
+	};
+
+	class GraphicsResource
+	{
+	public:
+		GraphicsResource(ID3D11Device5* graphicsDevice) noexcept;
+		virtual ~GraphicsResource() = default;
+
+		ID3D11Device5* GetDevice() noexcept;
+
+	private:
+		Microsoft::WRL::ComPtr<ID3D11Device5> graphicsDevice;
 	};
 }
