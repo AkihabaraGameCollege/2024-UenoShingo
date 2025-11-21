@@ -26,6 +26,8 @@ int WINAPI wWinMain(
 		.Title = L"Direct3D 11 ƒTƒ“ƒvƒ‹",
 		.Width = 1280,
 		.Height = 720,
+		.ForceVSync = false,
+		.UseWarpAdapter = false,
 	};
 	SampleGame game(settings);
 	return Application::Run(&game, hInstance, nShowCmd);

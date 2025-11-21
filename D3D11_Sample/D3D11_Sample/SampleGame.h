@@ -16,10 +16,12 @@ protected:
 	void OnRender() override;
 
 private:
-	Microsoft::WRL::ComPtr<ID3D11Buffer> vertexBuffer;
+	std::shared_ptr<GameLibrary::VertexBuffer> vertexBuffer;
+	UINT vertexOffset = 0;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> indexBuffer;
 	UINT indexCount = 0;
-	Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
+	// Shaders
+	GameLibrary::VertexShader* vertexShader;
 	Microsoft::WRL::ComPtr<ID3D11GeometryShader> geometryShader;
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader;
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;

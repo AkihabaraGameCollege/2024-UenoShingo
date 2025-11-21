@@ -4,8 +4,10 @@
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "D3D11.lib")
 #pragma comment (lib, "Winmm.lib")
+#include <GameLibrary/Graphics.h>
 #include <GameLibrary/Game.h>
-#include <GameLibrary/Time.h>
+#include <GameLibrary/Buffer.h>
+#include <GameLibrary/Shader.h>
 #include <GameLibrary/Utility.h>
 // Input
 #pragma comment(lib, "dinput8.lib")

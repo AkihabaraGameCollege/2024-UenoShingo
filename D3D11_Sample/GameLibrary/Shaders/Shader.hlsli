@@ -1,0 +1,9 @@
+struct VertexShaderInput_Sprite
+{
+	float4 position : POSITION;
+};
+
+struct VertexShaderOutput_Sprite
+{
+	float4 position : SV_POSITION;
+};
