@@ -1,5 +1,4 @@
 #include "SampleGame.h"
-#include "StandardVertexShader.h"
 
 using namespace GameLibrary;
 using namespace DirectX;
@@ -92,6 +91,11 @@ void SampleGame::OnInitialize()
 	geometryShader = spriteGeometryShader.get();
 	pixelShader = spritePixelShader.get();
 
+	// 入力レイアウト
+	inputLayout = std::make_shared<InputLayout_Sprite>(device.Get());
+
+	startVertexLocation = 0;
+
 	{
 		// 作成するインデックス バッファーについての記述
 		constexpr auto bufferDesc = D3D11_BUFFER_DESC{
@@ -109,13 +113,6 @@ void SampleGame::OnInitialize()
 	// バッファーにデータを転送
 	deviceContext->UpdateSubresource(indexBuffer.Get(), 0, NULL, indices_cube, 0, 0);
 	indexCount = std::size(indices_cube);
-
-	// 入力レイアウトを作成
-	hr = device->CreateInputLayout(
-		VertexPositionNormal::InputElementDescs, std::size(VertexPositionNormal::InputElementDescs),
-		g_StandardVertexShader, std::size(g_StandardVertexShader),
-		&inputLayout);
-	ThrowIfFailed(hr);
 
 	// 定数バッファーを作成
 	{
@@ -238,7 +235,7 @@ void SampleGame::OnRender()
 	const UINT strides[] = { vertexBuffer->GetStride(), };
 	const UINT offsets[] = { vertexOffset, };
 	deviceContext->IASetVertexBuffers(0, static_cast<UINT>(std::size(vertexBuffers)), vertexBuffers, strides, offsets);
-
+	deviceContext->IASetInputLayout(inputLayout->GetNativePointer());
 	// Shaders
 	vertexShader->Apply(deviceContext.Get());
 	geometryShader->Apply(deviceContext.Get());
@@ -246,9 +243,7 @@ void SampleGame::OnRender()
 
 	// インデックス バッファーを設定
 	deviceContext->IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
-	// 頂点バッファーと頂点シェーダーの組合せに対応した入力レイアウトを設定
-	deviceContext->IASetInputLayout(inputLayout.Get());
-	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// 定数バッファーを設定
 	deviceContext->UpdateSubresource(constantBuffer.Get(), 0, NULL, &constantBufferPerFrame, 0, 0);
@@ -258,5 +253,5 @@ void SampleGame::OnRender()
 	deviceContext->PSSetConstantBuffers(0, std::size(constantBuffers), constantBuffers);
 
 	// メッシュを描画
-	deviceContext->DrawIndexed(indexCount, 0, 0);
+	deviceContext->Draw(vertexBuffer->GetCount(), startVertexLocation);
 }

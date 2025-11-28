@@ -8,6 +8,7 @@
 #include <GameLibrary/Game.h>
 #include <GameLibrary/Buffer.h>
 #include <GameLibrary/Shader.h>
+#include <GameLibrary/InputLayout.h>
 #include <GameLibrary/Utility.h>
 // Input
 #pragma comment(lib, "dinput8.lib")

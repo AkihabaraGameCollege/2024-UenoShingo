@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Windows.h>
+#include <iterator>
 #include <wrl/client.h>
 #include <d3d11_4.h>
 #include <DirectXMath.h>
@@ -12,6 +13,11 @@ namespace GameLibrary
 		DirectX::XMFLOAT3 Position;
 
 		static constexpr UINT GetSize() { return static_cast<UINT>(sizeof(Vertex_Sprite)); }
+
+		static constexpr D3D11_INPUT_ELEMENT_DESC InputElementDescs[] = {
+			{ "POSITION", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		};
+		static constexpr UINT NumElements = static_cast<UINT>(std::size(InputElementDescs));
 	};
 
 	// 一つの頂点に含まれるデータの型

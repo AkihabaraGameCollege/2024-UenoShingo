@@ -57,6 +57,9 @@
     <ClInclude Include="include\GameLibrary\Shader.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="include\GameLibrary\InputLayout.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Game.cpp">
@@ -92,6 +95,9 @@
     <ClCompile Include="src\GraphicsResource.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="src\InputLayout.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Shader.hlsli" />
@@ -100,5 +106,6 @@
     <FxCompile Include="Shaders\SpriteVertexShader.hlsl" />
     <FxCompile Include="Shaders\SpritePixelShader.hlsl" />
     <FxCompile Include="Shaders\SpriteGeometryShader.hlsl" />
+    <FxCompile Include="Shaders\InputSignature_SpriteVertex.hlsl" />
   </ItemGroup>
 </Project>

@@ -146,6 +146,7 @@
     <ClInclude Include="include\GameLibrary.h" />
     <ClInclude Include="include\GameLibrary\Graphics.h" />
     <ClInclude Include="include\GameLibrary\Input.h" />
+    <ClInclude Include="include\GameLibrary\InputLayout.h" />
     <ClInclude Include="include\GameLibrary\Shader.h" />
     <ClInclude Include="include\GameLibrary\Time.h" />
     <ClInclude Include="include\GameLibrary\Utility.h" />
@@ -160,6 +161,7 @@
     <ClCompile Include="src\GamePad.cpp" />
     <ClCompile Include="src\GraphicsResource.cpp" />
     <ClCompile Include="src\Input.cpp" />
+    <ClCompile Include="src\InputLayout.cpp" />
     <ClCompile Include="src\InputManager.cpp" />
     <ClCompile Include="src\Keyboard.cpp" />
     <ClCompile Include="src\Mouse.cpp" />
@@ -171,6 +173,18 @@
     <None Include="Shaders\Shader.hlsli" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="Shaders\InputSignature_SpriteVertex.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">g_%(Filename)</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">g_%(Filename)</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">src\%(Filename).h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">src\%(Filename).h</HeaderFileOutput>
+    </FxCompile>
     <FxCompile Include="Shaders\SpriteGeometryShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Geometry</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>

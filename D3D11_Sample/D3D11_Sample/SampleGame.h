@@ -24,7 +24,10 @@ private:
 	GameLibrary::VertexShader* vertexShader = nullptr;
 	GameLibrary::GeometryShader* geometryShader = nullptr;
 	GameLibrary::PixelShader* pixelShader = nullptr;
-	Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
+
+	std::shared_ptr<GameLibrary::InputLayout> inputLayout;
+
+	UINT startVertexLocation = 0;
 
 	// 定数バッファーを介してシェーダーに毎フレーム送るデータを表します。
 	struct ConstantBufferPerFrame
