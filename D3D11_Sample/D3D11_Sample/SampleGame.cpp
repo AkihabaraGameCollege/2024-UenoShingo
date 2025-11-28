@@ -1,6 +1,5 @@
 #include "SampleGame.h"
 #include "StandardVertexShader.h"
-#include "StandardGeometryShader.h"
 
 using namespace GameLibrary;
 using namespace DirectX;
@@ -90,6 +89,7 @@ void SampleGame::OnInitialize()
 
 	// シェーダー
 	vertexShader = spriteVertexShader.get();
+	geometryShader = spriteGeometryShader.get();
 	pixelShader = spritePixelShader.get();
 
 	{
@@ -109,13 +109,6 @@ void SampleGame::OnInitialize()
 	// バッファーにデータを転送
 	deviceContext->UpdateSubresource(indexBuffer.Get(), 0, NULL, indices_cube, 0, 0);
 	indexCount = std::size(indices_cube);
-
-	// ジオメトリー シェーダーを作成
-	hr = device->CreateGeometryShader(
-		g_StandardGeometryShader, std::size(g_StandardGeometryShader),
-		NULL,
-		&geometryShader);
-	ThrowIfFailed(hr);
 
 	// 入力レイアウトを作成
 	hr = device->CreateInputLayout(
@@ -248,6 +241,7 @@ void SampleGame::OnRender()
 
 	// Shaders
 	vertexShader->Apply(deviceContext.Get());
+	geometryShader->Apply(deviceContext.Get());
 	pixelShader->Apply(deviceContext.Get());
 
 	// インデックス バッファーを設定
@@ -255,9 +249,6 @@ void SampleGame::OnRender()
 	// 頂点バッファーと頂点シェーダーの組合せに対応した入力レイアウトを設定
 	deviceContext->IASetInputLayout(inputLayout.Get());
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	// シェーダーを設定
-	deviceContext->GSSetShader(geometryShader.Get(), NULL, 0);
 
 	// 定数バッファーを設定
 	deviceContext->UpdateSubresource(constantBuffer.Get(), 0, NULL, &constantBufferPerFrame, 0, 0);

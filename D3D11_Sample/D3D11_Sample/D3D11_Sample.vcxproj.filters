@@ -29,7 +29,6 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="StandardVertexShader.hlsl" />
-    <FxCompile Include="StandardGeometryShader.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="StandardShader.hlsli" />

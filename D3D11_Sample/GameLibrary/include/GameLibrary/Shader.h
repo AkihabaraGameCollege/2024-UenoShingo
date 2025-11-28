@@ -24,6 +24,23 @@ namespace GameLibrary
 	};
 
 	/// <summary>
+	/// ジオメトリ シェーダーを表します。
+	/// </summary>
+	class GeometryShader final : public GraphicsResource
+	{
+	public:
+		GeometryShader(ID3D11Device5* graphicsDevice, const void* shaderBytecode, size_t bytecodeLength);
+		~GeometryShader() = default;
+
+		ID3D11GeometryShader* GetNativePointer() const noexcept;
+
+		void Apply(ID3D11DeviceContext4* deviceContext) noexcept;
+
+	private:
+		Microsoft::WRL::ComPtr<ID3D11GeometryShader> shader;
+	};
+
+	/// <summary>
 	/// ピクセル シェーダーを表します。
 	/// </summary>
 	class PixelShader final : public GraphicsResource

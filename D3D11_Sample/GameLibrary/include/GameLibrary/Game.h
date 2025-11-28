@@ -86,6 +86,7 @@ namespace GameLibrary
 		};
 
 		std::unique_ptr<VertexShader> spriteVertexShader;
+		std::unique_ptr<GeometryShader> spriteGeometryShader;
 		std::unique_ptr<PixelShader> spritePixelShader;
 	};
 
