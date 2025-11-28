@@ -7,3 +7,5 @@ struct VertexShaderOutput_Sprite
 {
 	float4 position : SV_POSITION;
 };
+
+typedef VertexShaderOutput_Sprite PixelShaderInput_Sprite;

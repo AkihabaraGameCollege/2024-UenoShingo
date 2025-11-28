@@ -21,9 +21,9 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> indexBuffer;
 	UINT indexCount = 0;
 	// Shaders
-	GameLibrary::VertexShader* vertexShader;
+	GameLibrary::VertexShader* vertexShader = nullptr;
+	GameLibrary::PixelShader* pixelShader = nullptr;
 	Microsoft::WRL::ComPtr<ID3D11GeometryShader> geometryShader;
-	Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader;
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
 
 	// 定数バッファーを介してシェーダーに毎フレーム送るデータを表します。

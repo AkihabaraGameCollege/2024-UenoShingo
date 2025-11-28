@@ -6,6 +6,7 @@
 #include <GameLibrary/Game.h>
 #include <GameLibrary/Utility.h>
 #include "SpriteVertexShader.h"
+#include "SpritePixelShader.h"
 
 using namespace GameLibrary;
 using namespace DirectX;
@@ -242,6 +243,8 @@ void Game::Initialize(HWND hWnd)
 
 	spriteVertexShader = std::make_unique<VertexShader>(
 		device.Get(), g_SpriteVertexShader, sizeof g_SpriteVertexShader);
+	spritePixelShader = std::make_unique<PixelShader>(
+		device.Get(), g_SpritePixelShader, sizeof g_SpritePixelShader);
 
 	OnInitialize();
 }

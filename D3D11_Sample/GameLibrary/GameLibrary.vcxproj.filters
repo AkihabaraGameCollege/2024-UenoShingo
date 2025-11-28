@@ -98,5 +98,6 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\SpriteVertexShader.hlsl" />
+    <FxCompile Include="Shaders\SpritePixelShader.hlsl" />
   </ItemGroup>
 </Project>

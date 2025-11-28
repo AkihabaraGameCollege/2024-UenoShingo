@@ -22,4 +22,21 @@ namespace GameLibrary
 	private:
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> shader;
 	};
+
+	/// <summary>
+	/// ピクセル シェーダーを表します。
+	/// </summary>
+	class PixelShader final : public GraphicsResource
+	{
+	public:
+		PixelShader(ID3D11Device5* graphicsDevice, const void* shaderBytecode, size_t bytecodeLength);
+		~PixelShader() = default;
+
+		ID3D11PixelShader* GetNativePointer() const noexcept;
+
+		void Apply(ID3D11DeviceContext4* deviceContext) noexcept;
+
+	private:
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> shader;
+	};
 }

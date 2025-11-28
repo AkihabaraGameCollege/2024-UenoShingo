@@ -1,7 +1,6 @@
 #include "SampleGame.h"
 #include "StandardVertexShader.h"
 #include "StandardGeometryShader.h"
-#include "StandardPixelShader.h"
 
 using namespace GameLibrary;
 using namespace DirectX;
@@ -91,6 +90,7 @@ void SampleGame::OnInitialize()
 
 	// シェーダー
 	vertexShader = spriteVertexShader.get();
+	pixelShader = spritePixelShader.get();
 
 	{
 		// 作成するインデックス バッファーについての記述
@@ -115,12 +115,6 @@ void SampleGame::OnInitialize()
 		g_StandardGeometryShader, std::size(g_StandardGeometryShader),
 		NULL,
 		&geometryShader);
-	ThrowIfFailed(hr);
-	// ピクセル シェーダーを作成
-	hr = device->CreatePixelShader(
-		g_StandardPixelShader, std::size(g_StandardPixelShader),
-		NULL,
-		&pixelShader);
 	ThrowIfFailed(hr);
 
 	// 入力レイアウトを作成
@@ -254,6 +248,7 @@ void SampleGame::OnRender()
 
 	// Shaders
 	vertexShader->Apply(deviceContext.Get());
+	pixelShader->Apply(deviceContext.Get());
 
 	// インデックス バッファーを設定
 	deviceContext->IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
@@ -263,7 +258,6 @@ void SampleGame::OnRender()
 
 	// シェーダーを設定
 	deviceContext->GSSetShader(geometryShader.Get(), NULL, 0);
-	deviceContext->PSSetShader(pixelShader.Get(), NULL, 0);
 
 	// 定数バッファーを設定
 	deviceContext->UpdateSubresource(constantBuffer.Get(), 0, NULL, &constantBufferPerFrame, 0, 0);
