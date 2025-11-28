@@ -157,9 +157,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\ConstantBuffer.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\GamePad.cpp" />
     <ClCompile Include="src\GraphicsResource.cpp" />
+    <ClCompile Include="src\IndexBuffer.cpp" />
     <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\InputLayout.cpp" />
     <ClCompile Include="src\InputManager.cpp" />
@@ -171,6 +173,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Shader.hlsli" />
+    <None Include="Shaders\SpriteShader.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\InputSignature_SpriteVertex.hlsl">

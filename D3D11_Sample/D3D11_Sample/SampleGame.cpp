@@ -5,11 +5,17 @@ using namespace DirectX;
 
 namespace
 {
-	// 頂点データの配列
-	constexpr Vertex_Sprite vertices[] = {
-		{ { -1.0f, +1.0f, +0.0f, }, },
-		{ { +1.0f, +1.0f, +0.0f, }, },
-		{ { -1.0f, -1.0f, +0.0f, }, },
+	// 矩形（頂点）
+	constexpr Vertex_Sprite quadVertices[] = {
+		{ { -0.5f, +0.5f, +0.0f, }, },
+		{ { +0.5f, +0.5f, +0.0f, }, },
+		{ { -0.5f, -0.5f, +0.0f, }, },
+		{ { +0.5f, -0.5f, +0.0f, }, },
+	};
+	// 矩形（インデックス）
+	constexpr uint32_t quadIndices[] = {
+		0, 1, 2,
+		3, 2, 1,
 	};
 
 	// キューブ（頂点）
@@ -76,67 +82,37 @@ SampleGame::SampleGame(const GameLibrary::ProjectSettings& settings)
 /// </summary>
 void SampleGame::OnInitialize()
 {
-	HRESULT hr = S_OK;
+	// マテリアル
+	albedoColor = { 0x80 / 255.0f, 0xBB / 255.0f, 0xFF / 255.0f, 1.0f };
 
 	// 頂点バッファー
 	vertexBuffer = std::make_shared<VertexBuffer>(
 		device.Get(),
 		Vertex_Sprite::GetSize(),
-		static_cast<UINT>(std::size(vertices)),
-		vertices);
+		static_cast<UINT>(std::size(quadVertices)),
+		quadVertices);
 	vertexOffset = 0;
+
+	// インデックス バッファー
+	indexBuffer = std::make_shared<IndexBuffer>(
+		device.Get(),
+		IndexFormat::UInt32, static_cast<UINT>(std::size(quadIndices)),
+		quadIndices);
+	indexOffset = 0;
 
 	// シェーダー
 	vertexShader = spriteVertexShader.get();
 	geometryShader = spriteGeometryShader.get();
 	pixelShader = spritePixelShader.get();
+	// マテリアル
+	constantBufferPerMaterial = std::make_shared<ConstantBuffer>(device.Get(),
+		static_cast<UINT>(sizeof constantsPerMaterial));
 
 	// 入力レイアウト
 	inputLayout = std::make_shared<InputLayout_Sprite>(device.Get());
 
-	startVertexLocation = 0;
-
-	{
-		// 作成するインデックス バッファーについての記述
-		constexpr auto bufferDesc = D3D11_BUFFER_DESC{
-			.ByteWidth = sizeof vertices,
-			.Usage = D3D11_USAGE::D3D11_USAGE_DEFAULT,
-			.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_INDEX_BUFFER,
-			.CPUAccessFlags = 0,
-			.MiscFlags = 0,
-			.StructureByteStride = 0,
-		};
-		// バッファーを作成
-		hr = device->CreateBuffer(&bufferDesc, NULL, &indexBuffer);
-		ThrowIfFailed(hr);
-	}
-	// バッファーにデータを転送
-	deviceContext->UpdateSubresource(indexBuffer.Get(), 0, NULL, indices_cube, 0, 0);
-	indexCount = std::size(indices_cube);
-
-	// 定数バッファーを作成
-	{
-		// 作成するバッファーについての記述
-		constexpr auto bufferDesc = D3D11_BUFFER_DESC{
-			.ByteWidth = sizeof(ConstantBufferPerFrame),
-			.Usage = D3D11_USAGE_DEFAULT,
-			.BindFlags = D3D11_BIND_CONSTANT_BUFFER,
-			.CPUAccessFlags = 0,
-			.MiscFlags = 0,
-			.StructureByteStride = 0,
-		};
-		// バッファーを作成
-		auto hr = device->CreateBuffer(&bufferDesc, nullptr, &constantBuffer);
-		ThrowIfFailed(hr);
-	}
-	// 定数バッファーを更新
-	XMStoreFloat4x4(&constantBufferPerFrame.worldMatrix, XMMatrixTranspose(XMMatrixIdentity()));
-	XMStoreFloat4x4(&constantBufferPerFrame.viewMatrix, XMMatrixTranspose(XMMatrixIdentity()));
-	XMStoreFloat4x4(&constantBufferPerFrame.projectionMatrix, XMMatrixTranspose(XMMatrixIdentity()));
-	XMStoreFloat4x4(&constantBufferPerFrame.wvpMatrix, XMMatrixTranspose(XMMatrixIdentity()));
-	constantBufferPerFrame.lightPosition = XMFLOAT4(1, 2, -2, 1);
-	constantBufferPerFrame.materialDiffuseColor = XMFLOAT4(1, 238 / 255.0f, 0, 1);
-	deviceContext->UpdateSubresource(constantBuffer.Get(), 0, NULL, &constantBufferPerFrame, 0, 0);
+	startIndexLocation = 0;
+	baseVertexLocation = 0;
 }
 
 /// <summary>
@@ -145,84 +121,6 @@ void SampleGame::OnInitialize()
 void SampleGame::OnUpdate()
 {
 	time += Time::GetDeltaTime();
-
-	// 位置座標
-	XMFLOAT3 position = { 0, 0, 0 };
-	// 回転
-	XMFLOAT4 rotation = {};
-	XMStoreFloat4(&rotation, XMQuaternionIdentity());
-	// スケール
-	XMFLOAT3 scale = { 1, 1, 1 };
-
-	// y軸回転
-	const float xAngle = XMConvertToRadians(45 * time);
-	const float yAngle = XMConvertToRadians(90 * time);
-	XMStoreFloat4(&rotation,
-		XMQuaternionRotationRollPitchYaw(xAngle, yAngle, 0));
-
-	// 定数バッファーを更新
-	const auto worldMatrix = XMMatrixTransformation(
-		XMVectorZero(), XMQuaternionIdentity(), XMLoadFloat3(&scale),
-		XMVectorZero(), XMLoadFloat4(&rotation),
-		XMLoadFloat3(&position));
-	XMStoreFloat4x4(&constantBufferPerFrame.worldMatrix, XMMatrixTranspose(worldMatrix));
-
-	// マテリアル
-	if (GetAsyncKeyState('D')) {
-		constantBufferPerFrame.materialDiffuseColor = DirectX::XMFLOAT4(1, 1, 0, 1);
-	}
-	else {
-		constantBufferPerFrame.materialDiffuseColor = DirectX::XMFLOAT4(0, 0, 0, 1);
-	}
-	if (GetAsyncKeyState('S')) {
-		constantBufferPerFrame.materialSpecularColor = DirectX::XMFLOAT3(1, 1, 1);
-		constantBufferPerFrame.materialSpecularPower = 1;
-	}
-	else {
-		constantBufferPerFrame.materialSpecularColor = DirectX::XMFLOAT3(0, 0, 0);
-	}
-
-	// ライト
-	constantBufferPerFrame.lightPosition = DirectX::XMFLOAT4(1.0f, 2.0f, -2.0f, 0.0f);
-
-	// カメラの位置座標
-	constexpr XMFLOAT3 eyePosition = { 0.0f, 0.0f, -10.0f };
-	// カメラの回転
-	XMFLOAT4 cameraRotation = {};
-	XMStoreFloat4(&cameraRotation, XMQuaternionIdentity());
-
-	// 定数バッファーを更新
-	const auto eyeDirection = XMVector3Rotate(XMVectorSet(0, 0, 1, 0), XMLoadFloat4(&cameraRotation));
-	const auto eyeUpDirection = XMVector3Rotate(XMVectorSet(0, 1, 0, 0), XMLoadFloat4(&cameraRotation));
-	const auto viewMatrix = XMMatrixLookToLH(
-		XMLoadFloat3(&eyePosition), eyeDirection, eyeUpDirection);
-	XMStoreFloat4x4(&constantBufferPerFrame.viewMatrix, XMMatrixTranspose(viewMatrix));
-
-
-	// スクリーン画面のアスペクト比
-	const auto aspectRatio = GetWidth() / static_cast<float>(GetHeight());
-	constexpr auto nearZ = 0.3f;	// nearクリップ面
-	constexpr auto farZ = 1000.0f;	// farクリップ面
-
-	//// 【正射影変換の場合】
-	//constexpr auto orthographicSize = 5.0f;	// ビュー空間の垂直方向の半分のサイズ
-	//// 定数バッファーを更新
-	//const auto projectionMatrix = XMMatrixOrthographicLH(
-	//	2 * orthographicSize * aspectRatio,
-	//	2 * orthographicSize, nearZ, farZ);
-
-	// 【パースペクティブ射影変換の場合】
-	// 視錐台の垂直方向の角度
-	constexpr auto fieldOfView = XMConvertToRadians(60);
-	const auto projectionMatrix = XMMatrixPerspectiveFovLH(
-		fieldOfView, aspectRatio, nearZ, farZ);
-
-	// 定数バッファーを更新
-	XMStoreFloat4x4(&constantBufferPerFrame.projectionMatrix, XMMatrixTranspose(projectionMatrix));
-
-	// ワールド × ビュー × プロジェクションをCPU側で計算してシェーダーへ送る
-	XMStoreFloat4x4(&constantBufferPerFrame.wvpMatrix,
-		XMMatrixTranspose(worldMatrix * viewMatrix * projectionMatrix));
 }
 
 /// <summary>
@@ -236,22 +134,37 @@ void SampleGame::OnRender()
 	const UINT offsets[] = { vertexOffset, };
 	deviceContext->IASetVertexBuffers(0, static_cast<UINT>(std::size(vertexBuffers)), vertexBuffers, strides, offsets);
 	deviceContext->IASetInputLayout(inputLayout->GetNativePointer());
+	// マテリアル
+	XMStoreFloat4(&constantsPerMaterial.Albedo, XMColorSRGBToRGB(XMLoadFloat4(&albedoColor)));
+	constantBufferPerMaterial->UpdateSubresource(&constantsPerMaterial);
+	// Constant buffer
+	{
+		ID3D11Buffer* const constantBuffers[] = {
+			constantBufferPerMaterial->GetNativePointer(),
+		};
+		//deviceContext->VSSetConstantBuffers(0, std::size(constantBuffers), constantBuffers);
+	}
+	{
+		ID3D11Buffer* const constantBuffers[] = {
+			constantBufferPerMaterial->GetNativePointer(),
+		};
+		//deviceContext->GSSetConstantBuffers(0, std::size(constantBuffers), constantBuffers);
+	}
+	{
+		ID3D11Buffer* const constantBuffers[] = {
+			constantBufferPerMaterial->GetNativePointer(),
+		};
+		deviceContext->PSSetConstantBuffers(0, std::size(constantBuffers), constantBuffers);
+	}
 	// Shaders
 	vertexShader->Apply(deviceContext.Get());
 	geometryShader->Apply(deviceContext.Get());
 	pixelShader->Apply(deviceContext.Get());
 
 	// インデックス バッファーを設定
-	deviceContext->IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
+	deviceContext->IASetIndexBuffer(indexBuffer->GetNativePointer(), indexBuffer->GetFormat(), indexOffset);
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	// 定数バッファーを設定
-	deviceContext->UpdateSubresource(constantBuffer.Get(), 0, NULL, &constantBufferPerFrame, 0, 0);
-	ID3D11Buffer* constantBuffers[] = { constantBuffer.Get(), };
-	deviceContext->VSSetConstantBuffers(0, std::size(constantBuffers), constantBuffers);
-	deviceContext->GSSetConstantBuffers(0, std::size(constantBuffers), constantBuffers);
-	deviceContext->PSSetConstantBuffers(0, std::size(constantBuffers), constantBuffers);
-
 	// メッシュを描画
-	deviceContext->Draw(vertexBuffer->GetCount(), startVertexLocation);
+	deviceContext->DrawIndexed(indexBuffer->GetCount(), startIndexLocation, baseVertexLocation);
 }

@@ -98,9 +98,16 @@
     <ClCompile Include="src\InputLayout.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="src\IndexBuffer.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ConstantBuffer.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Shader.hlsli" />
+    <None Include="Shaders\SpriteShader.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\SpriteVertexShader.hlsl" />

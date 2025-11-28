@@ -1,4 +1,4 @@
-#include "Shader.hlsli"
+#include "SpriteShader.hlsli"
 
 VertexShaderOutput_Sprite main(VertexShaderInput_Sprite input)
 {

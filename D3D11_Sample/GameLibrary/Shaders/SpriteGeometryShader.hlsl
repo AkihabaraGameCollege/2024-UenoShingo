@@ -1,4 +1,4 @@
-#include "Shader.hlsli"
+#include "SpriteShader.hlsli"
 
 [maxvertexcount(3)]
 void main(
