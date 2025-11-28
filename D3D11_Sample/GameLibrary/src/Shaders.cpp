@@ -4,15 +4,10 @@
 using namespace GameLibrary;
 
 VertexShader::VertexShader(ID3D11Device5* graphicsDevice, const void* shaderBytecode, size_t bytecodeLength)
-	: GraphicsResource(graphicsDevice)
+	: BaseShader(graphicsDevice)
 {
 	ThrowIfFailed(graphicsDevice->CreateVertexShader(
 		shaderBytecode, bytecodeLength, NULL, &shader));
-}
-
-ID3D11VertexShader* VertexShader::GetNativePointer() const noexcept
-{
-	return shader.Get();
 }
 
 void VertexShader::Apply(ID3D11DeviceContext4* deviceContext) noexcept
@@ -21,15 +16,10 @@ void VertexShader::Apply(ID3D11DeviceContext4* deviceContext) noexcept
 }
 
 GeometryShader::GeometryShader(ID3D11Device5* graphicsDevice, const void* shaderBytecode, size_t bytecodeLength)
-	: GraphicsResource(graphicsDevice)
+	: BaseShader(graphicsDevice)
 {
 	ThrowIfFailed(graphicsDevice->CreateGeometryShader(
 		shaderBytecode, bytecodeLength, NULL, &shader));
-}
-
-ID3D11GeometryShader* GeometryShader::GetNativePointer() const noexcept
-{
-	return shader.Get();
 }
 
 void GeometryShader::Apply(ID3D11DeviceContext4* deviceContext) noexcept
@@ -38,15 +28,10 @@ void GeometryShader::Apply(ID3D11DeviceContext4* deviceContext) noexcept
 }
 
 PixelShader::PixelShader(ID3D11Device5* graphicsDevice, const void* shaderBytecode, size_t bytecodeLength)
-	: GraphicsResource(graphicsDevice)
+	: BaseShader(graphicsDevice)
 {
 	ThrowIfFailed(graphicsDevice->CreatePixelShader(
 		shaderBytecode, bytecodeLength, NULL, &shader));
-}
-
-ID3D11PixelShader* PixelShader::GetNativePointer() const noexcept
-{
-	return shader.Get();
 }
 
 void PixelShader::Apply(ID3D11DeviceContext4* deviceContext) noexcept
