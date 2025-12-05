@@ -5,6 +5,9 @@
 //=============================================================================
 #include <GameLibrary/Game.h>
 #include <GameLibrary/Utility.h>
+#include "StandardVertexShader.h"
+#include "StandardGeometryShader.h"
+#include "StandardPixelShader.h"
 #include "SpriteVertexShader.h"
 #include "SpriteGeometryShader.h"
 #include "SpritePixelShader.h"
@@ -242,6 +245,12 @@ void Game::Initialize(HWND hWnd)
 		.MaxDepth = D3D11_MAX_DEPTH,
 	};
 
+	standardVertexShader = std::make_unique<VertexShader>(
+		device.Get(), g_StandardVertexShader, sizeof g_StandardVertexShader);
+	standardGeometryShader = std::make_unique<GeometryShader>(
+		device.Get(), g_StandardGeometryShader, sizeof g_StandardGeometryShader);
+	standardPixelShader = std::make_unique<PixelShader>(
+		device.Get(), g_StandardPixelShader, sizeof g_StandardPixelShader);
 	spriteVertexShader = std::make_unique<VertexShader>(
 		device.Get(), g_SpriteVertexShader, sizeof g_SpriteVertexShader);
 	spriteGeometryShader = std::make_unique<GeometryShader>(

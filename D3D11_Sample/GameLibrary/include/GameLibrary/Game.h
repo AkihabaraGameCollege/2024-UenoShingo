@@ -85,6 +85,9 @@ namespace GameLibrary
 			.MaxDepth = 1.0f,
 		};
 
+		std::unique_ptr<VertexShader> standardVertexShader;
+		std::unique_ptr<GeometryShader> standardGeometryShader;
+		std::unique_ptr<PixelShader> standardPixelShader;
 		std::unique_ptr<VertexShader> spriteVertexShader;
 		std::unique_ptr<GeometryShader> spriteGeometryShader;
 		std::unique_ptr<PixelShader> spritePixelShader;

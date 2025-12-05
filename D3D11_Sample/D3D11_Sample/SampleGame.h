@@ -16,6 +16,18 @@ protected:
 	void OnRender() override;
 
 private:
+	// ライト
+	DirectX::XMFLOAT4 lightRotation = { 0, 0, 0, 1 };
+	DirectX::XMFLOAT4 lightColor = { 1, 1, 1, 1 };
+
+	struct ConstantsPerLighting
+	{
+		DirectX::XMFLOAT4 LightDirection;
+		DirectX::XMFLOAT4 LightColor;
+	};
+	ConstantsPerLighting constantsPerLighting = {};
+	std::shared_ptr<GameLibrary::ConstantBuffer> constantBufferPerLighting;
+
 	// メイン カメラ
 	DirectX::XMFLOAT3 cameraPosition = { 0, 1, -10 };
 	DirectX::XMFLOAT4 cameraRotation = { 0, 0, 0, 1 };
@@ -57,6 +69,8 @@ private:
 	GameLibrary::VertexShader* vertexShader = nullptr;
 	GameLibrary::GeometryShader* geometryShader = nullptr;
 	GameLibrary::PixelShader* pixelShader = nullptr;
+	// Main Texture
+	std::shared_ptr<GameLibrary::Texture2D> mainTexture;
 	// マテリアル
 	struct ConstantsPerMaterial
 	{

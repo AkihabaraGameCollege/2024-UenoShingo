@@ -1,5 +1,6 @@
 #include <GameLibrary/InputLayout.h>
 #include <GameLibrary/Utility.h>
+#include "InputSignature_BaseVertex.h"
 #include "InputSignature_SpriteVertex.h"
 
 using namespace GameLibrary;
@@ -30,6 +31,18 @@ InputLayout::InputLayout(ID3D11Device5* graphicsDevice,
 ID3D11InputLayout* InputLayout::GetNativePointer()
 {
 	return inputLayout.Get();
+}
+
+/// <summary>
+/// このクラスの新しいインスタンスを初期化します。
+/// </summary>
+/// <param name="graphicsDevice">グラフィックス デバイス</param>
+InputLayout_Base::InputLayout_Base(ID3D11Device5* graphicsDevice)
+	: InputLayout(graphicsDevice,
+		Vertex_Base::InputElementDescs, Vertex_Base::NumElements,
+		g_InputSignature_BaseVertex, sizeof(g_InputSignature_BaseVertex))
+{
+
 }
 
 /// <summary>

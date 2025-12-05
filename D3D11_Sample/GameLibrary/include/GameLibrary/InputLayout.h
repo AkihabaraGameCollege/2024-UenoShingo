@@ -18,6 +18,12 @@ namespace GameLibrary
 		Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
 	};
 
+	class InputLayout_Base final : public InputLayout
+	{
+	public:
+		InputLayout_Base(ID3D11Device5* graphicsDevice);
+	};
+
 	class InputLayout_Sprite final : public InputLayout
 	{
 	public:

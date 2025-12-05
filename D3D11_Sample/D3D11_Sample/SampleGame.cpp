@@ -7,10 +7,10 @@ namespace
 {
 	// 矩形（頂点）
 	constexpr Vertex_Sprite quadVertices[] = {
-		{ { -0.5f, +0.5f, +0.0f, }, },
-		{ { +0.5f, +0.5f, +0.0f, }, },
-		{ { -0.5f, -0.5f, +0.0f, }, },
-		{ { +0.5f, -0.5f, +0.0f, }, },
+		{ { -0.5f, +0.5f, +0.0f, }, { 0.0f, 0.0f, }, },
+		{ { +0.5f, +0.5f, +0.0f, }, { 1.0f, 0.0f, }, },
+		{ { -0.5f, -0.5f, +0.0f, }, { 0.0f, 1.0f, }, },
+		{ { +0.5f, -0.5f, +0.0f, }, { 1.0f, 1.0f, }, },
 	};
 	// 矩形（インデックス）
 	constexpr uint32_t quadIndices[] = {
@@ -18,41 +18,39 @@ namespace
 		3, 2, 1,
 	};
 
-	// キューブ（頂点）
-	constexpr VertexPositionNormal vertices_cube[] = {
+	constexpr Vertex_Base cubeVertices[] = {
 		// Front
-		{ {  0.5f,  0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f } },
-		{ { -0.5f,  0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f } },
-		{ {  0.5f, -0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f } },
-		{ { -0.5f, -0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f } },
+		{ { +0.5f, +0.5f, +0.5f, }, { +0.0f, +0.0f, +1.0f }, },
+		{ { -0.5f, +0.5f, +0.5f, }, { +0.0f, +0.0f, +1.0f }, },
+		{ { +0.5f, -0.5f, +0.5f, }, { +0.0f, +0.0f, +1.0f }, },
+		{ { -0.5f, -0.5f, +0.5f, }, { +0.0f, +0.0f, +1.0f }, },
 		// Back
-		{ { -0.5f,  0.5f, -0.5f }, { 0.0f, 0.0f, -1.0f } },
-		{ {  0.5f,  0.5f, -0.5f }, { 0.0f, 0.0f, -1.0f } },
-		{ { -0.5f, -0.5f, -0.5f }, { 0.0f, 0.0f, -1.0f } },
-		{ {  0.5f, -0.5f, -0.5f }, { 0.0f, 0.0f, -1.0f } },
+		{ { -0.5f, +0.5f, -0.5f, }, { +0.0f, +0.0f, -1.0f }, },
+		{ { +0.5f, +0.5f, -0.5f, }, { +0.0f, +0.0f, -1.0f }, },
+		{ { -0.5f, -0.5f, -0.5f, }, { +0.0f, +0.0f, -1.0f }, },
+		{ { +0.5f, -0.5f, -0.5f, }, { +0.0f, +0.0f, -1.0f }, },
 		// Right
-		{ { 0.5f,  0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f } },
-		{ { 0.5f,  0.5f,  0.5f }, { 1.0f, 0.0f, 0.0f } },
-		{ { 0.5f, -0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f } },
-		{ { 0.5f, -0.5f,  0.5f }, { 1.0f, 0.0f, 0.0f } },
+		{ { +0.5f, +0.5f, -0.5f, }, { +1.0f, +0.0f, +0.0f }, },
+		{ { +0.5f, +0.5f, +0.5f, }, { +1.0f, +0.0f, +0.0f }, },
+		{ { +0.5f, -0.5f, -0.5f, }, { +1.0f, +0.0f, +0.0f }, },
+		{ { +0.5f, -0.5f, +0.5f, }, { +1.0f, +0.0f, +0.0f }, },
 		// Left
-		{ { -0.5f,  0.5f,  0.5f }, { -1.0f, 0.0f, 0.0f } },
-		{ { -0.5f,  0.5f, -0.5f }, { -1.0f, 0.0f, 0.0f } },
-		{ { -0.5f, -0.5f,  0.5f }, { -1.0f, 0.0f, 0.0f } },
-		{ { -0.5f, -0.5f, -0.5f }, { -1.0f, 0.0f, 0.0f } },
+		{ { -0.5f, +0.5f, +0.5f, }, { -1.0f, +0.0f, +0.0f }, },
+		{ { -0.5f, +0.5f, -0.5f, }, { -1.0f, +0.0f, +0.0f }, },
+		{ { -0.5f, -0.5f, +0.5f, }, { -1.0f, +0.0f, +0.0f }, },
+		{ { -0.5f, -0.5f, -0.5f, }, { -1.0f, +0.0f, +0.0f }, },
 		// Top
-		{ { -0.5f, 0.5f,  0.5f }, { 0.0f, 1.0f, 0.0f } },
-		{ {  0.5f, 0.5f,  0.5f }, { 0.0f, 1.0f, 0.0f } },
-		{ { -0.5f, 0.5f, -0.5f }, { 0.0f, 1.0f, 0.0f } },
-		{ {  0.5f, 0.5f, -0.5f }, { 0.0f, 1.0f, 0.0f } },
+		{ { -0.5f, +0.5f, +0.5f, }, { +0.0f, +1.0f, +0.0f }, },
+		{ { +0.5f, +0.5f, +0.5f, }, { +0.0f, +1.0f, +0.0f }, },
+		{ { -0.5f, +0.5f, -0.5f, }, { +0.0f, +1.0f, +0.0f }, },
+		{ { +0.5f, +0.5f, -0.5f, }, { +0.0f, +1.0f, +0.0f }, },
 		// Bottom
-		{ {  0.5f, -0.5f,  0.5f }, { 0.0f, -1.0f, 0.0f } },
-		{ { -0.5f, -0.5f,  0.5f }, { 0.0f, -1.0f, 0.0f } },
-		{ {  0.5f, -0.5f, -0.5f }, { 0.0f, -1.0f, 0.0f } },
-		{ { -0.5f, -0.5f, -0.5f }, { 0.0f, -1.0f, 0.0f } },
+		{ { +0.5f, -0.5f, +0.5f, }, { +0.0f, -1.0f, +0.0f }, },
+		{ { -0.5f, -0.5f, +0.5f, }, { +0.0f, -1.0f, +0.0f }, },
+		{ { +0.5f, -0.5f, -0.5f, }, { +0.0f, -1.0f, +0.0f }, },
+		{ { -0.5f, -0.5f, -0.5f, }, { +0.0f, -1.0f, +0.0f }, },
 	};
-	// キューブ（インデックス）
-	constexpr UINT32 indices_cube[] = {
+	constexpr uint32_t cubeIndices[] = {
 		// Front
 		0, 1, 2, 3, 2, 1,
 		// Back
@@ -65,6 +63,13 @@ namespace
 		16, 17, 18, 19, 18, 17,
 		// Bottom
 		20, 21, 22, 23, 22, 21,
+	};
+
+	constexpr uint32_t textureSource[] = {
+		0xFFB56300, 0xFF00F1FF, 0xFFB56300, 0xFF00F1FF,
+		0xFF00F1FF, 0xFFB56300, 0xFF00F1FF, 0xFFB56300,
+		0xFFB56300, 0xFF00F1FF, 0xFFB56300, 0xFF00F1FF,
+		0xFF00F1FF, 0xFFB56300, 0xFF00F1FF, 0xFFB56300,
 	};
 }
 
@@ -82,6 +87,16 @@ SampleGame::SampleGame(const GameLibrary::ProjectSettings& settings)
 /// </summary>
 void SampleGame::OnInitialize()
 {
+	// 平行ライト
+	XMStoreFloat4(&lightRotation, XMQuaternionRotationRollPitchYaw(
+		XMConvertToRadians(50),
+		XMConvertToRadians(-30),
+		XMConvertToRadians(0)));
+	lightColor = { 1, 1, 1, 1 };
+
+	constantBufferPerLighting = std::make_shared<ConstantBuffer>(device.Get(),
+		static_cast<UINT>(sizeof constantsPerLighting));
+
 	constantBufferPerFrame = std::make_shared<ConstantBuffer>(device.Get(),
 		static_cast<UINT>(sizeof constantsPerFrame));
 
@@ -94,28 +109,30 @@ void SampleGame::OnInitialize()
 	// 頂点バッファー
 	vertexBuffer = std::make_shared<VertexBuffer>(
 		device.Get(),
-		Vertex_Sprite::GetSize(),
-		static_cast<UINT>(std::size(quadVertices)),
-		quadVertices);
+		Vertex_Base::GetSize(),
+		static_cast<UINT>(std::size(cubeVertices)),
+		cubeVertices);
 	vertexOffset = 0;
 
 	// インデックス バッファー
 	indexBuffer = std::make_shared<IndexBuffer>(
 		device.Get(),
-		IndexFormat::UInt32, static_cast<UINT>(std::size(quadIndices)),
-		quadIndices);
+		IndexFormat::UInt32, static_cast<UINT>(std::size(cubeIndices)),
+		cubeIndices);
 	indexOffset = 0;
 
 	// シェーダー
-	vertexShader = spriteVertexShader.get();
-	geometryShader = spriteGeometryShader.get();
-	pixelShader = spritePixelShader.get();
+	vertexShader = standardVertexShader.get();
+	geometryShader = standardGeometryShader.get();
+	pixelShader = standardPixelShader.get();
+	// テクスチャ
+	mainTexture = std::make_shared<Texture2D>(device.Get(), 4, 4, DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, textureSource);
 	// マテリアル
 	constantBufferPerMaterial = std::make_shared<ConstantBuffer>(device.Get(),
 		static_cast<UINT>(sizeof constantsPerMaterial));
 
 	// 入力レイアウト
-	inputLayout = std::make_shared<InputLayout_Sprite>(device.Get());
+	inputLayout = std::make_shared<InputLayout_Base>(device.Get());
 
 	startIndexLocation = 0;
 	baseVertexLocation = 0;
@@ -126,7 +143,8 @@ void SampleGame::OnInitialize()
 /// </summary>
 void SampleGame::OnUpdate()
 {
-	time += Time::GetDeltaTime();
+	const auto rotationVelocity = XMQuaternionRotationRollPitchYaw(0, XMConvertToRadians(90), 0);
+	localRotation = XMQuaternionSlerp(localRotation, XMQuaternionMultiply(localRotation, rotationVelocity), Time::GetDeltaTime());
 }
 
 /// <summary>
@@ -134,6 +152,12 @@ void SampleGame::OnUpdate()
 /// </summary>
 void SampleGame::OnRender()
 {
+	// 平行ライト
+	const auto lightWorldMatrix = XMMatrixRotationQuaternion(XMLoadFloat4(&lightRotation));
+	const auto lightForward = lightWorldMatrix.r[2];
+	XMStoreFloat4(&constantsPerLighting.LightDirection, lightForward);
+	XMStoreFloat4(&constantsPerLighting.LightColor, XMColorSRGBToRGB(XMLoadFloat4(&lightColor)));
+	constantBufferPerLighting->UpdateSubresource(&constantsPerLighting);
 	// メイン カメラ
 	const auto cameraWorldMatrix = XMMatrixRotationQuaternion(XMLoadFloat4(&cameraRotation));
 	const auto cameraForward = cameraWorldMatrix.r[2];
@@ -190,10 +214,20 @@ void SampleGame::OnRender()
 	}
 	{
 		ID3D11Buffer* const constantBuffers[] = {
+			constantBufferPerLighting->GetNativePointer(),
 			constantBufferPerMaterial->GetNativePointer(),
 		};
 		deviceContext->PSSetConstantBuffers(0, std::size(constantBuffers), constantBuffers);
 	}
+	// Texture
+	ID3D11ShaderResourceView* const textures[] = { mainTexture->GetView(), };
+	deviceContext->VSSetShaderResources(0, std::size(textures), textures);
+	deviceContext->GSSetShaderResources(0, std::size(textures), textures);
+	deviceContext->PSSetShaderResources(0, std::size(textures), textures);
+	ID3D11SamplerState* const samplerStates[] = { mainTexture->GetSamplerState(), };
+	deviceContext->VSSetSamplers(0, std::size(samplerStates), samplerStates);
+	deviceContext->GSSetSamplers(0, std::size(samplerStates), samplerStates);
+	deviceContext->PSSetSamplers(0, std::size(samplerStates), samplerStates);
 	// Shaders
 	vertexShader->Apply(deviceContext.Get());
 	geometryShader->Apply(deviceContext.Get());

@@ -10,6 +10,7 @@ void main(
     {
         GeometryShaderOutput_Sprite element;
         element.position = mul(input[i].position, matrixWorldViewProjection);
+        element.texCoord = input[i].texCoord;
         output.Append(element);
     }
 }
