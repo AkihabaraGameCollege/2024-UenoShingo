@@ -1,3 +1,17 @@
+cbuffer ConstantBufferPerDraw
+{
+    matrix matrixWorld;
+};
+
+cbuffer ConstantBufferPerFrame
+{
+    matrix matrixView;
+    matrix matrixProjection;
+    matrix matrixViewProjection;
+};
+
+static const matrix matrixWorldViewProjection = mul(matrixWorld, matrixViewProjection);
+
 struct VertexShaderInput_Sprite
 {
 	float4 position : POSITION;

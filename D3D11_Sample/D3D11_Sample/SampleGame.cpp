@@ -82,6 +82,12 @@ SampleGame::SampleGame(const GameLibrary::ProjectSettings& settings)
 /// </summary>
 void SampleGame::OnInitialize()
 {
+	constantBufferPerFrame = std::make_shared<ConstantBuffer>(device.Get(),
+		static_cast<UINT>(sizeof constantsPerFrame));
+
+	constantBufferPerDraw = std::make_shared<ConstantBuffer>(device.Get(),
+		static_cast<UINT>(sizeof constantsPerDraw));
+
 	// マテリアル
 	albedoColor = { 0x80 / 255.0f, 0xBB / 255.0f, 0xFF / 255.0f, 1.0f };
 
@@ -128,6 +134,36 @@ void SampleGame::OnUpdate()
 /// </summary>
 void SampleGame::OnRender()
 {
+	// メイン カメラ
+	const auto cameraWorldMatrix = XMMatrixRotationQuaternion(XMLoadFloat4(&cameraRotation));
+	const auto cameraForward = cameraWorldMatrix.r[2];
+	const auto cameraUp = cameraWorldMatrix.r[1];
+	auto matrixView = XMMatrixLookToLH(XMLoadFloat3(&cameraPosition), cameraForward, cameraUp);
+	XMStoreFloat4x4(&constantsPerFrame.MatrixView, XMMatrixTranspose(matrixView));
+	// プロジェクション
+	const auto aspectRatio = GetWidth() / static_cast<float>(GetHeight());
+	auto matrixProjection = XMMatrixIdentity();
+	if (orthographic) {
+		matrixProjection = XMMatrixOrthographicLH(
+			orthographicSize * aspectRatio, orthographicSize, clipPlaneNear, clipPlaneFar);
+	}
+	else {
+		matrixProjection = XMMatrixPerspectiveFovLH(
+			XMConvertToRadians(fieldOfView), aspectRatio, clipPlaneNear, clipPlaneFar);
+	}
+	XMStoreFloat4x4(&constantsPerFrame.MatrixProjection, XMMatrixTranspose(matrixProjection));
+
+	XMStoreFloat4x4(&constantsPerFrame.MatrixViewProjection, XMMatrixTranspose(matrixView * matrixProjection));
+	constantBufferPerFrame->UpdateSubresource(&constantsPerFrame);
+
+	// ゲーム オブジェクト
+	const auto matrixWorld = XMMatrixTransformation(
+		XMVectorZero(), XMQuaternionIdentity(), localScale,
+		XMVectorZero(), localRotation,
+		localPosition);
+	XMStoreFloat4x4(&constantsPerDraw.MatrixWorld, XMMatrixTranspose(matrixWorld));
+	constantBufferPerDraw->UpdateSubresource(&constantsPerDraw);
+
 	// 頂点バッファーを設定
 	ID3D11Buffer* const vertexBuffers[] = { vertexBuffer->GetNativePointer(), };
 	const UINT strides[] = { vertexBuffer->GetStride(), };
@@ -140,15 +176,17 @@ void SampleGame::OnRender()
 	// Constant buffer
 	{
 		ID3D11Buffer* const constantBuffers[] = {
-			constantBufferPerMaterial->GetNativePointer(),
+			constantBufferPerDraw->GetNativePointer(),
+			constantBufferPerFrame->GetNativePointer(),
 		};
 		//deviceContext->VSSetConstantBuffers(0, std::size(constantBuffers), constantBuffers);
 	}
 	{
 		ID3D11Buffer* const constantBuffers[] = {
-			constantBufferPerMaterial->GetNativePointer(),
+			constantBufferPerDraw->GetNativePointer(),
+			constantBufferPerFrame->GetNativePointer(),
 		};
-		//deviceContext->GSSetConstantBuffers(0, std::size(constantBuffers), constantBuffers);
+		deviceContext->GSSetConstantBuffers(0, std::size(constantBuffers), constantBuffers);
 	}
 	{
 		ID3D11Buffer* const constantBuffers[] = {

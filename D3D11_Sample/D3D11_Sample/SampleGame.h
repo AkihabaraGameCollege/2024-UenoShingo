@@ -16,13 +16,43 @@ protected:
 	void OnRender() override;
 
 private:
+	// メイン カメラ
+	DirectX::XMFLOAT3 cameraPosition = { 0, 1, -10 };
+	DirectX::XMFLOAT4 cameraRotation = { 0, 0, 0, 1 };
+	// プロジェクション
+	float fieldOfView = 60.0f;
+	float clipPlaneNear = 0.3f;
+	float clipPlaneFar = 1000;
+	bool orthographic = false;
+	float orthographicSize = 10;
+
+	struct ConstantsPerFrame
+	{
+		DirectX::XMFLOAT4X4 MatrixView;
+		DirectX::XMFLOAT4X4 MatrixProjection;
+		DirectX::XMFLOAT4X4 MatrixViewProjection;
+	};
+	ConstantsPerFrame constantsPerFrame = {};
+	std::shared_ptr<GameLibrary::ConstantBuffer> constantBufferPerFrame;
+
 	// オブジェクト
+	DirectX::XMVECTOR localScale = { 1, 1, 1, };
+	DirectX::XMVECTOR localRotation = DirectX::XMQuaternionIdentity();
+	DirectX::XMVECTOR localPosition = { 0, 0, 0, };
 	DirectX::XMFLOAT4 albedoColor = { 1, 1, 1, 1 };
 
 	std::shared_ptr<GameLibrary::VertexBuffer> vertexBuffer;
 	UINT vertexOffset = 0;
 	std::shared_ptr<GameLibrary::IndexBuffer> indexBuffer;
 	UINT indexOffset = 0;
+
+	struct ConstantsPerDraw
+	{
+		DirectX::XMFLOAT4X4 MatrixWorld;
+	};
+	ConstantsPerDraw constantsPerDraw = {};
+	std::shared_ptr<GameLibrary::ConstantBuffer> constantBufferPerDraw;
+
 	// Shaders
 	GameLibrary::VertexShader* vertexShader = nullptr;
 	GameLibrary::GeometryShader* geometryShader = nullptr;

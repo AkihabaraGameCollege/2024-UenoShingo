@@ -9,7 +9,7 @@ void main(
     for (uint i = 0; i < 3; i++)
     {
         GeometryShaderOutput_Sprite element;
-        element.position = input[i].position;
+        element.position = mul(input[i].position, matrixWorldViewProjection);
         output.Append(element);
     }
 }
