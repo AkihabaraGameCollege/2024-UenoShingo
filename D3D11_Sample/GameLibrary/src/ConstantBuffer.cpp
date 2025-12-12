@@ -46,3 +46,23 @@ ID3D11Buffer* ConstantBuffer::GetNativePointer() noexcept
 {
 	return buffer.Get();
 }
+
+ConstantBufferManager::ConstantBufferManager(ID3D11Device5* graphicsDevice)
+	: GraphicsResource(graphicsDevice)
+{
+
+}
+
+void ConstantBufferManager::Add(const std::string& name, std::shared_ptr<ConstantBuffer> constantBuffer)
+{
+	constantBuffers.insert(std::make_pair(name, constantBuffer));
+}
+
+ConstantBuffer* ConstantBufferManager::Find(const std::string& name)
+{
+	const auto findItr = constantBuffers.find(name);
+	if (findItr == constantBuffers.cend()) {
+		return nullptr;
+	}
+	return findItr->second.get();
+}

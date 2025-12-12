@@ -16,6 +16,8 @@ protected:
 	void OnRender() override;
 
 private:
+	std::shared_ptr<GameLibrary::ConstantBufferManager> constantBufferManager;
+
 	// ƒ‰ƒCƒg
 	DirectX::XMFLOAT4 lightRotation = { 0, 0, 0, 1 };
 	DirectX::XMFLOAT4 lightColor = { 1, 1, 1, 1 };

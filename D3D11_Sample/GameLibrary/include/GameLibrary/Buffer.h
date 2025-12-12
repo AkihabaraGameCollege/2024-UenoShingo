@@ -2,6 +2,9 @@
 
 #include <GameLibrary/Graphics.h>
 #include <Windows.h>
+#include <memory>
+#include <string>
+#include <unordered_map>
 #include <wrl/client.h>
 #include <d3d11_4.h>
 
@@ -56,5 +59,20 @@ namespace GameLibrary
 	private:
 		Microsoft::WRL::ComPtr<ID3D11Buffer> buffer;
 		UINT byteWidth = 0;
+	};
+
+	class ConstantBufferManager final : public GraphicsResource
+	{
+		typedef std::unordered_map<std::string, std::shared_ptr<ConstantBuffer>> ConstantBuffersType;
+
+	public:
+		explicit ConstantBufferManager(ID3D11Device5* graphicsDevice);
+		~ConstantBufferManager() = default;
+
+		void Add(const std::string& name, std::shared_ptr<ConstantBuffer> constantBuffer);
+		ConstantBuffer* Find(const std::string& name);
+
+	private:
+		ConstantBuffersType constantBuffers;
 	};
 }

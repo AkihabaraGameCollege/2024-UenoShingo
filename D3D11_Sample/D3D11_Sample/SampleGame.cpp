@@ -87,6 +87,9 @@ SampleGame::SampleGame(const GameLibrary::ProjectSettings& settings)
 /// </summary>
 void SampleGame::OnInitialize()
 {
+	// 定数バッファー
+	constantBufferManager = std::make_shared<ConstantBufferManager>(device.Get());
+
 	// 平行ライト
 	XMStoreFloat4(&lightRotation, XMQuaternionRotationRollPitchYaw(
 		XMConvertToRadians(50),
@@ -96,12 +99,15 @@ void SampleGame::OnInitialize()
 
 	constantBufferPerLighting = std::make_shared<ConstantBuffer>(device.Get(),
 		static_cast<UINT>(sizeof constantsPerLighting));
+	constantBufferManager->Add("ConstantBufferPerLighting", constantBufferPerLighting);
 
 	constantBufferPerFrame = std::make_shared<ConstantBuffer>(device.Get(),
 		static_cast<UINT>(sizeof constantsPerFrame));
+	constantBufferManager->Add("ConstantBufferPerFrame", constantBufferPerFrame);
 
 	constantBufferPerDraw = std::make_shared<ConstantBuffer>(device.Get(),
 		static_cast<UINT>(sizeof constantsPerDraw));
+	constantBufferManager->Add("ConstantBufferPerDraw", constantBufferPerDraw);
 
 	// マテリアル
 	albedoColor = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -200,21 +206,21 @@ void SampleGame::OnRender()
 	// Constant buffer
 	{
 		ID3D11Buffer* const constantBuffers[] = {
-			constantBufferPerDraw->GetNativePointer(),
-			constantBufferPerFrame->GetNativePointer(),
+			constantBufferManager->Find("ConstantBufferPerDraw")->GetNativePointer(),
+			constantBufferManager->Find("ConstantBufferPerFrame")->GetNativePointer(),
 		};
 		//deviceContext->VSSetConstantBuffers(0, std::size(constantBuffers), constantBuffers);
 	}
 	{
 		ID3D11Buffer* const constantBuffers[] = {
-			constantBufferPerDraw->GetNativePointer(),
-			constantBufferPerFrame->GetNativePointer(),
+			constantBufferManager->Find("ConstantBufferPerDraw")->GetNativePointer(),
+			constantBufferManager->Find("ConstantBufferPerFrame")->GetNativePointer(),
 		};
 		deviceContext->GSSetConstantBuffers(0, std::size(constantBuffers), constantBuffers);
 	}
 	{
 		ID3D11Buffer* const constantBuffers[] = {
-			constantBufferPerLighting->GetNativePointer(),
+			constantBufferManager->Find("ConstantBufferPerLighting")->GetNativePointer(),
 			constantBufferPerMaterial->GetNativePointer(),
 		};
 		deviceContext->PSSetConstantBuffers(0, std::size(constantBuffers), constantBuffers);
