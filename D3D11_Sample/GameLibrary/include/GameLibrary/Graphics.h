@@ -12,12 +12,14 @@ namespace GameLibrary
 	{
 		DirectX::XMFLOAT3 Position;
 		DirectX::XMFLOAT3 Normal;
+		DirectX::XMFLOAT2 TexCoord;
 
 		static constexpr UINT GetSize() { return static_cast<UINT>(sizeof(Vertex_Base)); }
 
 		static constexpr D3D11_INPUT_ELEMENT_DESC InputElementDescs[] = {
 			{ "POSITION", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0,                            0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 			{ "NORMAL",   0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "TEXCOORD", 0,    DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		};
 		static constexpr UINT NumElements = static_cast<UINT>(std::size(InputElementDescs));
 	};

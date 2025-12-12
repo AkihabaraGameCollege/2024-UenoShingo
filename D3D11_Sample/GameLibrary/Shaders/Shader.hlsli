@@ -22,12 +22,14 @@ struct VertexShaderInput_Base
 {
     float4 position : POSITION;
     float4 normal : NORMAL;
+    float2 texCoord : TEXCOORD0;
 };
 
 struct VertexShaderOutput_Base
 {
     float4 position : SV_POSITION;
     float4 normal : NORMAL;
+    float2 texCoord : TEXCOORD0;
 };
 
 typedef VertexShaderOutput_Base GeometryShaderInput_Base;
@@ -37,6 +39,7 @@ struct GeometryShaderOutput_Base
     float4 worldPosition : POSITION;
     float4 worldNormal : NORMAL;
     float4 position : SV_POSITION;
+	float2 texCoord : TEXCOORD0;
 };
 
 typedef GeometryShaderOutput_Base PixelShaderInput_Base;

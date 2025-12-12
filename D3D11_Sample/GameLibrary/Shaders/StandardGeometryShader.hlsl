@@ -12,6 +12,7 @@ void main(
         element.worldPosition = mul(input[i].position, matrixWorld);
         element.worldNormal = mul(input[i].normal, matrixWorld);
         element.position = mul(input[i].position, matrixWorldViewProjection);
+        element.texCoord = input[i].texCoord;
         output.Append(element);
     }
 }
