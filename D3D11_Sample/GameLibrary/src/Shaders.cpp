@@ -12,6 +12,7 @@ VariableDesc::VariableDesc(ID3D11ShaderReflectionVariable* variable)
 	auto variableDesc = D3D11_SHADER_VARIABLE_DESC{};
 	ThrowIfFailed(variable->GetDesc(&variableDesc));
 
+	NameId = Shader::StringNameToId(variableDesc.Name);
 	Name = variableDesc.Name;
 	StartOffset = variableDesc.StartOffset;
 	Size = variableDesc.Size;
@@ -28,7 +29,7 @@ VariableDesc::VariableDesc(ID3D11ShaderReflectionVariable* variable)
 
 	auto bufferDesc = D3D11_SHADER_BUFFER_DESC{};
 	ThrowIfFailed(variable->GetBuffer()->GetDesc(&bufferDesc));
-	ConstantBufferName = bufferDesc.Name;
+	ConstantBufferId = Shader::StringNameToId(bufferDesc.Name);
 
 	const auto reflectionType = variable->GetType();
 	auto typeDesc = D3D11_SHADER_TYPE_DESC{};
@@ -77,6 +78,7 @@ ConstantBufferDesc::ConstantBufferDesc(ID3D11ShaderReflectionConstantBuffer* con
 	auto bufferDesc = D3D11_SHADER_BUFFER_DESC{};
 	ThrowIfFailed(constantBuffer->GetDesc(&bufferDesc));
 
+	NameId = Shader::StringNameToId(bufferDesc.Name);
 	Name = bufferDesc.Name;
 	Type = bufferDesc.Type;
 	Size = bufferDesc.Size;
@@ -92,6 +94,7 @@ ConstantBufferDesc::ConstantBufferDesc(ID3D11ShaderReflectionConstantBuffer* con
 
 ResourceBindingDesc::ResourceBindingDesc(const D3D11_SHADER_INPUT_BIND_DESC& bindingDesc)
 {
+	NameId = Shader::StringNameToId(bindingDesc.Name);
 	Name = bindingDesc.Name;
 	Type = bindingDesc.Type;
 	BindPoint = bindingDesc.BindPoint;
@@ -102,10 +105,10 @@ ResourceBindingDesc::ResourceBindingDesc(const D3D11_SHADER_INPUT_BIND_DESC& bin
 	NumSamples = bindingDesc.NumSamples;
 
 	if (bindingDesc.Type == D3D_SHADER_INPUT_TYPE::D3D_SIT_TEXTURE) {
-		SamplerName = std::format("{0}Sampler", bindingDesc.Name);
+		SamplerNameId = Shader::StringNameToId(std::format("{0}Sampler", bindingDesc.Name));
 	}
 	else {
-		SamplerName = "";
+		SamplerNameId = 0;
 	}
 }
 
@@ -168,13 +171,13 @@ void ReflectiveShader::Apply(ID3D11DeviceContext4* deviceContext,
 	for (const auto& desc : bindingDescs) {
 		switch (desc.Type) {
 		case D3D_SHADER_INPUT_TYPE::D3D_SIT_CBUFFER:
-			constantBuffers[desc.BindPoint] = constantBufferMap.at(desc.Name);
+			constantBuffers[desc.BindPoint] = constantBufferMap.at(desc.NameId);
 			break;
 		case D3D_SHADER_INPUT_TYPE::D3D_SIT_TEXTURE:
-			shaderResourceViews[desc.BindPoint] = shaderResourceViewMap.at(desc.Name);
+			shaderResourceViews[desc.BindPoint] = shaderResourceViewMap.at(desc.NameId);
 			break;
 		case D3D_SHADER_INPUT_TYPE::D3D_SIT_SAMPLER:
-			samplers[desc.BindPoint] = samplerStateMap.at(desc.Name);
+			samplers[desc.BindPoint] = samplerStateMap.at(desc.NameId);
 			break;
 		default:
 			break;
@@ -259,14 +262,14 @@ Shader::Shader(ID3D11Device5* graphicsDevice,
 
 	// 各シェーダーからグローバル変数用の定数バッファーを検索
 	for (const auto& shader : shaders) {
-		std::unordered_set<std::string> descSet;
+		std::unordered_set<size_t> descSet;
 
 		// 定数バッファー
 		for (auto& desc : shader->GetConstantBufferDescs()) {
-			const auto& name = desc.Name;
-			auto findItr = descSet.find(name);
+			const auto nameId = desc.NameId;
+			auto findItr = descSet.find(nameId);
 			if (findItr == descSet.cend()) {
-				descSet.insert(name);
+				descSet.insert(nameId);
 				constantBufferDescs.push_back(desc);
 			}
 		}
@@ -275,14 +278,19 @@ Shader::Shader(ID3D11Device5* graphicsDevice,
 
 		// バインディング リソース
 		for (auto& desc : shader->GetResourceBindingDescs()) {
-			const auto name = desc.Name;
-			auto findItr = descSet.find(name);
+			const auto nameId = desc.NameId;
+			auto findItr = descSet.find(nameId);
 			if (findItr == descSet.cend()) {
-				descSet.insert(name);
+				descSet.insert(nameId);
 				bindingDescs.push_back(desc);
 			}
 		}
 	}
+}
+
+size_t Shader::StringNameToId(const std::string_view& name)
+{
+	return std::hash<std::string_view>{}(name);
 }
 
 const ConstantBufferDescs& Shader::GetConstantBufferDescs() const noexcept

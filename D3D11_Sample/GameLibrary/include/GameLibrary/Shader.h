@@ -3,6 +3,7 @@
 #include <GameLibrary/Graphics.h>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
 #include <unordered_map>
 #include <Windows.h>
@@ -12,9 +13,9 @@
 
 namespace GameLibrary
 {
-	typedef std::unordered_map<std::string, ID3D11Buffer*> ConstantBufferMap;
-	typedef std::unordered_map<std::string, ID3D11ShaderResourceView*> ShaderResourceViewMap;
-	typedef std::unordered_map<std::string, ID3D11SamplerState*> SamplerStateMap;
+	typedef std::unordered_map<size_t, ID3D11Buffer*> ConstantBufferMap;
+	typedef std::unordered_map<size_t, ID3D11ShaderResourceView*> ShaderResourceViewMap;
+	typedef std::unordered_map<size_t, ID3D11SamplerState*> SamplerStateMap;
 
 	enum class ShaderPropertyType
 	{
@@ -31,6 +32,7 @@ namespace GameLibrary
 	// Variables
 	struct VariableDesc
 	{
+		size_t NameId = 0;
 		std::string Name;
 		ShaderPropertyType Type = {};
 		UINT StartOffset = 0;
@@ -41,7 +43,7 @@ namespace GameLibrary
 		UINT TextureSize = 0;
 		UINT StartSampler = 0;
 		UINT SamplerSize = 0;
-		std::string ConstantBufferName;
+		size_t ConstantBufferId = 0;
 
 		explicit VariableDesc(ID3D11ShaderReflectionVariable* variable);
 	};
@@ -49,6 +51,7 @@ namespace GameLibrary
 	// ConstantBuffers
 	struct ConstantBufferDesc
 	{
+		size_t NameId;
 		std::string Name;
 		D3D_CBUFFER_TYPE Type;
 		std::vector<VariableDesc> Variables;
@@ -62,6 +65,7 @@ namespace GameLibrary
 	// ResourceBindings
 	struct ResourceBindingDesc
 	{
+		size_t NameId;
 		std::string Name;
 		D3D_SHADER_INPUT_TYPE Type;
 		UINT BindPoint;
@@ -70,7 +74,7 @@ namespace GameLibrary
 		D3D_RESOURCE_RETURN_TYPE ReturnType;
 		D3D_SRV_DIMENSION Dimension;
 		UINT NumSamples;
-		std::string SamplerName;
+		size_t SamplerNameId = 0;
 
 		explicit ResourceBindingDesc(const D3D11_SHADER_INPUT_BIND_DESC& bindingDesc);
 	};
@@ -191,6 +195,8 @@ namespace GameLibrary
 			const void* vertexShaderBytecode, size_t vertexShaderBytecodeLength,
 			const void* geometryShaderBytecode, size_t geometryShaderBytecodeLength,
 			const void* pixelShaderBytecode, size_t pixelShaderBytecodeLength);
+
+		static size_t StringNameToId(const std::string_view& name);
 
 		const ConstantBufferDescs& GetConstantBufferDescs() const noexcept;
 		const ResourceBindingDescs& GetResourceBindingDescs() const noexcept;

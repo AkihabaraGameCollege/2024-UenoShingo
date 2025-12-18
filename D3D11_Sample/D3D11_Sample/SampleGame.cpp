@@ -135,22 +135,22 @@ void SampleGame::OnInitialize()
 	constantBufferPerMaterial = std::make_shared<ConstantBuffer>(device.Get(),
 		static_cast<UINT>(sizeof constantsPerMaterial));
 	constantBufferMap.insert(std::make_pair(
-		"ConstantBufferPerMaterial",
+		Shader::StringNameToId("ConstantBufferPerMaterial"),
 		constantBufferPerMaterial->GetNativePointer()));
 	constantBufferMap.insert(std::make_pair(
-		"ConstantBufferPerLighting",
+		Shader::StringNameToId("ConstantBufferPerLighting"),
 		constantBufferManager->Find("ConstantBufferPerLighting")->GetNativePointer()));
 	constantBufferMap.insert(std::make_pair(
-		"ConstantBufferPerFrame",
+		Shader::StringNameToId("ConstantBufferPerFrame"),
 		constantBufferManager->Find("ConstantBufferPerFrame")->GetNativePointer()));
 	constantBufferMap.insert(std::make_pair(
-		"ConstantBufferPerDraw",
+		Shader::StringNameToId("ConstantBufferPerDraw"),
 		constantBufferManager->Find("ConstantBufferPerDraw")->GetNativePointer()));
 	shaderResourceViewMap.insert(std::make_pair(
-		"MainTexture",
+		Shader::StringNameToId("MainTexture"),
 		mainTexture->GetView()));
 	samplerStateMap.insert(std::make_pair(
-		"MainTextureSampler",
+		Shader::StringNameToId("MainTextureSampler"),
 		mainTexture->GetSamplerState()));
 
 	// 入力レイアウト

@@ -63,13 +63,14 @@ namespace GameLibrary
 
 	class ConstantBufferManager final : public GraphicsResource
 	{
-		typedef std::unordered_map<std::string, std::shared_ptr<ConstantBuffer>> ConstantBuffersType;
+		typedef std::unordered_map<size_t, std::shared_ptr<ConstantBuffer>> ConstantBuffersType;
 
 	public:
 		explicit ConstantBufferManager(ID3D11Device5* graphicsDevice);
 		~ConstantBufferManager() = default;
 
 		void Add(const std::string& name, std::shared_ptr<ConstantBuffer> constantBuffer);
+		ConstantBuffer* Find(size_t nameId);
 		ConstantBuffer* Find(const std::string& name);
 
 	private:

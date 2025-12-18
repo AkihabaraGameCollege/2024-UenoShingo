@@ -1,4 +1,5 @@
 #include <GameLibrary/Buffer.h>
+#include <GameLibrary/Shader.h>
 #include <GameLibrary/Utility.h>
 
 using namespace GameLibrary;
@@ -55,14 +56,19 @@ ConstantBufferManager::ConstantBufferManager(ID3D11Device5* graphicsDevice)
 
 void ConstantBufferManager::Add(const std::string& name, std::shared_ptr<ConstantBuffer> constantBuffer)
 {
-	constantBuffers.insert(std::make_pair(name, constantBuffer));
+	constantBuffers.insert(std::make_pair(Shader::StringNameToId(name), constantBuffer));
 }
 
-ConstantBuffer* ConstantBufferManager::Find(const std::string& name)
+ConstantBuffer* ConstantBufferManager::Find(size_t nameId)
 {
-	const auto findItr = constantBuffers.find(name);
+	const auto findItr = constantBuffers.find(nameId);
 	if (findItr == constantBuffers.cend()) {
 		return nullptr;
 	}
 	return findItr->second.get();
+}
+
+ConstantBuffer* ConstantBufferManager::Find(const std::string& name)
+{
+	return Find(Shader::StringNameToId(name));
 }
