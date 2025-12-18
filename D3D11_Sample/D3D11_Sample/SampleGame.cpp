@@ -128,14 +128,30 @@ void SampleGame::OnInitialize()
 	indexOffset = 0;
 
 	// シェーダー
-	vertexShader = standardVertexShader.get();
-	geometryShader = standardGeometryShader.get();
-	pixelShader = standardPixelShader.get();
+	shader = standardShader;
 	// テクスチャ
 	mainTexture = std::make_shared<Texture2D>(device.Get(), 4, 4, DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, textureSource);
 	// マテリアル
 	constantBufferPerMaterial = std::make_shared<ConstantBuffer>(device.Get(),
 		static_cast<UINT>(sizeof constantsPerMaterial));
+	constantBufferMap.insert(std::make_pair(
+		"ConstantBufferPerMaterial",
+		constantBufferPerMaterial->GetNativePointer()));
+	constantBufferMap.insert(std::make_pair(
+		"ConstantBufferPerLighting",
+		constantBufferManager->Find("ConstantBufferPerLighting")->GetNativePointer()));
+	constantBufferMap.insert(std::make_pair(
+		"ConstantBufferPerFrame",
+		constantBufferManager->Find("ConstantBufferPerFrame")->GetNativePointer()));
+	constantBufferMap.insert(std::make_pair(
+		"ConstantBufferPerDraw",
+		constantBufferManager->Find("ConstantBufferPerDraw")->GetNativePointer()));
+	shaderResourceViewMap.insert(std::make_pair(
+		"MainTexture",
+		mainTexture->GetView()));
+	samplerStateMap.insert(std::make_pair(
+		"MainTextureSampler",
+		mainTexture->GetSamplerState()));
 
 	// 入力レイアウト
 	inputLayout = std::make_shared<InputLayout_Base>(device.Get());
@@ -203,41 +219,8 @@ void SampleGame::OnRender()
 	// マテリアル
 	XMStoreFloat4(&constantsPerMaterial.Albedo, XMColorSRGBToRGB(XMLoadFloat4(&albedoColor)));
 	constantBufferPerMaterial->UpdateSubresource(&constantsPerMaterial);
-	// Constant buffer
-	{
-		ID3D11Buffer* const constantBuffers[] = {
-			constantBufferManager->Find("ConstantBufferPerDraw")->GetNativePointer(),
-			constantBufferManager->Find("ConstantBufferPerFrame")->GetNativePointer(),
-		};
-		//deviceContext->VSSetConstantBuffers(0, std::size(constantBuffers), constantBuffers);
-	}
-	{
-		ID3D11Buffer* const constantBuffers[] = {
-			constantBufferManager->Find("ConstantBufferPerDraw")->GetNativePointer(),
-			constantBufferManager->Find("ConstantBufferPerFrame")->GetNativePointer(),
-		};
-		deviceContext->GSSetConstantBuffers(0, std::size(constantBuffers), constantBuffers);
-	}
-	{
-		ID3D11Buffer* const constantBuffers[] = {
-			constantBufferManager->Find("ConstantBufferPerLighting")->GetNativePointer(),
-			constantBufferPerMaterial->GetNativePointer(),
-		};
-		deviceContext->PSSetConstantBuffers(0, std::size(constantBuffers), constantBuffers);
-	}
-	// Texture
-	ID3D11ShaderResourceView* const textures[] = { mainTexture->GetView(), };
-	deviceContext->VSSetShaderResources(0, std::size(textures), textures);
-	deviceContext->GSSetShaderResources(0, std::size(textures), textures);
-	deviceContext->PSSetShaderResources(0, std::size(textures), textures);
-	ID3D11SamplerState* const samplerStates[] = { mainTexture->GetSamplerState(), };
-	deviceContext->VSSetSamplers(0, std::size(samplerStates), samplerStates);
-	deviceContext->GSSetSamplers(0, std::size(samplerStates), samplerStates);
-	deviceContext->PSSetSamplers(0, std::size(samplerStates), samplerStates);
 	// Shaders
-	vertexShader->Apply(deviceContext.Get());
-	geometryShader->Apply(deviceContext.Get());
-	pixelShader->Apply(deviceContext.Get());
+	shader->Apply(deviceContext.Get(), constantBufferMap, shaderResourceViewMap, samplerStateMap);
 
 	// インデックス バッファーを設定
 	deviceContext->IASetIndexBuffer(indexBuffer->GetNativePointer(), indexBuffer->GetFormat(), indexOffset);

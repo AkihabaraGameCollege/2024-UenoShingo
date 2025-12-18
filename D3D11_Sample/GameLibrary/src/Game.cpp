@@ -245,18 +245,16 @@ void Game::Initialize(HWND hWnd)
 		.MaxDepth = D3D11_MAX_DEPTH,
 	};
 
-	standardVertexShader = std::make_unique<VertexShader>(
-		device.Get(), g_StandardVertexShader, sizeof g_StandardVertexShader);
-	standardGeometryShader = std::make_unique<GeometryShader>(
-		device.Get(), g_StandardGeometryShader, sizeof g_StandardGeometryShader);
-	standardPixelShader = std::make_unique<PixelShader>(
-		device.Get(), g_StandardPixelShader, sizeof g_StandardPixelShader);
-	spriteVertexShader = std::make_unique<VertexShader>(
-		device.Get(), g_SpriteVertexShader, sizeof g_SpriteVertexShader);
-	spriteGeometryShader = std::make_unique<GeometryShader>(
-		device.Get(), g_SpriteGeometryShader, sizeof g_SpriteGeometryShader);
-	spritePixelShader = std::make_unique<PixelShader>(
-		device.Get(), g_SpritePixelShader, sizeof g_SpritePixelShader);
+	standardShader = std::make_shared<Shader>(
+		device.Get(),
+		g_StandardVertexShader, sizeof g_StandardVertexShader,
+		g_StandardGeometryShader, sizeof g_StandardGeometryShader,
+		g_StandardPixelShader, sizeof g_StandardPixelShader);
+	spriteShader = std::make_shared<Shader>(
+		device.Get(),
+		g_SpriteVertexShader, sizeof g_SpriteVertexShader,
+		g_SpriteGeometryShader, sizeof g_SpriteGeometryShader,
+		g_SpritePixelShader, sizeof g_SpritePixelShader);
 
 	OnInitialize();
 }

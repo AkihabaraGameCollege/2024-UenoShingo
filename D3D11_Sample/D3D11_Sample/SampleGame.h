@@ -68,9 +68,7 @@ private:
 	std::shared_ptr<GameLibrary::ConstantBuffer> constantBufferPerDraw;
 
 	// Shaders
-	GameLibrary::VertexShader* vertexShader = nullptr;
-	GameLibrary::GeometryShader* geometryShader = nullptr;
-	GameLibrary::PixelShader* pixelShader = nullptr;
+	std::shared_ptr<GameLibrary::Shader> shader;
 	// Main Texture
 	std::shared_ptr<GameLibrary::Texture2D> mainTexture;
 	// ƒ}ƒeƒŠƒAƒ‹
@@ -80,6 +78,9 @@ private:
 	};
 	ConstantsPerMaterial constantsPerMaterial = {};
 	std::shared_ptr<GameLibrary::ConstantBuffer> constantBufferPerMaterial;
+	GameLibrary::ConstantBufferMap constantBufferMap;
+	GameLibrary::ShaderResourceViewMap shaderResourceViewMap;
+	GameLibrary::SamplerStateMap samplerStateMap;
 
 	std::shared_ptr<GameLibrary::InputLayout> inputLayout;
 

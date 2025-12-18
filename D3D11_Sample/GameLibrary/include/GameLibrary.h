@@ -3,6 +3,7 @@
 #pragma comment(lib, "GameLibrary.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "D3D11.lib")
+#pragma comment(lib, "d3dcompiler.lib")
 #pragma comment (lib, "Winmm.lib")
 #include <GameLibrary/Graphics.h>
 #include <GameLibrary/Game.h>
