@@ -13,6 +13,7 @@
 #include <GameLibrary/Texture.h>
 #include <GameLibrary/Utility.h>
 #include <GameLibrary/Material.h>
+#include <GameLibrary/Mesh.h>
 // Input
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")

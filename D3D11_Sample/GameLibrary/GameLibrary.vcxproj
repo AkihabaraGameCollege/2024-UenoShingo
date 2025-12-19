@@ -148,6 +148,7 @@
     <ClInclude Include="include\GameLibrary\Input.h" />
     <ClInclude Include="include\GameLibrary\InputLayout.h" />
     <ClInclude Include="include\GameLibrary\Material.h" />
+    <ClInclude Include="include\GameLibrary\Mesh.h" />
     <ClInclude Include="include\GameLibrary\Shader.h" />
     <ClInclude Include="include\GameLibrary\Texture.h" />
     <ClInclude Include="include\GameLibrary\Time.h" />
@@ -169,6 +170,7 @@
     <ClCompile Include="src\InputManager.cpp" />
     <ClCompile Include="src\Keyboard.cpp" />
     <ClCompile Include="src\Material.cpp" />
+    <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Mouse.cpp" />
     <ClCompile Include="src\Shaders.cpp" />
     <ClCompile Include="src\Textures.cpp" />

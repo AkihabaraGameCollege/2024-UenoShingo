@@ -55,11 +55,6 @@ private:
 	DirectX::XMVECTOR localPosition = { 0, 0, 0, };
 	DirectX::XMFLOAT4 albedoColor = { 1, 1, 1, 1 };
 
-	std::shared_ptr<GameLibrary::VertexBuffer> vertexBuffer;
-	UINT vertexOffset = 0;
-	std::shared_ptr<GameLibrary::IndexBuffer> indexBuffer;
-	UINT indexOffset = 0;
-
 	struct ConstantsPerDraw
 	{
 		DirectX::XMFLOAT4X4 MatrixWorld;
@@ -69,11 +64,8 @@ private:
 
 	// マテリアル
 	std::unique_ptr<GameLibrary::Material> material;
+	// メッシュ
+	std::unique_ptr<GameLibrary::Mesh> mesh;
 
 	std::shared_ptr<GameLibrary::InputLayout> inputLayout;
-
-	UINT startIndexLocation = 0;
-	INT baseVertexLocation = 0;
-
-	float time = 0;
 };

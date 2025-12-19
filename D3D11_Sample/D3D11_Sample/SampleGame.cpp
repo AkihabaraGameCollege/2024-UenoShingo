@@ -112,20 +112,11 @@ void SampleGame::OnInitialize()
 	// マテリアル
 	albedoColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-	// 頂点バッファー
-	vertexBuffer = std::make_shared<VertexBuffer>(
-		device.Get(),
-		Vertex_Base::GetSize(),
-		static_cast<UINT>(std::size(cubeVertices)),
-		cubeVertices);
-	vertexOffset = 0;
-
-	// インデックス バッファー
-	indexBuffer = std::make_shared<IndexBuffer>(
-		device.Get(),
-		IndexFormat::UInt32, static_cast<UINT>(std::size(cubeIndices)),
-		cubeIndices);
-	indexOffset = 0;
+	// メッシュ
+	mesh = std::make_unique<Mesh>(device.Get());
+	mesh->SetVertexBuffer(Vertex_Base::GetSize(), static_cast<UINT>(std::size(cubeVertices)), cubeVertices);
+	mesh->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	mesh->SetIndexBuffer(IndexFormat::UInt32, static_cast<UINT>(std::size(cubeIndices)), cubeIndices);
 
 	// シェーダー
 	auto shader = shaderManager->Find(L"Shader/Standard");
@@ -138,9 +129,6 @@ void SampleGame::OnInitialize()
 
 	// 入力レイアウト
 	inputLayout = std::make_shared<InputLayout_Base>(device.Get());
-
-	startIndexLocation = 0;
-	baseVertexLocation = 0;
 }
 
 /// <summary>
@@ -193,19 +181,18 @@ void SampleGame::OnRender()
 	XMStoreFloat4x4(&constantsPerDraw.MatrixWorld, XMMatrixTranspose(matrixWorld));
 	constantBufferPerDraw->UpdateSubresource(&constantsPerDraw);
 
-	// 頂点バッファーを設定
+	// Mesh
+	const auto vertexBuffer = mesh->GetVertexBuffer();
 	ID3D11Buffer* const vertexBuffers[] = { vertexBuffer->GetNativePointer(), };
 	const UINT strides[] = { vertexBuffer->GetStride(), };
-	const UINT offsets[] = { vertexOffset, };
+	const UINT offsets[] = { mesh->GetVertexOffset(), };
 	deviceContext->IASetVertexBuffers(0, static_cast<UINT>(std::size(vertexBuffers)), vertexBuffers, strides, offsets);
 	deviceContext->IASetInputLayout(inputLayout->GetNativePointer());
+	const auto indexBuffer = mesh->GetIndexBuffer();
+	deviceContext->IASetIndexBuffer(indexBuffer->GetNativePointer(), indexBuffer->GetFormat(), mesh->GetIndexOffset());
+	deviceContext->IASetPrimitiveTopology(mesh->GetPrimitiveTopology());
 	// マテリアル
 	material->Apply(deviceContext.Get());
 
-	// インデックス バッファーを設定
-	deviceContext->IASetIndexBuffer(indexBuffer->GetNativePointer(), indexBuffer->GetFormat(), indexOffset);
-	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	// メッシュを描画
-	deviceContext->DrawIndexed(indexBuffer->GetCount(), startIndexLocation, baseVertexLocation);
+	deviceContext->DrawIndexed(indexBuffer->GetCount(), mesh->GetStartIndexLocation(), mesh->GetBaseVertexLocation());
 }
