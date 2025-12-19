@@ -1,10 +1,10 @@
-#include "Keyboard.h"
+ï»¿#include "Keyboard.h"
 #include <GameLibrary/Utility.h>
 
 using namespace GameLibrary;
 
 /// <summary>
-/// ‚±‚ÌƒNƒ‰ƒX‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ğ‰ğ•ú‚µ‚Ü‚·B
+/// ã“ã®ã‚¯ãƒ©ã‚¹ã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’è§£æ”¾ã—ã¾ã™ã€‚
 /// </summary>
 Keyboard::~Keyboard()
 {
@@ -15,10 +15,10 @@ Keyboard::~Keyboard()
 }
 
 /// <summary>
-/// ‚±‚ÌƒNƒ‰ƒX‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ğ‰Šú‰»‚µ‚Ü‚·B
+/// ã“ã®ã‚¯ãƒ©ã‚¹ã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’åˆæœŸåŒ–ã—ã¾ã™ã€‚
 /// </summary>
 /// <param name="directInput"></param>
-/// <param name="hWnd">ƒEƒBƒ“ƒhƒE ƒnƒ“ƒhƒ‹</param>
+/// <param name="hWnd">ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ ãƒãƒ³ãƒ‰ãƒ«</param>
 void Keyboard::Initialize(IDirectInput8W* directInput, HWND hWnd)
 {
 	ThrowIfFailed(directInput->CreateDevice(GUID_SysKeyboard, &device, nullptr));
@@ -34,7 +34,7 @@ void Keyboard::Initialize(IDirectInput8W* directInput, HWND hWnd)
 }
 
 /// <summary>
-/// Œ»İ‚ÌƒL[“ü—Íó‘Ô‚ğXV‚µ‚Ü‚·B
+/// ç¾åœ¨ã®ã‚­ãƒ¼å…¥åŠ›çŠ¶æ…‹ã‚’æ›´æ–°ã—ã¾ã™ã€‚
 /// </summary>
 void Keyboard::Update(bool(&currentButtons)[DigitalInput::NumDigitalInputs]) noexcept
 {
@@ -48,10 +48,10 @@ void Keyboard::Update(bool(&currentButtons)[DigitalInput::NumDigitalInputs]) noe
 }
 
 /// <summary>
-/// w’è‚µ‚½ƒ{ƒ^ƒ““ü—Íó‘Ô‚ğæ“¾‚µ‚Ü‚·B
+/// æŒ‡å®šã—ãŸãƒœã‚¿ãƒ³å…¥åŠ›çŠ¶æ…‹ã‚’å–å¾—ã—ã¾ã™ã€‚
 /// </summary>
 /// <param name="digitalInput">Digital Input</param>
-/// <returns>ƒ{ƒ^ƒ“‚ğ‰Ÿ‚µ‰º‚°‚Ä‚¢‚éê‡‚Í trueA—£‚µ‚Ä‚¢‚éê‡‚Í false</returns>
+/// <returns>ãƒœã‚¿ãƒ³ã‚’æŠ¼ã—ä¸‹ã’ã¦ã„ã‚‹å ´åˆã¯ trueã€é›¢ã—ã¦ã„ã‚‹å ´åˆã¯ false</returns>
 bool Keyboard::GetButton(DigitalInput digitalInput) const noexcept
 {
 	static constexpr unsigned char s_DIK_Mapping[DigitalInput::NumKeys] = {

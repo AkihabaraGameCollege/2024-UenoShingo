@@ -1,4 +1,4 @@
-#include "InputManager.h"
+ï»¿#include "InputManager.h"
 #include <GameLibrary/Utility.h>
 
 #include <format>
@@ -7,7 +7,7 @@ using namespace GameLibrary;
 using namespace DirectX;
 
 /// <summary>
-/// ‚±‚ÌƒNƒ‰ƒX‚ÌV‚µ‚¢ƒCƒ“ƒXƒ^ƒ“ƒX‚ğ‰Šú‰»‚µ‚Ü‚·B
+/// ã“ã®ã‚¯ãƒ©ã‚¹ã®æ–°ã—ã„ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’åˆæœŸåŒ–ã—ã¾ã™ã€‚
 /// </summary>
 InputManager::InputManager(HINSTANCE hInstance, HWND hWnd)
 {
@@ -21,11 +21,11 @@ InputManager::InputManager(HINSTANCE hInstance, HWND hWnd)
 }
 
 /// <summary>
-/// ƒtƒŒ[ƒ€XV‚ğŠJn‚µ‚Ü‚·B
+/// ãƒ•ãƒ¬ãƒ¼ãƒ æ›´æ–°ã‚’é–‹å§‹ã—ã¾ã™ã€‚
 /// </summary>
 void InputManager::Update() noexcept
 {
-	// ‘O‰ñƒtƒŒ[ƒ€‚Ìó‘Ô‚ğXV
+	// å‰å›ãƒ•ãƒ¬ãƒ¼ãƒ ã®çŠ¶æ…‹ã‚’æ›´æ–°
 	std::swap(lastButtons, currentButtons);
 
 	keyboard.Update(*currentButtons);
@@ -33,49 +33,49 @@ void InputManager::Update() noexcept
 	gamePad.Update(*currentButtons, analogs);
 }
 
-/// Œ»İ‚ÌƒtƒŒ[ƒ€‚Åƒ{ƒ^ƒ““ü—Í‚ªŠJn‚³‚ê‚½‚©‚ğæ“¾‚µ‚Ü‚·B
+/// ç¾åœ¨ã®ãƒ•ãƒ¬ãƒ¼ãƒ ã§ãƒœã‚¿ãƒ³å…¥åŠ›ãŒé–‹å§‹ã•ã‚ŒãŸã‹ã‚’å–å¾—ã—ã¾ã™ã€‚
 /// </summary>
-/// <param name="digitalInput">ƒfƒWƒ^ƒ‹“ü—Í‚Ìí—Ş</param>
-/// <returns>ƒ{ƒ^ƒ““ü—Í‚ªŠJn‚³‚ê‚½ê‡‚Í trueA‚»‚êˆÈŠO‚Í false</returns>
+/// <param name="digitalInput">ãƒ‡ã‚¸ã‚¿ãƒ«å…¥åŠ›ã®ç¨®é¡</param>
+/// <returns>ãƒœã‚¿ãƒ³å…¥åŠ›ãŒé–‹å§‹ã•ã‚ŒãŸå ´åˆã¯ trueã€ãã‚Œä»¥å¤–ã¯ false</returns>
 bool InputManager::GetButtonDown(DigitalInput digitalInput) const noexcept
 {
 	return (!(*lastButtons)[digitalInput] && (*currentButtons)[digitalInput]);
 }
 
 /// <summary>
-/// Œ»İ‚Ìƒ{ƒ^ƒ““ü—Íó‘Ô‚ğæ“¾‚µ‚Ü‚·B
+/// ç¾åœ¨ã®ãƒœã‚¿ãƒ³å…¥åŠ›çŠ¶æ…‹ã‚’å–å¾—ã—ã¾ã™ã€‚
 /// </summary>
-/// <param name="digitalInput">ƒfƒWƒ^ƒ‹“ü—Í‚Ìí—Ş</param>
-/// <returns>‰Ÿ‚µ‰º‚°‚ç‚ê‚Ä‚¢‚éê‡‚Í trueA‚»‚êˆÈŠO‚Í false</returns>
+/// <param name="digitalInput">ãƒ‡ã‚¸ã‚¿ãƒ«å…¥åŠ›ã®ç¨®é¡</param>
+/// <returns>æŠ¼ã—ä¸‹ã’ã‚‰ã‚Œã¦ã„ã‚‹å ´åˆã¯ trueã€ãã‚Œä»¥å¤–ã¯ false</returns>
 bool InputManager::GetButton(DigitalInput digitalInput) const noexcept
 {
 	return (*currentButtons)[digitalInput];
 }
 
 /// <summary>
-/// Œ»İ‚ÌƒtƒŒ[ƒ€‚Åƒ{ƒ^ƒ““ü—Í‚ªI—¹‚³‚ê‚½‚©‚ğæ“¾‚µ‚Ü‚·B
+/// ç¾åœ¨ã®ãƒ•ãƒ¬ãƒ¼ãƒ ã§ãƒœã‚¿ãƒ³å…¥åŠ›ãŒçµ‚äº†ã•ã‚ŒãŸã‹ã‚’å–å¾—ã—ã¾ã™ã€‚
 /// </summary>
-/// <param name="digitalInput">ƒfƒWƒ^ƒ‹“ü—Í‚Ìí—Ş</param>
-/// <returns>ƒ{ƒ^ƒ““ü—Í‚ªI—¹‚³‚ê‚½ê‡‚Í trueA‚»‚êˆÈŠO‚Í false</returns>
+/// <param name="digitalInput">ãƒ‡ã‚¸ã‚¿ãƒ«å…¥åŠ›ã®ç¨®é¡</param>
+/// <returns>ãƒœã‚¿ãƒ³å…¥åŠ›ãŒçµ‚äº†ã•ã‚ŒãŸå ´åˆã¯ trueã€ãã‚Œä»¥å¤–ã¯ false</returns>
 bool InputManager::GetButtonUp(DigitalInput digitalInput) const noexcept
 {
 	return ((*lastButtons)[digitalInput] && !(*currentButtons)[digitalInput]);
 }
 
 /// <summary>
-/// ƒAƒiƒƒO“ü—Í’l‚ğæ“¾‚µ‚Ü‚·B
+/// ã‚¢ãƒŠãƒ­ã‚°å…¥åŠ›å€¤ã‚’å–å¾—ã—ã¾ã™ã€‚
 /// </summary>
-/// <param name="analogInput">ƒAƒiƒƒO“ü—Í‚Ìí—Ş</param>
-/// <returns>float’l</returns>
+/// <param name="analogInput">ã‚¢ãƒŠãƒ­ã‚°å…¥åŠ›ã®ç¨®é¡</param>
+/// <returns>floatå€¤</returns>
 float InputManager::GetAxis(AnalogInput analogInput) const noexcept
 {
 	return analogs[analogInput];
 }
 
 /// <summary>
-/// ƒ}ƒEƒX‚ÌƒJ[ƒ\ƒ‹ˆÊ’u‚ğæ“¾‚µ‚Ü‚·B
+/// ãƒã‚¦ã‚¹ã®ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã‚’å–å¾—ã—ã¾ã™ã€‚
 /// </summary>
-/// <returns>ˆÊ’uÀ•W</returns>
+/// <returns>ä½ç½®åº§æ¨™</returns>
 const XMFLOAT2& InputManager::GetMousePosition() const noexcept
 {
 	return mouse.GetMousePosition();

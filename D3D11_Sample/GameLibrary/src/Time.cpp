@@ -1,4 +1,4 @@
-#include <GameLibrary/Time.h>
+ï»¿#include <GameLibrary/Time.h>
 #include <GameLibrary/Utility.h>
 #include <timeapi.h>
 
@@ -13,7 +13,7 @@ namespace
 }
 
 /// <summary>
-/// ŠÔŒv‘ª‚ğŠJn‚µ‚Ü‚·B
+/// æ™‚é–“è¨ˆæ¸¬ã‚’é–‹å§‹ã—ã¾ã™ã€‚
 /// </summary>
 void Time::Initialize()
 {
@@ -21,7 +21,7 @@ void Time::Initialize()
 }
 
 /// <summary>
-/// ŠÔŒv‘ª‚ğI—¹‚µ‚Ü‚·B
+/// æ™‚é–“è¨ˆæ¸¬ã‚’çµ‚äº†ã—ã¾ã™ã€‚
 /// </summary>
 void Time::Shutdown() noexcept
 {
@@ -29,12 +29,12 @@ void Time::Shutdown() noexcept
 }
 
 /// <summary>
-/// ƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚©‚çA‚±‚ÌŠÖ”‚ğ–ˆƒtƒŒ[ƒ€ŒÄ‚Ño‚µ‚ÄŒ»İŠÔ‚ğXV‚µ‚Ü‚·B
+/// ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã‹ã‚‰ã€ã“ã®é–¢æ•°ã‚’æ¯ãƒ•ãƒ¬ãƒ¼ãƒ å‘¼ã³å‡ºã—ã¦ç¾åœ¨æ™‚é–“ã‚’æ›´æ–°ã—ã¾ã™ã€‚
 /// </summary>
 void Time::Update() noexcept
 {
 	DWORD currentTime;
-	// Å‰‚ÌƒtƒŒ[ƒ€
+	// æœ€åˆã®ãƒ•ãƒ¬ãƒ¼ãƒ 
 	if (s_LastTime == 0) {
 		currentTime = s_MaxDeltaTime;
 	}
@@ -53,9 +53,9 @@ float Time::GetTime() noexcept
 }
 
 /// <summary>
-/// ‘O‰ñ‚ÌƒtƒŒ[ƒ€‚©‚ç‚Ì·•ªŠÔ‚ğæ“¾‚µ‚Ü‚·B
+/// å‰å›ã®ãƒ•ãƒ¬ãƒ¼ãƒ ã‹ã‚‰ã®å·®åˆ†æ™‚é–“ã‚’å–å¾—ã—ã¾ã™ã€‚
 /// </summary>
-/// <returns>·•ªŠÔ(•b)</returns>
+/// <returns>å·®åˆ†æ™‚é–“(ç§’)</returns>
 float Time::GetDeltaTime() noexcept
 {
 	return s_DeltaTime / 1000.0f;

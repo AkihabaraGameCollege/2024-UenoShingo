@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <Windows.h>
 #include <iterator>
@@ -38,11 +38,11 @@ namespace GameLibrary
 		static constexpr UINT NumElements = static_cast<UINT>(std::size(InputElementDescs));
 	};
 
-	// ˆê‚Â‚Ì’¸“_‚ÉŠÜ‚Ü‚ê‚éƒf[ƒ^‚ÌŒ^
+	// ä¸€ã¤ã®é ‚ç‚¹ã«å«ã¾ã‚Œã‚‹ãƒ‡ãƒ¼ã‚¿ã®å‹
 	struct VertexPositionColor
 	{
-		DirectX::XMFLOAT3 position;	// ˆÊ’uÀ•W
-		DirectX::XMFLOAT4 color;	// ’¸“_ƒJƒ‰[
+		DirectX::XMFLOAT3 position;	// ä½ç½®åº§æ¨™
+		DirectX::XMFLOAT4 color;	// é ‚ç‚¹ã‚«ãƒ©ãƒ¼
 
 		static constexpr D3D11_INPUT_ELEMENT_DESC InputElementDescs[] = {
 			{ "POSITION", 0,    DXGI_FORMAT_R32G32B32_FLOAT, 0,                            0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
@@ -50,25 +50,25 @@ namespace GameLibrary
 		};
 	};
 
-	// ˆÊ’uÀ•W‚Æ–@üƒxƒNƒgƒ‹‚ğ’¸“_î•ñ‚É‚Âƒf[ƒ^‚ğ•\‚µ‚Ü‚·B
+	// ä½ç½®åº§æ¨™ã¨æ³•ç·šãƒ™ã‚¯ãƒˆãƒ«ã‚’é ‚ç‚¹æƒ…å ±ã«æŒã¤ãƒ‡ãƒ¼ã‚¿ã‚’è¡¨ã—ã¾ã™ã€‚
 	struct VertexPositionNormal
 	{
-		DirectX::XMFLOAT3 position;	// ˆÊ’uÀ•W
-		DirectX::XMFLOAT3 normal;	// –@üƒxƒNƒgƒ‹
+		DirectX::XMFLOAT3 position;	// ä½ç½®åº§æ¨™
+		DirectX::XMFLOAT3 normal;	// æ³•ç·šãƒ™ã‚¯ãƒˆãƒ«
 
-		// ‚±‚Ì’¸“_î•ñ‚ğD3D11_INPUT_ELEMENT_DESC‚Å•\‚µ‚½”z—ñ‚ğæ“¾‚µ‚Ü‚·B
+		// ã“ã®é ‚ç‚¹æƒ…å ±ã‚’D3D11_INPUT_ELEMENT_DESCã§è¡¨ã—ãŸé…åˆ—ã‚’å–å¾—ã—ã¾ã™ã€‚
 		static constexpr D3D11_INPUT_ELEMENT_DESC InputElementDescs[] = {
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,                            0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 			{ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		};
 	};
 
-	// ˆê‚Â‚Ì’¸“_‚ÉŠÜ‚Ü‚ê‚éƒf[ƒ^‚ÌŒ^
+	// ä¸€ã¤ã®é ‚ç‚¹ã«å«ã¾ã‚Œã‚‹ãƒ‡ãƒ¼ã‚¿ã®å‹
 	struct VertexPositionNormalTexture
 	{
-		DirectX::XMFLOAT3 position;	// ˆÊ’uÀ•W
-		DirectX::XMFLOAT3 normal;	// –@üƒxƒNƒgƒ‹
-		DirectX::XMFLOAT2 texCoord;	// ƒeƒNƒXƒ`ƒƒUVÀ•W
+		DirectX::XMFLOAT3 position;	// ä½ç½®åº§æ¨™
+		DirectX::XMFLOAT3 normal;	// æ³•ç·šãƒ™ã‚¯ãƒˆãƒ«
+		DirectX::XMFLOAT2 texCoord;	// ãƒ†ã‚¯ã‚¹ãƒãƒ£UVåº§æ¨™
 
 		static constexpr D3D11_INPUT_ELEMENT_DESC inputElementDescs[] = {
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,                            0, D3D11_INPUT_PER_VERTEX_DATA, 0 },

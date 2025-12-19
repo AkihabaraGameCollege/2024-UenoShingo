@@ -1,18 +1,18 @@
-#include "SampleGame.h"
+ï»¿#include "SampleGame.h"
 
 using namespace GameLibrary;
 using namespace DirectX;
 
 namespace
 {
-	// ‹éŒ`i’¸“_j
+	// çŸ©å½¢ï¼ˆé ‚ç‚¹ï¼‰
 	constexpr Vertex_Sprite quadVertices[] = {
 		{ { -0.5f, +0.5f, +0.0f, }, { 0.0f, 0.0f, }, },
 		{ { +0.5f, +0.5f, +0.0f, }, { 1.0f, 0.0f, }, },
 		{ { -0.5f, -0.5f, +0.0f, }, { 0.0f, 1.0f, }, },
 		{ { +0.5f, -0.5f, +0.0f, }, { 1.0f, 1.0f, }, },
 	};
-	// ‹éŒ`iƒCƒ“ƒfƒbƒNƒXj
+	// çŸ©å½¢ï¼ˆã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ï¼‰
 	constexpr uint32_t quadIndices[] = {
 		0, 1, 2,
 		3, 2, 1,
@@ -74,7 +74,7 @@ namespace
 }
 
 /// <summary>
-/// ‚±‚ÌƒNƒ‰ƒX‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ğ‰Šú‰»‚µ‚Ü‚·B
+/// ã“ã®ã‚¯ãƒ©ã‚¹ã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’åˆæœŸåŒ–ã—ã¾ã™ã€‚
 /// </summary>
 SampleGame::SampleGame(const GameLibrary::ProjectSettings& settings)
 	: Game(settings)
@@ -83,14 +83,14 @@ SampleGame::SampleGame(const GameLibrary::ProjectSettings& settings)
 }
 
 /// <summary>
-/// ‰Šú‰»ˆ—‚ğÀ‘•‚µ‚Ü‚·B
+/// åˆæœŸåŒ–å‡¦ç†ã‚’å®Ÿè£…ã—ã¾ã™ã€‚
 /// </summary>
 void SampleGame::OnInitialize()
 {
-	// ’è”ƒoƒbƒtƒ@[
+	// å®šæ•°ãƒãƒƒãƒ•ã‚¡ãƒ¼
 	constantBufferManager = std::make_shared<ConstantBufferManager>(device.Get());
 
-	// •½sƒ‰ƒCƒg
+	// å¹³è¡Œãƒ©ã‚¤ãƒˆ
 	XMStoreFloat4(&lightRotation, XMQuaternionRotationRollPitchYaw(
 		XMConvertToRadians(50),
 		XMConvertToRadians(-30),
@@ -109,10 +109,10 @@ void SampleGame::OnInitialize()
 		static_cast<UINT>(sizeof constantsPerDraw));
 	constantBufferManager->Add("ConstantBufferPerDraw", constantBufferPerDraw);
 
-	// ƒ}ƒeƒŠƒAƒ‹
+	// ãƒãƒ†ãƒªã‚¢ãƒ«
 	albedoColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-	// ’¸“_ƒoƒbƒtƒ@[
+	// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ãƒ¼
 	vertexBuffer = std::make_shared<VertexBuffer>(
 		device.Get(),
 		Vertex_Base::GetSize(),
@@ -120,40 +120,23 @@ void SampleGame::OnInitialize()
 		cubeVertices);
 	vertexOffset = 0;
 
-	// ƒCƒ“ƒfƒbƒNƒX ƒoƒbƒtƒ@[
+	// ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ ãƒãƒƒãƒ•ã‚¡ãƒ¼
 	indexBuffer = std::make_shared<IndexBuffer>(
 		device.Get(),
 		IndexFormat::UInt32, static_cast<UINT>(std::size(cubeIndices)),
 		cubeIndices);
 	indexOffset = 0;
 
-	// ƒVƒF[ƒ_[
-	shader = standardShader;
-	// ƒeƒNƒXƒ`ƒƒ
-	mainTexture = std::make_shared<Texture2D>(device.Get(), 4, 4, DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, textureSource);
-	// ƒ}ƒeƒŠƒAƒ‹
-	constantBufferPerMaterial = std::make_shared<ConstantBuffer>(device.Get(),
-		static_cast<UINT>(sizeof constantsPerMaterial));
-	constantBufferMap.insert(std::make_pair(
-		Shader::StringNameToId("ConstantBufferPerMaterial"),
-		constantBufferPerMaterial->GetNativePointer()));
-	constantBufferMap.insert(std::make_pair(
-		Shader::StringNameToId("ConstantBufferPerLighting"),
-		constantBufferManager->Find("ConstantBufferPerLighting")->GetNativePointer()));
-	constantBufferMap.insert(std::make_pair(
-		Shader::StringNameToId("ConstantBufferPerFrame"),
-		constantBufferManager->Find("ConstantBufferPerFrame")->GetNativePointer()));
-	constantBufferMap.insert(std::make_pair(
-		Shader::StringNameToId("ConstantBufferPerDraw"),
-		constantBufferManager->Find("ConstantBufferPerDraw")->GetNativePointer()));
-	shaderResourceViewMap.insert(std::make_pair(
-		Shader::StringNameToId("MainTexture"),
-		mainTexture->GetView()));
-	samplerStateMap.insert(std::make_pair(
-		Shader::StringNameToId("MainTextureSampler"),
-		mainTexture->GetSamplerState()));
+	// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
+	auto shader = shaderManager->Find(L"Shader/Standard");
+	// ãƒãƒ†ãƒªã‚¢ãƒ«
+	material = std::make_unique<Material>(device.Get(), constantBufferManager, shader);
+	material->SetColor("AlbedoColor", albedoColor);
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£
+	auto mainTexture = std::make_shared<Texture2D>(device.Get(), 4, 4, DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, textureSource);
+	material->SetTexture("MainTexture", mainTexture);
 
-	// “ü—ÍƒŒƒCƒAƒEƒg
+	// å…¥åŠ›ãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆ
 	inputLayout = std::make_shared<InputLayout_Base>(device.Get());
 
 	startIndexLocation = 0;
@@ -161,7 +144,7 @@ void SampleGame::OnInitialize()
 }
 
 /// <summary>
-/// ƒtƒŒ[ƒ€‚ÌXVˆ—‚ğÀ‘•‚µ‚Ü‚·B
+/// ãƒ•ãƒ¬ãƒ¼ãƒ ã®æ›´æ–°å‡¦ç†ã‚’å®Ÿè£…ã—ã¾ã™ã€‚
 /// </summary>
 void SampleGame::OnUpdate()
 {
@@ -170,23 +153,23 @@ void SampleGame::OnUpdate()
 }
 
 /// <summary>
-/// ƒtƒŒ[ƒ€‚Ì•`‰æˆ—‚ğÀ‘•‚µ‚Ü‚·B
+/// ãƒ•ãƒ¬ãƒ¼ãƒ ã®æç”»å‡¦ç†ã‚’å®Ÿè£…ã—ã¾ã™ã€‚
 /// </summary>
 void SampleGame::OnRender()
 {
-	// •½sƒ‰ƒCƒg
+	// å¹³è¡Œãƒ©ã‚¤ãƒˆ
 	const auto lightWorldMatrix = XMMatrixRotationQuaternion(XMLoadFloat4(&lightRotation));
 	const auto lightForward = lightWorldMatrix.r[2];
 	XMStoreFloat4(&constantsPerLighting.LightDirection, lightForward);
 	XMStoreFloat4(&constantsPerLighting.LightColor, XMColorSRGBToRGB(XMLoadFloat4(&lightColor)));
 	constantBufferPerLighting->UpdateSubresource(&constantsPerLighting);
-	// ƒƒCƒ“ ƒJƒƒ‰
+	// ãƒ¡ã‚¤ãƒ³ ã‚«ãƒ¡ãƒ©
 	const auto cameraWorldMatrix = XMMatrixRotationQuaternion(XMLoadFloat4(&cameraRotation));
 	const auto cameraForward = cameraWorldMatrix.r[2];
 	const auto cameraUp = cameraWorldMatrix.r[1];
 	auto matrixView = XMMatrixLookToLH(XMLoadFloat3(&cameraPosition), cameraForward, cameraUp);
 	XMStoreFloat4x4(&constantsPerFrame.MatrixView, XMMatrixTranspose(matrixView));
-	// ƒvƒƒWƒFƒNƒVƒ‡ƒ“
+	// ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³
 	const auto aspectRatio = GetWidth() / static_cast<float>(GetHeight());
 	auto matrixProjection = XMMatrixIdentity();
 	if (orthographic) {
@@ -202,7 +185,7 @@ void SampleGame::OnRender()
 	XMStoreFloat4x4(&constantsPerFrame.MatrixViewProjection, XMMatrixTranspose(matrixView * matrixProjection));
 	constantBufferPerFrame->UpdateSubresource(&constantsPerFrame);
 
-	// ƒQ[ƒ€ ƒIƒuƒWƒFƒNƒg
+	// ã‚²ãƒ¼ãƒ  ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 	const auto matrixWorld = XMMatrixTransformation(
 		XMVectorZero(), XMQuaternionIdentity(), localScale,
 		XMVectorZero(), localRotation,
@@ -210,22 +193,19 @@ void SampleGame::OnRender()
 	XMStoreFloat4x4(&constantsPerDraw.MatrixWorld, XMMatrixTranspose(matrixWorld));
 	constantBufferPerDraw->UpdateSubresource(&constantsPerDraw);
 
-	// ’¸“_ƒoƒbƒtƒ@[‚ğİ’è
+	// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ãƒ¼ã‚’è¨­å®š
 	ID3D11Buffer* const vertexBuffers[] = { vertexBuffer->GetNativePointer(), };
 	const UINT strides[] = { vertexBuffer->GetStride(), };
 	const UINT offsets[] = { vertexOffset, };
 	deviceContext->IASetVertexBuffers(0, static_cast<UINT>(std::size(vertexBuffers)), vertexBuffers, strides, offsets);
 	deviceContext->IASetInputLayout(inputLayout->GetNativePointer());
-	// ƒ}ƒeƒŠƒAƒ‹
-	XMStoreFloat4(&constantsPerMaterial.Albedo, XMColorSRGBToRGB(XMLoadFloat4(&albedoColor)));
-	constantBufferPerMaterial->UpdateSubresource(&constantsPerMaterial);
-	// Shaders
-	shader->Apply(deviceContext.Get(), constantBufferMap, shaderResourceViewMap, samplerStateMap);
+	// ãƒãƒ†ãƒªã‚¢ãƒ«
+	material->Apply(deviceContext.Get());
 
-	// ƒCƒ“ƒfƒbƒNƒX ƒoƒbƒtƒ@[‚ğİ’è
+	// ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ ãƒãƒƒãƒ•ã‚¡ãƒ¼ã‚’è¨­å®š
 	deviceContext->IASetIndexBuffer(indexBuffer->GetNativePointer(), indexBuffer->GetFormat(), indexOffset);
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	// ƒƒbƒVƒ…‚ğ•`‰æ
+	// ãƒ¡ãƒƒã‚·ãƒ¥ã‚’æç”»
 	deviceContext->DrawIndexed(indexBuffer->GetCount(), startIndexLocation, baseVertexLocation);
 }

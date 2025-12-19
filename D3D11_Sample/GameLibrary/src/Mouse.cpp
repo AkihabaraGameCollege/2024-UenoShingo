@@ -1,11 +1,11 @@
-#include "Mouse.h"
+ï»¿#include "Mouse.h"
 #include <GameLibrary/Utility.h>
 
 using namespace GameLibrary;
 using namespace DirectX;
 
 /// <summary>
-/// ‚±‚ÌƒNƒ‰ƒX‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ğ‰ğ•ú‚µ‚Ü‚·B
+/// ã“ã®ã‚¯ãƒ©ã‚¹ã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’è§£æ”¾ã—ã¾ã™ã€‚
 /// </summary>
 Mouse::~Mouse()
 {
@@ -16,10 +16,10 @@ Mouse::~Mouse()
 }
 
 /// <summary>
-/// ‚±‚ÌƒNƒ‰ƒX‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ğ‰Šú‰»‚µ‚Ü‚·B
+/// ã“ã®ã‚¯ãƒ©ã‚¹ã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’åˆæœŸåŒ–ã—ã¾ã™ã€‚
 /// </summary>
 /// <param name="directInput"></param>
-/// <param name="hWnd">ƒEƒBƒ“ƒhƒE ƒnƒ“ƒhƒ‹</param>
+/// <param name="hWnd">ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ ãƒãƒ³ãƒ‰ãƒ«</param>
 void Mouse::Initialize(IDirectInput8W* directInput, HWND hWnd)
 {
 	this->hWnd = hWnd;
@@ -30,7 +30,7 @@ void Mouse::Initialize(IDirectInput8W* directInput, HWND hWnd)
 }
 
 /// <summary>
-/// Œ»İ‚Ìƒ}ƒEƒX“ü—Íó‘Ô‚ğXV‚µ‚Ü‚·B
+/// ç¾åœ¨ã®ãƒã‚¦ã‚¹å…¥åŠ›çŠ¶æ…‹ã‚’æ›´æ–°ã—ã¾ã™ã€‚
 /// </summary>
 void Mouse::Update(
 	bool(&currentButtons)[DigitalInput::NumDigitalInputs],
@@ -61,9 +61,9 @@ void Mouse::Update(
 }
 
 /// <summary>
-/// ƒ}ƒEƒX‚ÌƒJ[ƒ\ƒ‹ˆÊ’u‚ğXV‚µ‚Ü‚·B
+/// ãƒã‚¦ã‚¹ã®ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã‚’æ›´æ–°ã—ã¾ã™ã€‚
 /// </summary>
-/// <param name="hWnd">ƒEƒBƒ“ƒhƒE‚Ìƒnƒ“ƒhƒ‹</param>
+/// <param name="hWnd">ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ãƒãƒ³ãƒ‰ãƒ«</param>
 void Mouse::UpdateMousePosition() noexcept
 {
 	if (!IsWindowEnabled(hWnd)) {
@@ -104,9 +104,9 @@ LONG Mouse::GetMouseScroll() const noexcept
 }
 
 /// <summary>
-/// ƒ}ƒEƒX‚ÌƒJ[ƒ\ƒ‹ˆÊ’u‚ğæ“¾‚µ‚Ü‚·B
+/// ãƒã‚¦ã‚¹ã®ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã‚’å–å¾—ã—ã¾ã™ã€‚
 /// </summary>
-/// <returns>ˆÊ’uÀ•W</returns>
+/// <returns>ä½ç½®åº§æ¨™</returns>
 const XMFLOAT2& Mouse::GetMousePosition() const noexcept
 {
 	return mousePosition;

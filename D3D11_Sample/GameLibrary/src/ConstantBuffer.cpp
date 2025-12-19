@@ -1,4 +1,4 @@
-#include <GameLibrary/Buffer.h>
+ï»¿#include <GameLibrary/Buffer.h>
 #include <GameLibrary/Shader.h>
 #include <GameLibrary/Utility.h>
 
@@ -20,18 +20,18 @@ ConstantBuffer::ConstantBuffer(ID3D11Device5* graphicsDevice, UINT byteWidth)
 }
 
 /// <summary>
-/// ’è”ƒoƒbƒtƒ@[‚ÌƒTƒCƒY‚ğæ“¾‚µ‚Ü‚·B
+/// å®šæ•°ãƒãƒƒãƒ•ã‚¡ãƒ¼ã®ã‚µã‚¤ã‚ºã‚’å–å¾—ã—ã¾ã™ã€‚
 /// </summary>
-/// <returns>ƒoƒbƒtƒ@[‚ÌƒTƒCƒY(ƒoƒCƒg’PˆÊ)</returns>
+/// <returns>ãƒãƒƒãƒ•ã‚¡ãƒ¼ã®ã‚µã‚¤ã‚º(ãƒã‚¤ãƒˆå˜ä½)</returns>
 UINT ConstantBuffer::GetByteWidth() const noexcept
 {
 	return byteWidth;
 }
 
 /// <summary>
-/// w’è‚µ‚½ƒf[ƒ^‚Å’è”ƒoƒbƒtƒ@[‚ğXV‚µ‚Ü‚·B
+/// æŒ‡å®šã—ãŸãƒ‡ãƒ¼ã‚¿ã§å®šæ•°ãƒãƒƒãƒ•ã‚¡ãƒ¼ã‚’æ›´æ–°ã—ã¾ã™ã€‚
 /// </summary>
-/// <param name="source">XVŒ³ƒf[ƒ^</param>
+/// <param name="source">æ›´æ–°å…ƒãƒ‡ãƒ¼ã‚¿</param>
 void GameLibrary::ConstantBuffer::UpdateSubresource(const void* source) noexcept
 {
 	ComPtr<ID3D11DeviceContext3> context;
@@ -40,9 +40,9 @@ void GameLibrary::ConstantBuffer::UpdateSubresource(const void* source) noexcept
 }
 
 /// <summary>
-/// Direct3D 11 ƒlƒCƒeƒBƒu‚Ìƒ|ƒCƒ“ƒ^[‚ğæ“¾‚µ‚Ü‚·B
+/// Direct3D 11 ãƒã‚¤ãƒ†ã‚£ãƒ–ã®ãƒã‚¤ãƒ³ã‚¿ãƒ¼ã‚’å–å¾—ã—ã¾ã™ã€‚
 /// </summary>
-/// <returns>ID3D11Buffer ƒ|ƒCƒ“ƒ^[</returns>
+/// <returns>ID3D11Buffer ãƒã‚¤ãƒ³ã‚¿ãƒ¼</returns>
 ID3D11Buffer* ConstantBuffer::GetNativePointer() noexcept
 {
 	return buffer.Get();

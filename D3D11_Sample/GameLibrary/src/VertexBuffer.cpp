@@ -1,4 +1,4 @@
-#include <GameLibrary/Buffer.h>
+ï»¿#include <GameLibrary/Buffer.h>
 #include <GameLibrary/Utility.h>
 
 using namespace GameLibrary;
@@ -23,27 +23,27 @@ VertexBuffer::VertexBuffer(ID3D11Device5* graphicsDevice, UINT vertexStride, UIN
 }
 
 /// <summary>
-/// ’¸“_î•ñˆê‚Â•ª‚ÌƒTƒCƒY‚ğæ“¾‚µ‚Ü‚·B
+/// é ‚ç‚¹æƒ…å ±ä¸€ã¤åˆ†ã®ã‚µã‚¤ã‚ºã‚’å–å¾—ã—ã¾ã™ã€‚
 /// </summary>
-/// <returns>’¸“_‚Ì•(ƒoƒCƒg”)</returns>
+/// <returns>é ‚ç‚¹ã®å¹…(ãƒã‚¤ãƒˆæ•°)</returns>
 UINT VertexBuffer::GetStride() const noexcept
 {
 	return stride;
 }
 
 /// <summary>
-/// ’¸“_î•ñ‚Ì”‚ğæ“¾‚µ‚Ü‚·B
+/// é ‚ç‚¹æƒ…å ±ã®æ•°ã‚’å–å¾—ã—ã¾ã™ã€‚
 /// </summary>
-/// <returns>’¸“_î•ñ‚Ì”</returns>
+/// <returns>é ‚ç‚¹æƒ…å ±ã®æ•°</returns>
 UINT VertexBuffer::GetCount() const noexcept
 {
 	return count;
 }
 
 /// <summary>
-/// Direct3D 11 ƒlƒCƒeƒBƒu‚Ìƒ|ƒCƒ“ƒ^[‚ğæ“¾‚µ‚Ü‚·B
+/// Direct3D 11 ãƒã‚¤ãƒ†ã‚£ãƒ–ã®ãƒã‚¤ãƒ³ã‚¿ãƒ¼ã‚’å–å¾—ã—ã¾ã™ã€‚
 /// </summary>
-/// <returns>ID3D11Buffer ƒ|ƒCƒ“ƒ^[</returns>
+/// <returns>ID3D11Buffer ãƒã‚¤ãƒ³ã‚¿ãƒ¼</returns>
 ID3D11Buffer* VertexBuffer::GetNativePointer() noexcept
 {
 	return buffer.Get();

@@ -1,7 +1,7 @@
-//=============================================================================
+ï»¿//=============================================================================
 // Game.cpp
 //
-// ƒEƒBƒ“ƒhƒE‚ğì¬‚µ‚ÄƒƒbƒZ[ƒWƒ‹[ƒv‚ğŠJn‚·‚é‹@”\‚ªŠÜ‚Ü‚ê‚Ü‚·B
+// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ä½œæˆã—ã¦ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒ«ãƒ¼ãƒ—ã‚’é–‹å§‹ã™ã‚‹æ©Ÿèƒ½ãŒå«ã¾ã‚Œã¾ã™ã€‚
 //=============================================================================
 #include <GameLibrary/Game.h>
 #include <GameLibrary/Utility.h>
@@ -32,10 +32,10 @@ namespace
 	};
 
 	/// <summary>
-	/// ƒn[ƒhƒEƒFƒA‚ÅÀ‘•‚³‚ê‚Ä‚¢‚éƒfƒBƒXƒvƒŒƒC ƒTƒuƒVƒXƒeƒ€‚ğæ“¾‚µ‚Ü‚·B
+	/// ãƒãƒ¼ãƒ‰ã‚¦ã‚§ã‚¢ã§å®Ÿè£…ã•ã‚Œã¦ã„ã‚‹ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ ã‚µãƒ–ã‚·ã‚¹ãƒ†ãƒ ã‚’å–å¾—ã—ã¾ã™ã€‚
 	/// </summary>
-	/// <param name="factory">IDXGIFactory7 ƒCƒ“ƒ^[ƒtƒFƒCƒX</param>
-	/// <returns>ƒfƒBƒXƒvƒŒƒC ƒTƒuƒVƒXƒeƒ€</returns>
+	/// <param name="factory">IDXGIFactory7 ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹</param>
+	/// <returns>ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ ã‚µãƒ–ã‚·ã‚¹ãƒ†ãƒ </returns>
 	ComPtr<IDXGIAdapter4> GetHardwareAdapter(IDXGIFactory7* factory)
 	{
 		ComPtr<IDXGIAdapter4> adapter;
@@ -65,7 +65,7 @@ namespace
 	}
 }
 
-// ‚±‚ÌƒNƒ‰ƒX‚ğ‰Šú‰»‚µ‚Ü‚·B
+// ã“ã®ã‚¯ãƒ©ã‚¹ã‚’åˆæœŸåŒ–ã—ã¾ã™ã€‚
 Game::Game(const ProjectSettings& settings)
 	: title(settings.Title), width(settings.Width), height(settings.Height)
 	, forceVSync(settings.ForceVSync), useWarpAdapter(settings.UseWarpAdapter)
@@ -73,10 +73,10 @@ Game::Game(const ProjectSettings& settings)
 
 }
 
-// ƒQ[ƒ€‚ğ‰Šú‰»‚µ‚Ü‚·B
+// ã‚²ãƒ¼ãƒ ã‚’åˆæœŸåŒ–ã—ã¾ã™ã€‚
 void Game::Initialize(HWND hWnd)
 {
-	// DXGI ƒtƒ@ƒNƒgƒŠ[
+	// DXGI ãƒ•ã‚¡ã‚¯ãƒˆãƒªãƒ¼
 #if defined(_DEBUG)
 	constexpr UINT factoryFlags = DXGI_CREATE_FACTORY_DEBUG;
 #else
@@ -94,14 +94,14 @@ void Game::Initialize(HWND hWnd)
 		allowTearing = featureSupportData;
 	}
 
-	// DXGI ƒAƒ_ƒvƒ^[
+	// DXGI ã‚¢ãƒ€ãƒ—ã‚¿ãƒ¼
 	if (useWarpAdapter) {
 		ThrowIfFailed(dxgiFactory->EnumWarpAdapter(IID_PPV_ARGS(&dxgiAdapter)));
 	}
 	else {
-		// HARDWARE ƒAƒ_ƒvƒ^[
+		// HARDWARE ã‚¢ãƒ€ãƒ—ã‚¿ãƒ¼
 		dxgiAdapter = GetHardwareAdapter(dxgiFactory.Get());
-		// WARP ƒAƒ_ƒvƒ^[
+		// WARP ã‚¢ãƒ€ãƒ—ã‚¿ãƒ¼
 		if (dxgiAdapter == nullptr) {
 			ThrowIfFailed(dxgiFactory->EnumWarpAdapter(IID_PPV_ARGS(&dxgiAdapter)));
 		}
@@ -109,7 +109,7 @@ void Game::Initialize(HWND hWnd)
 	auto adapterDesc = DXGI_ADAPTER_DESC3{};
 	ThrowIfFailed(dxgiAdapter->GetDesc3(&adapterDesc));
 
-	// D3D11/DXGI ƒfƒoƒCƒX
+	// D3D11/DXGI ãƒ‡ãƒã‚¤ã‚¹
 	ComPtr<ID3D11Device> currentDevice;
 	ComPtr<ID3D11DeviceContext> currentDeviceContext;
 	ThrowIfFailed(D3D11CreateDevice(
@@ -122,7 +122,7 @@ void Game::Initialize(HWND hWnd)
 	ThrowIfFailed(currentDeviceContext.As(&deviceContext));
 	currentDeviceContext.Reset();
 
-	// ƒXƒƒbƒv ƒ`ƒF[ƒ“
+	// ã‚¹ãƒ¯ãƒƒãƒ— ãƒã‚§ãƒ¼ãƒ³
 	ComPtr<IDXGISwapChain1> currentSwapChain;
 	auto swapChainDesc = DXGI_SWAP_CHAIN_DESC1{
 		.Width = static_cast<UINT>(width),
@@ -161,12 +161,12 @@ void Game::Initialize(HWND hWnd)
 		&currentSwapChain));
 	ThrowIfFailed(currentSwapChain.As(&swapChain));
 
-	// ƒoƒbƒN ƒoƒbƒtƒ@[
+	// ãƒãƒƒã‚¯ ãƒãƒƒãƒ•ã‚¡ãƒ¼
 	ComPtr<ID3D11Texture2D1> backBuffer;
 	ThrowIfFailed(swapChain->GetBuffer(0, IID_PPV_ARGS(&backBuffer)));
 	auto backBufferDesc = D3D11_TEXTURE2D_DESC1{};
 	backBuffer->GetDesc1(&backBufferDesc);
-	// ƒŒƒ“ƒ_[ ƒ^[ƒQƒbƒg
+	// ãƒ¬ãƒ³ãƒ€ãƒ¼ ã‚¿ãƒ¼ã‚²ãƒƒãƒˆ
 	auto format = DXGI_FORMAT{};
 	switch (backBufferDesc.Format) {
 	case DXGI_FORMAT::DXGI_FORMAT_B8G8R8A8_UNORM:
@@ -190,7 +190,7 @@ void Game::Initialize(HWND hWnd)
 	backBuffer.Reset();
 
 
-	// [“xƒXƒeƒ“ƒVƒ‹
+	// æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«
 	ComPtr<ID3D11Texture2D1> depthStencilBuffer;
 	const auto depthStencilDesc = D3D11_TEXTURE2D_DESC1{
 		.Width = swapChainDesc.Width,
@@ -245,13 +245,13 @@ void Game::Initialize(HWND hWnd)
 		.MaxDepth = D3D11_MAX_DEPTH,
 	};
 
-	standardShader = std::make_shared<Shader>(
-		device.Get(),
+	// ä¸€èˆ¬çš„ãªã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®ãƒ—ãƒªãƒ­ãƒ¼ãƒ‰
+	shaderManager = std::make_unique<ShaderManager>(device.Get());
+	shaderManager->Register(L"Shader/Standard",
 		g_StandardVertexShader, sizeof g_StandardVertexShader,
 		g_StandardGeometryShader, sizeof g_StandardGeometryShader,
 		g_StandardPixelShader, sizeof g_StandardPixelShader);
-	spriteShader = std::make_shared<Shader>(
-		device.Get(),
+	shaderManager->Register(L"Shader/Sprite",
 		g_SpriteVertexShader, sizeof g_SpriteVertexShader,
 		g_SpriteGeometryShader, sizeof g_SpriteGeometryShader,
 		g_SpritePixelShader, sizeof g_SpritePixelShader);
@@ -259,24 +259,24 @@ void Game::Initialize(HWND hWnd)
 	OnInitialize();
 }
 
-// ƒŠƒ\[ƒX‚ğ‰ğ•ú‚µ‚Ü‚·B
+// ãƒªã‚½ãƒ¼ã‚¹ã‚’è§£æ”¾ã—ã¾ã™ã€‚
 void Game::Release() noexcept
 {
 	OnRelease();
 }
 
-// ƒtƒŒ[ƒ€‚ÌXVˆ—‚ğÀs‚µ‚Ü‚·B
+// ãƒ•ãƒ¬ãƒ¼ãƒ ã®æ›´æ–°å‡¦ç†ã‚’å®Ÿè¡Œã—ã¾ã™ã€‚
 void Game::Update() noexcept
 {
 	OnUpdate();
 }
 
-// ƒtƒŒ[ƒ€‚Ì•`‰æˆ—‚ğÀs‚µ‚Ü‚·B
+// ãƒ•ãƒ¬ãƒ¼ãƒ ã®æç”»å‡¦ç†ã‚’å®Ÿè¡Œã—ã¾ã™ã€‚
 void Game::Render() noexcept
 {
 	ID3D11RenderTargetView* renderTargetViews[] = { renderTargetView.Get(), };
 	deviceContext->OMSetRenderTargets(std::size(renderTargetViews), renderTargetViews, depthStencilView.Get());
-	// ‰æ–Ê‚ğƒNƒŠƒA
+	// ç”»é¢ã‚’ã‚¯ãƒªã‚¢
 	deviceContext->ClearRenderTargetView(renderTargetView.Get(), XMColorSRGBToRGB(clearColor).m128_f32);
 	//deviceContext->ClearRenderTargetView(renderTargetView.Get(), clearColor);
 	deviceContext->ClearDepthStencilView(
@@ -308,18 +308,18 @@ const std::wstring& Game::GetTitle() const
 }
 
 /// <summary>
-/// ƒEƒBƒ“ƒhƒE‚Ì•‚ğæ“¾‚µ‚Ü‚·B
+/// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å¹…ã‚’å–å¾—ã—ã¾ã™ã€‚
 /// </summary>
-/// <returns>ƒEƒBƒ“ƒhƒE‚Ì•</returns>
+/// <returns>ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å¹…</returns>
 int Game::GetWidth() const
 {
 	return width;
 }
 
 /// <summary>
-/// ƒEƒBƒ“ƒhƒE‚Ì‚‚³‚ğæ“¾‚µ‚Ü‚·B
+/// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®é«˜ã•ã‚’å–å¾—ã—ã¾ã™ã€‚
 /// </summary>
-/// <returns>ƒEƒBƒ“ƒhƒE‚Ì‚‚³</returns>
+/// <returns>ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®é«˜ã•</returns>
 int Game::GetHeight() const
 {
 	return height;

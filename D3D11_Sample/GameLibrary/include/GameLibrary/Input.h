@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <GameLibrary/DigitalInput.h>
 #include <GameLibrary/AnalogInput.h>
@@ -9,7 +9,7 @@
 namespace GameLibrary
 {
 	/// <summary>
-	/// ƒ†[ƒU[“ü—Í‚ğæ“¾‚·‚é‹@”\‚ğ’ñ‹Ÿ‚µ‚Ü‚·B
+	/// ãƒ¦ãƒ¼ã‚¶ãƒ¼å…¥åŠ›ã‚’å–å¾—ã™ã‚‹æ©Ÿèƒ½ã‚’æä¾›ã—ã¾ã™ã€‚
 	/// </summary>
 	class Input final
 	{

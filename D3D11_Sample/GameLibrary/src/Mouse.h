@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <Windows.h>
 #include <GameLibrary/DigitalInput.h>
@@ -12,7 +12,7 @@
 namespace GameLibrary
 {
 	/// <summary>
-	/// ƒ}ƒEƒX ƒfƒoƒCƒX‚ğ•\‚µ‚Ü‚·B
+	/// ãƒã‚¦ã‚¹ ãƒ‡ãƒã‚¤ã‚¹ã‚’è¡¨ã—ã¾ã™ã€‚
 	/// </summary>
 	class Mouse final
 	{

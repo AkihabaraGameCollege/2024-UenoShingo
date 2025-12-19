@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <GameLibrary/DigitalInput.h>
 #include <GameLibrary/AnalogInput.h>
@@ -9,7 +9,7 @@
 namespace GameLibrary
 {
 	/// <summary>
-	/// ƒQ[ƒ€ƒpƒbƒh‚ğ•\‚µ‚Ü‚·B
+	/// ã‚²ãƒ¼ãƒ ãƒ‘ãƒƒãƒ‰ã‚’è¡¨ã—ã¾ã™ã€‚
 	/// </summary>
 	class GamePad final
 	{

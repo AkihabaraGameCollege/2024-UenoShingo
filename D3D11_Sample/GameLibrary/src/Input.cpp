@@ -1,4 +1,4 @@
-#include <GameLibrary/Input.h>
+﻿#include <GameLibrary/Input.h>
 #include "InputManager.h"
 
 #include <memory>
@@ -12,17 +12,17 @@ namespace
 }
 
 /// <summary>
-/// ���[�U�[���͋@�\�����������܂��B
+/// ユーザー入力機能を初期化します。
 /// </summary>
-/// <param name="hInstance">�C���X�^���X �n���h��</param>
-/// <param name="hWnd">�E�B���h�E �n���h��</param>
+/// <param name="hInstance">インスタンス ハンドル</param>
+/// <param name="hWnd">ウィンドウ ハンドル</param>
 void Input::Initialize(HINSTANCE hInstance, HWND hWnd)
 {
 	s_Manager = std::make_unique<InputManager>(hInstance, hWnd);
 }
 
 /// <summary>
-/// ���[�U�[���͋@�\��������܂��B
+/// ユーザー入力機能を解放します。
 /// </summary>
 void Input::Shutdown() noexcept
 {
@@ -30,7 +30,7 @@ void Input::Shutdown() noexcept
 }
 
 /// <summary>
-/// ���݂̃t���[���ł̃��[�U�[���͂��X�V���܂��B
+/// 現在のフレームでのユーザー入力を更新します。
 /// </summary>
 void Input::Update() noexcept
 {
@@ -38,49 +38,49 @@ void Input::Update() noexcept
 }
 
 /// <summary>
-/// ���݂̃t���[���Ń{�^�����͂��J�n���ꂽ�����擾���܂��B
+/// 現在のフレームでボタン入力が開始されたかを取得します。
 /// </summary>
-/// <param name="digitalInput">�f�W�^�����͂̎��</param>
-/// <returns>�{�^�����͂��J�n���ꂽ�ꍇ�� true�A����ȊO�� false</returns>
+/// <param name="digitalInput">デジタル入力の種類</param>
+/// <returns>ボタン入力が開始された場合は true、それ以外は false</returns>
 bool Input::GetButtonDown(DigitalInput digitalInput) noexcept
 {
 	return s_Manager->GetButtonDown(digitalInput);
 }
 
 /// <summary>
-/// ���݂̃{�^�����͏�Ԃ��擾���܂��B
+/// 現在のボタン入力状態を取得します。
 /// </summary>
-/// <param name="digitalInput">�f�W�^�����͂̎��</param>
-/// <returns>�����������Ă���ꍇ�� true�A����ȊO�� false</returns>
+/// <param name="digitalInput">デジタル入力の種類</param>
+/// <returns>押し下げられている場合は true、それ以外は false</returns>
 bool Input::GetButton(DigitalInput digitalInput) noexcept
 {
 	return s_Manager->GetButton(digitalInput);
 }
 
 /// <summary>
-/// ���݂̃t���[���Ń{�^�����͂��I�����ꂽ�����擾���܂��B
+/// 現在のフレームでボタン入力が終了されたかを取得します。
 /// </summary>
-/// <param name="digitalInput">�f�W�^�����͂̎��</param>
-/// <returns>�{�^�����͂��I�����ꂽ�ꍇ�� true�A����ȊO�� false</returns>
+/// <param name="digitalInput">デジタル入力の種類</param>
+/// <returns>ボタン入力が終了された場合は true、それ以外は false</returns>
 bool Input::GetButtonUp(DigitalInput digitalInput) noexcept
 {
 	return s_Manager->GetButtonUp(digitalInput);
 }
 
 /// <summary>
-/// �A�i���O���͒l���擾���܂��B
+/// アナログ入力値を取得します。
 /// </summary>
-/// <param name="analogInput">�A�i���O���͂̎��</param>
-/// <returns>float�l</returns>
+/// <param name="analogInput">アナログ入力の種類</param>
+/// <returns>float値</returns>
 float Input::GetAxis(AnalogInput analogInput) noexcept
 {
 	return s_Manager->GetAxis(analogInput);
 }
 
 /// <summary>
-/// �}�E�X�̃J�[�\���ʒu���擾���܂��B
+/// マウスのカーソル位置を取得します。
 /// </summary>
-/// <returns>�ʒu���W</returns>
+/// <returns>位置座標</returns>
 const XMFLOAT2& Input::GetMousePosition() noexcept
 {
 	return s_Manager->GetMousePosition();

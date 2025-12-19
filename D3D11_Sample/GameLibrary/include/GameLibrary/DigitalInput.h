@@ -1,10 +1,10 @@
-#pragma once
+ï»¿#pragma once
 
 namespace GameLibrary
 {
 	enum DigitalInput : unsigned char
 	{
-		// ƒL[ƒ{[ƒh
+		// ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰
 		Escape = 0,
 		Digit1,
 		Digit2,
@@ -112,7 +112,7 @@ namespace GameLibrary
 
 		NumKeys,
 
-		// ƒQ[ƒ€ƒpƒbƒh
+		// ã‚²ãƒ¼ãƒ ãƒ‘ãƒƒãƒ‰
 		DPadUp = NumKeys,
 		DPadDown,
 		DPadLeft,
@@ -128,7 +128,7 @@ namespace GameLibrary
 		XButton,
 		YButton,
 
-		// ƒ}ƒEƒX
+		// ãƒã‚¦ã‚¹
 		Mouse0,
 		Mouse1,
 		Mouse2,

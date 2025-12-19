@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #pragma comment(lib, "GameLibrary.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -12,6 +12,7 @@
 #include <GameLibrary/InputLayout.h>
 #include <GameLibrary/Texture.h>
 #include <GameLibrary/Utility.h>
+#include <GameLibrary/Material.h>
 // Input
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")

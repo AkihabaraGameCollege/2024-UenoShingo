@@ -1,10 +1,10 @@
-#pragma once
+ï»¿#pragma once
 
 namespace GameLibrary
 {
 	enum AnalogInput : unsigned char
 	{
-		// ƒQ[ƒ€ƒpƒbƒh
+		// ã‚²ãƒ¼ãƒ ãƒ‘ãƒƒãƒ‰
 		LeftTrigger,
 		RightTrigger,
 		LeftStickX,
@@ -12,7 +12,7 @@ namespace GameLibrary
 		RightStickX,
 		RightStickY,
 
-		// ƒ}ƒEƒX
+		// ãƒã‚¦ã‚¹
 		MouseX,
 		MouseY,
 		MouseScroll,

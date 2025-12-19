@@ -1,4 +1,4 @@
-#include <GameLibrary/Shader.h>
+ï»¿#include <GameLibrary/Shader.h>
 #include <GameLibrary/Utility.h>
 #include <format>
 #include <unordered_set>
@@ -83,7 +83,7 @@ ConstantBufferDesc::ConstantBufferDesc(ID3D11ShaderReflectionConstantBuffer* con
 	Type = bufferDesc.Type;
 	Size = bufferDesc.Size;
 	uFlags = bufferDesc.uFlags;
-	// ƒOƒ[ƒoƒ‹•Ï”‚ğŒŸõ
+	// ã‚°ãƒ­ãƒ¼ãƒãƒ«å¤‰æ•°ã‚’æ¤œç´¢
 	Variables.reserve(bufferDesc.Variables);
 	for (UINT variableIndex = 0; variableIndex < bufferDesc.Variables; variableIndex++) {
 		const auto reflectionVariable = constantBuffer->GetVariableByIndex(variableIndex);
@@ -115,13 +115,13 @@ ResourceBindingDesc::ResourceBindingDesc(const D3D11_SHADER_INPUT_BIND_DESC& bin
 ReflectiveShader::ReflectiveShader(ID3D11Device5* graphicsDevice, const void* shaderBytecode, size_t bytecodeLength)
 	: GraphicsResource(graphicsDevice)
 {
-	// ƒVƒF[ƒ_[‚ÌƒŠƒtƒŒƒNƒVƒ‡ƒ“‚ğæ“¾
+	// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã®ãƒªãƒ•ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³ã‚’å–å¾—
 	ComPtr<ID3D11ShaderReflection> reflection;
 	ThrowIfFailed(D3DReflect(shaderBytecode, bytecodeLength, IID_PPV_ARGS(&reflection)));
 	auto shaderDesc = D3D11_SHADER_DESC{};
 	ThrowIfFailed(reflection->GetDesc(&shaderDesc));
 
-	// ’è”ƒoƒbƒtƒ@[‚ğŒŸõ
+	// å®šæ•°ãƒãƒƒãƒ•ã‚¡ãƒ¼ã‚’æ¤œç´¢
 	constantBufferDescs.reserve(shaderDesc.ConstantBuffers);
 	for (UINT index = 0; index < shaderDesc.ConstantBuffers; index++) {
 		const auto reflectionBuffer = reflection->GetConstantBufferByIndex(index);
@@ -129,7 +129,7 @@ ReflectiveShader::ReflectiveShader(ID3D11Device5* graphicsDevice, const void* sh
 		constantBufferDescs.push_back(bufferDesc);
 	}
 
-	// ƒŠƒ\[ƒX ƒoƒCƒ“ƒfƒBƒ“ƒO‚ÌÚ×‚ğæ“¾
+	// ãƒªã‚½ãƒ¼ã‚¹ ãƒã‚¤ãƒ³ãƒ‡ã‚£ãƒ³ã‚°ã®è©³ç´°ã‚’å–å¾—
 	bindingDescs.reserve(shaderDesc.BoundResources);
 	for (UINT resourceIndex = 0; resourceIndex < shaderDesc.BoundResources; resourceIndex++) {
 		auto desc = D3D11_SHADER_INPUT_BIND_DESC{};
@@ -251,7 +251,7 @@ Shader::Shader(ID3D11Device5* graphicsDevice,
 	const void* pixelShaderBytecode, size_t pixelShaderBytecodeLength)
 	: GraphicsResource(graphicsDevice)
 {
-	// ’¸“_AƒWƒIƒƒgƒŠAƒsƒNƒZƒ‹ ƒVƒF[ƒ_[‚ğì¬
+	// é ‚ç‚¹ã€ã‚¸ã‚ªãƒ¡ãƒˆãƒªã€ãƒ”ã‚¯ã‚»ãƒ« ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚’ä½œæˆ
 	shaders.reserve(3);
 	shaders.push_back(std::make_unique<VertexShader>(
 		graphicsDevice, vertexShaderBytecode, vertexShaderBytecodeLength));
@@ -260,11 +260,11 @@ Shader::Shader(ID3D11Device5* graphicsDevice,
 	shaders.push_back(std::make_unique<PixelShader>(
 		graphicsDevice, pixelShaderBytecode, pixelShaderBytecodeLength));
 
-	// ŠeƒVƒF[ƒ_[‚©‚çƒOƒ[ƒoƒ‹•Ï”—p‚Ì’è”ƒoƒbƒtƒ@[‚ğŒŸõ
+	// å„ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‹ã‚‰ã‚°ãƒ­ãƒ¼ãƒãƒ«å¤‰æ•°ç”¨ã®å®šæ•°ãƒãƒƒãƒ•ã‚¡ãƒ¼ã‚’æ¤œç´¢
 	for (const auto& shader : shaders) {
 		std::unordered_set<size_t> descSet;
 
-		// ’è”ƒoƒbƒtƒ@[
+		// å®šæ•°ãƒãƒƒãƒ•ã‚¡ãƒ¼
 		for (auto& desc : shader->GetConstantBufferDescs()) {
 			const auto nameId = desc.NameId;
 			auto findItr = descSet.find(nameId);
@@ -276,7 +276,7 @@ Shader::Shader(ID3D11Device5* graphicsDevice,
 
 		descSet.clear();
 
-		// ƒoƒCƒ“ƒfƒBƒ“ƒO ƒŠƒ\[ƒX
+		// ãƒã‚¤ãƒ³ãƒ‡ã‚£ãƒ³ã‚° ãƒªã‚½ãƒ¼ã‚¹
 		for (auto& desc : shader->GetResourceBindingDescs()) {
 			const auto nameId = desc.NameId;
 			auto findItr = descSet.find(nameId);
@@ -311,4 +311,33 @@ void Shader::Apply(ID3D11DeviceContext4* deviceContext,
 	for (const auto& shader : shaders) {
 		shader->Apply(deviceContext, constantBufferMap, shaderResourceViewMap, samplerStateMap);
 	}
+}
+
+ShaderManager::ShaderManager(ID3D11Device5* graphicsDevice)
+	: GraphicsResource(graphicsDevice)
+{
+
+}
+
+void ShaderManager::Register(const std::wstring& name,
+	const void* vertexShaderBytecode, size_t vertexShaderBytecodeLength,
+	const void* geometryShaderBytecode, size_t geometryShaderBytecodeLength,
+	const void* pixelShaderBytecode, size_t pixelShaderBytecodeLength)
+{
+	if (shaderPool[name]) {
+		const auto message = std::format(
+			L"åŒã˜åå‰({0})ã®ã‚¨ãƒ•ã‚§ã‚¯ãƒˆãŒã™ã§ã«ç™»éŒ²ã•ã‚Œã¦ã„ã¾ã™ã€‚\n", name);
+		OutputDebugStringW(message.c_str());
+		ThrowIfFailed(E_INVALIDARG);
+	}
+	shaderPool[name] = std::make_shared<Shader>(
+		GetDevice(),
+		vertexShaderBytecode, vertexShaderBytecodeLength,
+		geometryShaderBytecode, geometryShaderBytecodeLength,
+		pixelShaderBytecode, pixelShaderBytecodeLength);
+}
+
+std::shared_ptr<Shader> ShaderManager::Find(const std::wstring& name)
+{
+	return shaderPool[name];
 }

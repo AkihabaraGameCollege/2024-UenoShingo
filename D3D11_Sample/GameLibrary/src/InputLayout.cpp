@@ -1,4 +1,4 @@
-#include <GameLibrary/InputLayout.h>
+ï»¿#include <GameLibrary/InputLayout.h>
 #include <GameLibrary/Utility.h>
 #include "InputSignature_BaseVertex.h"
 #include "InputSignature_SpriteVertex.h"
@@ -6,13 +6,13 @@
 using namespace GameLibrary;
 
 /// <summary>
-/// ‚±‚ÌƒNƒ‰ƒX‚ÌV‚µ‚¢ƒCƒ“ƒXƒ^ƒ“ƒX‚ğ‰Šú‰»‚µ‚Ü‚·B
+/// ã“ã®ã‚¯ãƒ©ã‚¹ã®æ–°ã—ã„ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’åˆæœŸåŒ–ã—ã¾ã™ã€‚
 /// </summary>
-/// <param name="graphicsDevice">ƒOƒ‰ƒtƒBƒbƒNƒX ƒfƒoƒCƒX</param>
-/// <param name="inputElementDescs">’¸“_‚Ì“ü—Í—v‘f”z—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^[</param>
-/// <param name="numElements">inputElementDescs‚Ì—v‘f”</param>
-/// <param name="shaderBytecodeWithInputSignature">“ü—Í–¼‚ª‹Lq‚³‚ê‚Ä‚¢‚éƒVƒF[ƒ_[‚ÌƒoƒCƒgƒf[ƒ^</param>
-/// <param name="bytecodeLength">shaderBytecodeWithInputSignature‚ÌƒTƒCƒY</param>
+/// <param name="graphicsDevice">ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã‚¹ ãƒ‡ãƒã‚¤ã‚¹</param>
+/// <param name="inputElementDescs">é ‚ç‚¹ã®å…¥åŠ›è¦ç´ é…åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿ãƒ¼</param>
+/// <param name="numElements">inputElementDescsã®è¦ç´ æ•°</param>
+/// <param name="shaderBytecodeWithInputSignature">å…¥åŠ›ç½²åãŒè¨˜è¿°ã•ã‚Œã¦ã„ã‚‹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã®ãƒã‚¤ãƒˆãƒ‡ãƒ¼ã‚¿</param>
+/// <param name="bytecodeLength">shaderBytecodeWithInputSignatureã®ã‚µã‚¤ã‚º</param>
 InputLayout::InputLayout(ID3D11Device5* graphicsDevice,
 	const D3D11_INPUT_ELEMENT_DESC* inputElementDescs, UINT numElements,
 	const void* shaderBytecodeWithInputSignature, SIZE_T bytecodeLength)
@@ -25,18 +25,18 @@ InputLayout::InputLayout(ID3D11Device5* graphicsDevice,
 }
 
 /// <summary>
-/// Direct3D 11 ƒlƒCƒeƒBƒu‚Ìƒ|ƒCƒ“ƒ^[‚ğæ“¾‚µ‚Ü‚·B
+/// Direct3D 11 ãƒã‚¤ãƒ†ã‚£ãƒ–ã®ãƒã‚¤ãƒ³ã‚¿ãƒ¼ã‚’å–å¾—ã—ã¾ã™ã€‚
 /// </summary>
-/// <returns>ID3D11InputLayout ƒ|ƒCƒ“ƒ^[</returns>
+/// <returns>ID3D11InputLayout ãƒã‚¤ãƒ³ã‚¿ãƒ¼</returns>
 ID3D11InputLayout* InputLayout::GetNativePointer()
 {
 	return inputLayout.Get();
 }
 
 /// <summary>
-/// ‚±‚ÌƒNƒ‰ƒX‚ÌV‚µ‚¢ƒCƒ“ƒXƒ^ƒ“ƒX‚ğ‰Šú‰»‚µ‚Ü‚·B
+/// ã“ã®ã‚¯ãƒ©ã‚¹ã®æ–°ã—ã„ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’åˆæœŸåŒ–ã—ã¾ã™ã€‚
 /// </summary>
-/// <param name="graphicsDevice">ƒOƒ‰ƒtƒBƒbƒNƒX ƒfƒoƒCƒX</param>
+/// <param name="graphicsDevice">ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã‚¹ ãƒ‡ãƒã‚¤ã‚¹</param>
 InputLayout_Base::InputLayout_Base(ID3D11Device5* graphicsDevice)
 	: InputLayout(graphicsDevice,
 		Vertex_Base::InputElementDescs, Vertex_Base::NumElements,
@@ -46,9 +46,9 @@ InputLayout_Base::InputLayout_Base(ID3D11Device5* graphicsDevice)
 }
 
 /// <summary>
-/// ‚±‚ÌƒNƒ‰ƒX‚ÌV‚µ‚¢ƒCƒ“ƒXƒ^ƒ“ƒX‚ğ‰Šú‰»‚µ‚Ü‚·B
+/// ã“ã®ã‚¯ãƒ©ã‚¹ã®æ–°ã—ã„ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’åˆæœŸåŒ–ã—ã¾ã™ã€‚
 /// </summary>
-/// <param name="graphicsDevice">ƒOƒ‰ƒtƒBƒbƒNƒX ƒfƒoƒCƒX</param>
+/// <param name="graphicsDevice">ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã‚¹ ãƒ‡ãƒã‚¤ã‚¹</param>
 InputLayout_Sprite::InputLayout_Sprite(ID3D11Device5* graphicsDevice)
 	: InputLayout(graphicsDevice,
 		Vertex_Sprite::InputElementDescs, Vertex_Sprite::NumElements,

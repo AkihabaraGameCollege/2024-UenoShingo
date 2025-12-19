@@ -1,4 +1,4 @@
-#include <GameLibrary/Buffer.h>
+ï»¿#include <GameLibrary/Buffer.h>
 #include <GameLibrary/Utility.h>
 
 using namespace GameLibrary;
@@ -36,27 +36,27 @@ IndexBuffer::IndexBuffer(ID3D11Device5* graphicsDevice, IndexFormat format, UINT
 }
 
 /// <summary>
-/// ‚±‚ÌƒCƒ“ƒfƒbƒNƒX ƒoƒbƒtƒ@[‚Ì DXGI_FORMAT ‚ğæ“¾‚µ‚Ü‚·B
+/// ã“ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ ãƒãƒƒãƒ•ã‚¡ãƒ¼ã® DXGI_FORMAT ã‚’å–å¾—ã—ã¾ã™ã€‚
 /// </summary>
-/// <returns>DXGI_FORMAT ƒtƒH[ƒ}ƒbƒg</returns>
+/// <returns>DXGI_FORMAT ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ</returns>
 DXGI_FORMAT IndexBuffer::GetFormat() const noexcept
 {
 	return format;
 }
 
 /// <summary>
-/// ƒCƒ“ƒfƒbƒNƒX‚Ì”‚ğæ“¾‚µ‚Ü‚·B
+/// ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã®æ•°ã‚’å–å¾—ã—ã¾ã™ã€‚
 /// </summary>
-/// <returns>ƒCƒ“ƒfƒbƒNƒX‚Ì”</returns>
+/// <returns>ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã®æ•°</returns>
 UINT IndexBuffer::GetCount() const noexcept
 {
 	return count;
 }
 
 /// <summary>
-/// Direct3D 11 ƒlƒCƒeƒBƒu‚Ìƒ|ƒCƒ“ƒ^[‚ğæ“¾‚µ‚Ü‚·B
+/// Direct3D 11 ãƒã‚¤ãƒ†ã‚£ãƒ–ã®ãƒã‚¤ãƒ³ã‚¿ãƒ¼ã‚’å–å¾—ã—ã¾ã™ã€‚
 /// </summary>
-/// <returns>ID3D11Buffer ƒ|ƒCƒ“ƒ^[</returns>
+/// <returns>ID3D11Buffer ãƒã‚¤ãƒ³ã‚¿ãƒ¼</returns>
 ID3D11Buffer* IndexBuffer::GetNativePointer() noexcept
 {
 	return buffer.Get();

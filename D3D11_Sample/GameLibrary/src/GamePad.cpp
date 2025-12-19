@@ -1,4 +1,4 @@
-#include "GamePad.h"
+Ôªø#include "GamePad.h"
 #include <GameLibrary/Utility.h>
 
 #include <format>
@@ -43,7 +43,7 @@ void GamePad::Update(
 	if (result == ERROR_SUCCESS) {
 		const auto& gamepad = state.Gamepad;
 		const auto& buttons = gamepad.wButtons;
-		// É{É^Éìì¸óÕ
+		// „Éú„Çø„É≥ÂÖ•Âäõ
 		currentButtons[DigitalInput::DPadUp] = (buttons & XINPUT_GAMEPAD_DPAD_UP);
 		currentButtons[DigitalInput::DPadDown] = (buttons & XINPUT_GAMEPAD_DPAD_DOWN);
 		currentButtons[DigitalInput::DPadLeft] = (buttons & XINPUT_GAMEPAD_DPAD_LEFT);
@@ -58,7 +58,7 @@ void GamePad::Update(
 		currentButtons[DigitalInput::BButton] = (buttons & XINPUT_GAMEPAD_B);
 		currentButtons[DigitalInput::XButton] = (buttons & XINPUT_GAMEPAD_X);
 		currentButtons[DigitalInput::YButton] = (buttons & XINPUT_GAMEPAD_Y);
-		// ÉAÉiÉçÉOì¸óÕ
+		// „Ç¢„Éä„É≠„Ç∞ÂÖ•Âäõ
 		analogs[AnalogInput::LeftTrigger] = gamepad.bLeftTrigger / 255.0f;
 		analogs[AnalogInput::RightTrigger] = gamepad.bRightTrigger / 255.0f;
 		analogs[AnalogInput::LeftStickX] = NormalizeAnalogInput(gamepad.sThumbLX, XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);

@@ -1,4 +1,4 @@
-#ifdef _DEBUG
+ï»¿#ifdef _DEBUG
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
@@ -9,7 +9,7 @@
 using namespace GameLibrary;
 
 /// <summary>
-/// ƒGƒ“ƒgƒŠ[ƒ|ƒCƒ“ƒg
+/// ã‚¨ãƒ³ãƒˆãƒªãƒ¼ãƒã‚¤ãƒ³ãƒˆ
 /// </summary>
 int WINAPI wWinMain(
 	_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
@@ -20,7 +20,7 @@ int WINAPI wWinMain(
 #endif
 
 	const ProjectSettings settings = {
-		.Title = L"Input ƒTƒ“ƒvƒ‹",
+		.Title = L"Input ã‚µãƒ³ãƒ—ãƒ«",
 		.Width = 1280,
 		.Height = 720,
 	};

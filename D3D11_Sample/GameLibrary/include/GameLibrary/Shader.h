@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <GameLibrary/Graphics.h>
 #include <memory>
@@ -81,7 +81,7 @@ namespace GameLibrary
 	typedef std::vector<ResourceBindingDesc> ResourceBindingDescs;
 
 	/// <summary>
-	/// ’è”ƒoƒbƒtƒ@[‚ÆƒOƒ[ƒoƒ‹•Ï”‚Ì’è‹`‚ğæ“¾‚Å‚«‚éƒVƒF[ƒ_[‚ğ•\‚µ‚Ü‚·B
+	/// å®šæ•°ãƒãƒƒãƒ•ã‚¡ãƒ¼ã¨ã‚°ãƒ­ãƒ¼ãƒãƒ«å¤‰æ•°ã®å®šç¾©ã‚’å–å¾—ã§ãã‚‹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚’è¡¨ã—ã¾ã™ã€‚
 	/// </summary>
 	class ReflectiveShader : public GraphicsResource
 	{
@@ -111,9 +111,9 @@ namespace GameLibrary
 	};
 
 	/// <summary>
-	/// ƒVƒF[ƒ_[‚ÌƒlƒCƒeƒBƒu ƒ|ƒCƒ“ƒ^[‚ğŠÇ—‚·‚éƒNƒ‰ƒX‚ğì¬‚·‚éƒeƒ“ƒvƒŒ[ƒg‚ğ•\‚µ‚Ü‚·B
+	/// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã®ãƒã‚¤ãƒ†ã‚£ãƒ– ãƒã‚¤ãƒ³ã‚¿ãƒ¼ã‚’ç®¡ç†ã™ã‚‹ã‚¯ãƒ©ã‚¹ã‚’ä½œæˆã™ã‚‹ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã‚’è¡¨ã—ã¾ã™ã€‚
 	/// </summary>
-	/// <typeparam name="T">ƒlƒCƒeƒBƒu ƒ|ƒCƒ“ƒ^[‚ÌŒ^</typeparam>
+	/// <typeparam name="T">ãƒã‚¤ãƒ†ã‚£ãƒ– ãƒã‚¤ãƒ³ã‚¿ãƒ¼ã®å‹</typeparam>
 	template<class T>
 	class BaseShader : public ReflectiveShader
 	{
@@ -141,7 +141,7 @@ namespace GameLibrary
 	}
 
 	/// <summary>
-	/// ’¸“_ƒVƒF[ƒ_[‚ğ•\‚µ‚Ü‚·B
+	/// é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚’è¡¨ã—ã¾ã™ã€‚
 	/// </summary>
 	class VertexShader final : public BaseShader<ID3D11VertexShader>
 	{
@@ -156,7 +156,7 @@ namespace GameLibrary
 	};
 
 	/// <summary>
-	/// ƒWƒIƒƒgƒŠ ƒVƒF[ƒ_[‚ğ•\‚µ‚Ü‚·B
+	/// ã‚¸ã‚ªãƒ¡ãƒˆãƒª ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚’è¡¨ã—ã¾ã™ã€‚
 	/// </summary>
 	class GeometryShader final : public BaseShader<ID3D11GeometryShader>
 	{
@@ -171,7 +171,7 @@ namespace GameLibrary
 	};
 
 	/// <summary>
-	/// ƒsƒNƒZƒ‹ ƒVƒF[ƒ_[‚ğ•\‚µ‚Ü‚·B
+	/// ãƒ”ã‚¯ã‚»ãƒ« ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚’è¡¨ã—ã¾ã™ã€‚
 	/// </summary>
 	class PixelShader final : public BaseShader<ID3D11PixelShader>
 	{
@@ -186,7 +186,7 @@ namespace GameLibrary
 	};
 
 	/// <summary>
-	/// ’¸“_AƒWƒIƒƒgƒŠAƒsƒNƒZƒ‹ ƒVƒF[ƒ_[‚ğ‚Ü‚Æ‚ß‚ÄŠÇ—‚·‚é‹@”\‚ğ’ñ‹Ÿ‚µ‚Ü‚·B
+	/// é ‚ç‚¹ã€ã‚¸ã‚ªãƒ¡ãƒˆãƒªã€ãƒ”ã‚¯ã‚»ãƒ« ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚’ã¾ã¨ã‚ã¦ç®¡ç†ã™ã‚‹æ©Ÿèƒ½ã‚’æä¾›ã—ã¾ã™ã€‚
 	/// </summary>
 	class Shader : public GraphicsResource
 	{
@@ -211,5 +211,23 @@ namespace GameLibrary
 
 		ConstantBufferDescs constantBufferDescs;
 		ResourceBindingDescs bindingDescs;
+	};
+
+	/// <summary>
+	/// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚’ä½œæˆã—ã¦ãƒ—ãƒ¼ãƒªãƒ³ã‚°ã™ã‚‹æ©Ÿèƒ½ã‚’æä¾›ã—ã¾ã™ã€‚
+	/// </summary>
+	class ShaderManager final : public GraphicsResource
+	{
+	public:
+		ShaderManager(ID3D11Device5* graphicsDevice);
+
+		void Register(const std::wstring& name,
+			const void* vertexShaderBytecode, size_t vertexShaderBytecodeLength,
+			const void* geometryShaderBytecode, size_t geometryShaderBytecodeLength,
+			const void* pixelShaderBytecode, size_t pixelShaderBytecodeLength);
+		std::shared_ptr<Shader> Find(const std::wstring& name);
+
+	private:
+		std::unordered_map<std::wstring, std::shared_ptr<Shader>> shaderPool;
 	};
 }

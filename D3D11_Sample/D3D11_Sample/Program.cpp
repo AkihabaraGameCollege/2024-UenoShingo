@@ -1,7 +1,7 @@
-//=============================================================================
+ï»¿//=============================================================================
 // Program.cpp
 //
-// ƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚ÌƒGƒ“ƒgƒŠ[ƒ|ƒCƒ“ƒg‚ªŠÜ‚Ü‚ê‚Ü‚·B
+// ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã®ã‚¨ãƒ³ãƒˆãƒªãƒ¼ãƒã‚¤ãƒ³ãƒˆãŒå«ã¾ã‚Œã¾ã™ã€‚
 //=============================================================================
 #ifdef _DEBUG
 #define _CRTDBG_MAP_ALLOC
@@ -13,7 +13,7 @@
 
 using namespace GameLibrary;
 
-// ƒGƒ“ƒgƒŠ[ƒ|ƒCƒ“ƒg
+// ã‚¨ãƒ³ãƒˆãƒªãƒ¼ãƒã‚¤ãƒ³ãƒˆ
 int WINAPI wWinMain(
 	_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR lpCmdLine, _In_ int nShowCmd)
@@ -23,7 +23,7 @@ int WINAPI wWinMain(
 #endif
 
 	const ProjectSettings settings = {
-		.Title = L"Direct3D 11 ƒTƒ“ƒvƒ‹",
+		.Title = L"Direct3D 11 ã‚µãƒ³ãƒ—ãƒ«",
 		.Width = 1280,
 		.Height = 720,
 		.ForceVSync = false,

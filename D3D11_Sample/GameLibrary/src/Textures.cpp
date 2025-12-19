@@ -1,4 +1,4 @@
-#include <GameLibrary/Texture.h>
+ï»¿#include <GameLibrary/Texture.h>
 #include <GameLibrary/Utility.h>
 
 using namespace GameLibrary;
@@ -51,45 +51,45 @@ Texture2D::Texture2D(ID3D11Device5* graphicsDevice, UINT width, UINT height, DXG
 }
 
 /// <summary>
-/// ƒeƒNƒXƒ`ƒƒ‚Ì•‚ğæ“¾‚µ‚Ü‚·B
+/// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®å¹…ã‚’å–å¾—ã—ã¾ã™ã€‚
 /// </summary>
-/// <returns>ƒeƒNƒXƒ`ƒƒ‚Ì•</returns>
+/// <returns>ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®å¹…</returns>
 UINT Texture2D::GetWidth() const noexcept
 {
 	return width;
 }
 
 /// <summary>
-/// ƒeƒNƒXƒ`ƒƒ‚Ì‚‚³‚ğæ“¾‚µ‚Ü‚·B
+/// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®é«˜ã•ã‚’å–å¾—ã—ã¾ã™ã€‚
 /// </summary>
-/// <returns>ƒeƒNƒXƒ`ƒƒ‚Ì‚‚³</returns>
+/// <returns>ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®é«˜ã•</returns>
 UINT Texture2D::GetHeight() const noexcept
 {
 	return height;
 }
 
 /// <summary>
-/// ID3D11Texture2D1 ‚ÌƒlƒCƒeƒBƒu ƒ|ƒCƒ“ƒ^[‚ğæ“¾‚µ‚Ü‚·B
+/// ID3D11Texture2D1 ã®ãƒã‚¤ãƒ†ã‚£ãƒ– ãƒã‚¤ãƒ³ã‚¿ãƒ¼ã‚’å–å¾—ã—ã¾ã™ã€‚
 /// </summary>
-/// <returns>ƒlƒCƒeƒBƒu ƒ|ƒCƒ“ƒ^[</returns>
+/// <returns>ãƒã‚¤ãƒ†ã‚£ãƒ– ãƒã‚¤ãƒ³ã‚¿ãƒ¼</returns>
 ID3D11Texture2D1* Texture2D::GetNativePointer() noexcept
 {
 	return nativePointer.Get();
 }
 
 /// <summary>
-/// ‚±‚ÌƒeƒNƒXƒ`ƒƒ‚ÌƒVƒF[ƒ_[ƒŠƒ\[ƒXƒrƒ…[‚ğæ“¾‚µ‚Ü‚·B
+/// ã“ã®ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ãƒ“ãƒ¥ãƒ¼ã‚’å–å¾—ã—ã¾ã™ã€‚
 /// </summary>
-/// <returns>ƒVƒF[ƒ_[ƒŠƒ\[ƒXƒrƒ…[</returns>
+/// <returns>ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ãƒ“ãƒ¥ãƒ¼</returns>
 ID3D11ShaderResourceView1* Texture2D::GetView() noexcept
 {
 	return view.Get();
 }
 
 /// <summary>
-/// ‚±‚ÌƒeƒNƒXƒ`ƒƒ‚ÌƒTƒ“ƒvƒ‰[‚ğæ“¾‚µ‚Ü‚·B
+/// ã“ã®ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ã‚µãƒ³ãƒ—ãƒ©ãƒ¼ã‚’å–å¾—ã—ã¾ã™ã€‚
 /// </summary>
-/// <returns>ƒTƒ“ƒvƒ‰[ ƒXƒe[ƒg</returns>
+/// <returns>ã‚µãƒ³ãƒ—ãƒ©ãƒ¼ ã‚¹ãƒ†ãƒ¼ãƒˆ</returns>
 ID3D11SamplerState* Texture2D::GetSamplerState() noexcept
 {
 	return samplerState.Get();

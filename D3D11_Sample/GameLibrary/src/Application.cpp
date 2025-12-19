@@ -1,4 +1,4 @@
-#include <GameLibrary/Game.h>
+ï»¿#include <GameLibrary/Game.h>
 #include <GameLibrary/Time.h>
 #include <GameLibrary/Input.h>
 #include <GameLibrary/Utility.h>
@@ -13,7 +13,7 @@ namespace
 	HWND s_hWnd = NULL;
 
 	/// <summary>
-	/// ƒEƒBƒ“ƒhƒE ƒƒbƒZ[ƒW‚ğˆ—‚µ‚Ü‚·B
+	/// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‡¦ç†ã—ã¾ã™ã€‚
 	/// </summary>
 	LRESULT CALLBACK WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
@@ -26,7 +26,7 @@ namespace
 			return 0;
 		}
 		case WM_CLOSE:
-			if (MessageBoxW(hWnd, L"•Û‘¶‚µ‚Ä‚¢‚È‚¢ƒf[ƒ^‚Í”jŠü‚³‚ê‚Ü‚·B", L"ƒQ[ƒ€‚ğI—¹‚µ‚Ü‚·‚©H", MB_YESNO) == IDYES) {
+			if (MessageBoxW(hWnd, L"ä¿å­˜ã—ã¦ã„ãªã„ãƒ‡ãƒ¼ã‚¿ã¯ç ´æ£„ã•ã‚Œã¾ã™ã€‚", L"ã‚²ãƒ¼ãƒ ã‚’çµ‚äº†ã—ã¾ã™ã‹ï¼Ÿ", MB_YESNO) == IDYES) {
 				DestroyWindow(hWnd);
 				s_hWnd = NULL;
 			}
@@ -41,7 +41,7 @@ namespace
 
 	void InitializeWindow(Game* game, HINSTANCE hInstance, int nCmdShow)
 	{
-		// ƒEƒBƒ“ƒhƒEƒNƒ‰ƒX‚Ì“o˜^
+		// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¯ãƒ©ã‚¹ã®ç™»éŒ²
 		const auto wndClass = WNDCLASSEXW{
 			.cbSize = sizeof(WNDCLASSEXW),
 			.style = 0,
@@ -56,12 +56,12 @@ namespace
 		if (s_ClassAtom == 0) {
 			ThrowLastError();
 		}
-		// ƒNƒ‰ƒCƒAƒ“ƒg—Ìˆæ‚ğw’è‚µ‚ÄƒEƒBƒ“ƒhƒEƒTƒCƒY‚ğæ“¾
+		// ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆé ˜åŸŸã‚’æŒ‡å®šã—ã¦ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚µã‚¤ã‚ºã‚’å–å¾—
 		auto rect = RECT{ 0, 0, game->GetWidth(), game->GetHeight() };
 		if (!AdjustWindowRectEx(&rect, WS_OVERLAPPEDWINDOW, FALSE, 0)) {
 			ThrowLastError();
 		}
-		// ƒEƒBƒ“ƒhƒE‚ğì¬
+		// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ä½œæˆ
 		s_hWnd = CreateWindowExW(
 			0, MAKEINTATOM(s_ClassAtom), game->GetTitle().c_str(), WS_OVERLAPPEDWINDOW,
 			CW_USEDEFAULT, CW_USEDEFAULT,
@@ -69,7 +69,7 @@ namespace
 			NULL, NULL, hInstance, game);
 		if (s_hWnd == NULL) {
 			ThrowLastError();
-			return;	// C6387‘Îô
+			return;	// C6387å¯¾ç­–
 		}
 
 		game->Initialize(s_hWnd);
@@ -84,14 +84,14 @@ namespace
 namespace GameLibrary
 {
 	/// <summary>
-	/// ƒEƒBƒ“ƒhƒE‚ğì¬‚µ‚ÄƒƒbƒZ[ƒWƒ‹[ƒv‚ğŠJn‚µ‚Ü‚·B
+	/// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ä½œæˆã—ã¦ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒ«ãƒ¼ãƒ—ã‚’é–‹å§‹ã—ã¾ã™ã€‚
 	/// </summary>
-	/// <param name="hInstance">ƒCƒ“ƒXƒ^ƒ“ƒX‚Ìƒnƒ“ƒhƒ‹</param>
-	/// <param name="nCmdShow">ƒEƒBƒ“ƒhƒE‚Ì•\¦•û–@</param>
-	/// <param name="title">ƒEƒBƒ“ƒhƒE‚Ìƒ^ƒCƒgƒ‹</param>
-	/// <param name="width">ƒNƒ‰ƒCƒAƒ“ƒg—Ìˆæ‚Ì•</param>
-	/// <param name="height">ƒNƒ‰ƒCƒAƒ“ƒg—Ìˆæ‚Ì‚‚³</param>
-	/// <returns>ƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚ÌI—¹ƒR[ƒh</returns>
+	/// <param name="hInstance">ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã®ãƒãƒ³ãƒ‰ãƒ«</param>
+	/// <param name="nCmdShow">ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®è¡¨ç¤ºæ–¹æ³•</param>
+	/// <param name="title">ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚¿ã‚¤ãƒˆãƒ«</param>
+	/// <param name="width">ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆé ˜åŸŸã®å¹…</param>
+	/// <param name="height">ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆé ˜åŸŸã®é«˜ã•</param>
+	/// <returns>ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã®çµ‚äº†ã‚³ãƒ¼ãƒ‰</returns>
 	int Application::Run(Game* game, HINSTANCE hInstance, int nCmdShow) noexcept
 	{
 		try {
@@ -100,23 +100,23 @@ namespace GameLibrary
 			Time::Initialize();
 		}
 		catch (const std::system_error& error) {
-			MessageBoxA(s_hWnd, error.what(), "ERROR: ƒEƒBƒ“ƒhƒE‚ğ‰Šú‰»‚Å‚«‚Ü‚¹‚ñ‚Å‚µ‚½", MB_OK | MB_ICONERROR);
+			MessageBoxA(s_hWnd, error.what(), "ERROR: ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’åˆæœŸåŒ–ã§ãã¾ã›ã‚“ã§ã—ãŸ", MB_OK | MB_ICONERROR);
 			return 0;
 		}
 		catch (const _com_error& error) {
-			MessageBox(s_hWnd, error.ErrorMessage(), TEXT("ERROR: ƒOƒ‰ƒtƒBƒbƒNƒfƒoƒCƒX‚ğ‰Šú‰»‚Å‚«‚Ü‚¹‚ñ‚Å‚µ‚½B"), MB_OK);
+			MessageBox(s_hWnd, error.ErrorMessage(), TEXT("ERROR: ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ãƒ‡ãƒã‚¤ã‚¹ã‚’åˆæœŸåŒ–ã§ãã¾ã›ã‚“ã§ã—ãŸã€‚"), MB_OK);
 			return 0;
 		}
 
-		// ƒƒbƒZ[ƒWƒ‹[ƒv‚ğÀs
+		// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒ«ãƒ¼ãƒ—ã‚’å®Ÿè¡Œ
 		MSG msg = {};
 		while (msg.message != WM_QUIT) {
 			Input::Update();
 			Time::Update();
 
-			// ‚±‚ÌƒEƒBƒ“ƒhƒE‚ÌƒƒbƒZ[ƒW‚ª‘¶İ‚·‚é‚©‚ğŠm”F
+			// ã“ã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒå­˜åœ¨ã™ã‚‹ã‹ã‚’ç¢ºèª
 			if (PeekMessageW(&msg, NULL, 0, 0, PM_NOREMOVE)) {
-				// ƒƒbƒZ[ƒW‚ğæ“¾
+				// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å–å¾—
 				if (!GetMessageW(&msg, NULL, 0, 0)) {
 					break;
 				}
@@ -136,9 +136,9 @@ namespace GameLibrary
 	}
 
 	/// <summary>
-	/// ƒEƒBƒ“ƒhƒE‚Ìƒnƒ“ƒhƒ‹‚ğæ“¾‚µ‚Ü‚·B
+	/// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ãƒãƒ³ãƒ‰ãƒ«ã‚’å–å¾—ã—ã¾ã™ã€‚
 	/// </summary>
-	/// <returns>ƒEƒBƒ“ƒhƒE ƒnƒ“ƒhƒ‹</returns>
+	/// <returns>ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ ãƒãƒ³ãƒ‰ãƒ«</returns>
 	HWND Application::GetWindowHandle() noexcept
 	{
 		return s_hWnd;

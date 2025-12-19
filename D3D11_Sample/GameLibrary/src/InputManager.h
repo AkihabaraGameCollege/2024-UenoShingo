@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <GameLibrary/DigitalInput.h>
 #include <GameLibrary/AnalogInput.h>
@@ -15,7 +15,7 @@
 namespace GameLibrary
 {
 	/// <summary>
-	/// ƒ†[ƒU[“ü—Í‚ğŠÇ—‚µ‚Ü‚·B
+	/// ãƒ¦ãƒ¼ã‚¶ãƒ¼å…¥åŠ›ã‚’ç®¡ç†ã—ã¾ã™ã€‚
 	/// </summary>
 	class InputManager final
 	{
@@ -32,13 +32,13 @@ namespace GameLibrary
 		const DirectX::XMFLOAT2& GetMousePosition() const noexcept;
 
 	private:
-		// ƒ{ƒ^ƒ““ü—Íó‘Ô
+		// ãƒœã‚¿ãƒ³å…¥åŠ›çŠ¶æ…‹
 		bool buttons[2][DigitalInput::NumDigitalInputs] = {};
-		// Œ»İ‚ÌƒtƒŒ[ƒ€‚Å‚Ìƒ{ƒ^ƒ““ü—Íó‘Ô
+		// ç¾åœ¨ã®ãƒ•ãƒ¬ãƒ¼ãƒ ã§ã®ãƒœã‚¿ãƒ³å…¥åŠ›çŠ¶æ…‹
 		bool (*currentButtons)[DigitalInput::NumDigitalInputs] = nullptr;
-		// ’¼‘O‚ÌƒtƒŒ[ƒ€‚Å‚Ìƒ{ƒ^ƒ““ü—Íó‘Ô
+		// ç›´å‰ã®ãƒ•ãƒ¬ãƒ¼ãƒ ã§ã®ãƒœã‚¿ãƒ³å…¥åŠ›çŠ¶æ…‹
 		bool (*lastButtons)[DigitalInput::NumDigitalInputs] = nullptr;
-		// Œ»İ‚ÌƒtƒŒ[ƒ€‚Å‚ÌƒAƒiƒƒO“ü—Íó‘Ô
+		// ç¾åœ¨ã®ãƒ•ãƒ¬ãƒ¼ãƒ ã§ã®ã‚¢ãƒŠãƒ­ã‚°å…¥åŠ›çŠ¶æ…‹
 		float analogs[AnalogInput::NumAnalogInputs] = {};
 
 		Microsoft::WRL::ComPtr<IDirectInput8W> directInput;

@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <Windows.h>
 #include <system_error>
@@ -9,7 +9,7 @@
 namespace GameLibrary
 {
 	/// <summary>
-	/// ’¼‘O‚ÌƒVƒXƒeƒ€ƒGƒ‰[ ƒƒbƒZ[ƒW‚ğƒfƒoƒbƒOo—Í‚É•\¦‚µ‚Ü‚·B
+	/// ç›´å‰ã®ã‚·ã‚¹ãƒ†ãƒ ã‚¨ãƒ©ãƒ¼ ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ãƒ‡ãƒãƒƒã‚°å‡ºåŠ›ã«è¡¨ç¤ºã—ã¾ã™ã€‚
 	/// </summary>
 	/// <return></return>
 	inline void OutputLastError(const std::source_location& location = std::source_location::current()) noexcept
@@ -33,7 +33,7 @@ namespace GameLibrary
 	}
 
 	/// <summary>
-	/// ’¼‘O‚ÌƒVƒXƒeƒ€ƒGƒ‰[‚ğ—áŠO‚Æ‚µ‚ÄƒXƒ[‚µ‚Ü‚·B
+	/// ç›´å‰ã®ã‚·ã‚¹ãƒ†ãƒ ã‚¨ãƒ©ãƒ¼ã‚’ä¾‹å¤–ã¨ã—ã¦ã‚¹ãƒ­ãƒ¼ã—ã¾ã™ã€‚
 	/// </summary>
 	inline void ThrowLastError(const std::source_location& location = std::source_location::current())
 	{
@@ -58,7 +58,7 @@ namespace GameLibrary
 	}
 
 	/// <summary>
-	/// ’¼‘O‚ÌƒVƒXƒeƒ€ƒGƒ‰[‚ğ—áŠO‚Æ‚µ‚ÄƒXƒ[‚µ‚Ü‚·B
+	/// ç›´å‰ã®ã‚·ã‚¹ãƒ†ãƒ ã‚¨ãƒ©ãƒ¼ã‚’ä¾‹å¤–ã¨ã—ã¦ã‚¹ãƒ­ãƒ¼ã—ã¾ã™ã€‚
 	/// </summary>
 	inline void ThrowIfFailed(HRESULT hr, const std::source_location& location = std::source_location::current())
 	{

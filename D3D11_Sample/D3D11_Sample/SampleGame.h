@@ -1,9 +1,9 @@
-#pragma once
+ï»¿#pragma once
 
 #include <GameLibrary.h>
 
 /// <summary>
-/// ƒTƒ“ƒvƒ‹‚ÌƒQ[ƒ€‚ğ•\‚µ‚Ü‚·B
+/// ã‚µãƒ³ãƒ—ãƒ«ã®ã‚²ãƒ¼ãƒ ã‚’è¡¨ã—ã¾ã™ã€‚
 /// </summary>
 class SampleGame : public GameLibrary::Game
 {
@@ -18,7 +18,7 @@ protected:
 private:
 	std::shared_ptr<GameLibrary::ConstantBufferManager> constantBufferManager;
 
-	// ƒ‰ƒCƒg
+	// ãƒ©ã‚¤ãƒˆ
 	DirectX::XMFLOAT4 lightRotation = { 0, 0, 0, 1 };
 	DirectX::XMFLOAT4 lightColor = { 1, 1, 1, 1 };
 
@@ -30,10 +30,10 @@ private:
 	ConstantsPerLighting constantsPerLighting = {};
 	std::shared_ptr<GameLibrary::ConstantBuffer> constantBufferPerLighting;
 
-	// ƒƒCƒ“ ƒJƒƒ‰
+	// ãƒ¡ã‚¤ãƒ³ ã‚«ãƒ¡ãƒ©
 	DirectX::XMFLOAT3 cameraPosition = { 0, 1, -10 };
 	DirectX::XMFLOAT4 cameraRotation = { 0, 0, 0, 1 };
-	// ƒvƒƒWƒFƒNƒVƒ‡ƒ“
+	// ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³
 	float fieldOfView = 60.0f;
 	float clipPlaneNear = 0.3f;
 	float clipPlaneFar = 1000;
@@ -49,7 +49,7 @@ private:
 	ConstantsPerFrame constantsPerFrame = {};
 	std::shared_ptr<GameLibrary::ConstantBuffer> constantBufferPerFrame;
 
-	// ƒIƒuƒWƒFƒNƒg
+	// ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 	DirectX::XMVECTOR localScale = { 1, 1, 1, };
 	DirectX::XMVECTOR localRotation = DirectX::XMQuaternionIdentity();
 	DirectX::XMVECTOR localPosition = { 0, 0, 0, };
@@ -67,20 +67,8 @@ private:
 	ConstantsPerDraw constantsPerDraw = {};
 	std::shared_ptr<GameLibrary::ConstantBuffer> constantBufferPerDraw;
 
-	// Shaders
-	std::shared_ptr<GameLibrary::Shader> shader;
-	// Main Texture
-	std::shared_ptr<GameLibrary::Texture2D> mainTexture;
-	// ƒ}ƒeƒŠƒAƒ‹
-	struct ConstantsPerMaterial
-	{
-		DirectX::XMFLOAT4 Albedo;
-	};
-	ConstantsPerMaterial constantsPerMaterial = {};
-	std::shared_ptr<GameLibrary::ConstantBuffer> constantBufferPerMaterial;
-	GameLibrary::ConstantBufferMap constantBufferMap;
-	GameLibrary::ShaderResourceViewMap shaderResourceViewMap;
-	GameLibrary::SamplerStateMap samplerStateMap;
+	// ãƒãƒ†ãƒªã‚¢ãƒ«
+	std::unique_ptr<GameLibrary::Material> material;
 
 	std::shared_ptr<GameLibrary::InputLayout> inputLayout;
 

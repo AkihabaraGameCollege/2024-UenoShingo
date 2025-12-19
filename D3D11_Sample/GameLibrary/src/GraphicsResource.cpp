@@ -1,11 +1,11 @@
-#include <GameLibrary/Graphics.h>
+ï»¿#include <GameLibrary/Graphics.h>
 
 using namespace GameLibrary;
 
 /// <summary>
-/// ‚±‚ÌƒNƒ‰ƒX‚ÌV‚µ‚¢ƒCƒ“ƒXƒ^ƒ“ƒX‚ð‰Šú‰»‚µ‚Ü‚·B
+/// ã“ã®ã‚¯ãƒ©ã‚¹ã®æ–°ã—ã„ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’åˆæœŸåŒ–ã—ã¾ã™ã€‚
 /// </summary>
-/// <param name="graphicsDevice">ƒOƒ‰ƒtƒBƒbƒNƒX ƒfƒoƒCƒX</param>
+/// <param name="graphicsDevice">ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã‚¹ ãƒ‡ãƒã‚¤ã‚¹</param>
 GraphicsResource::GraphicsResource(ID3D11Device5* graphicsDevice) noexcept
 	: graphicsDevice(graphicsDevice)
 {
@@ -13,9 +13,9 @@ GraphicsResource::GraphicsResource(ID3D11Device5* graphicsDevice) noexcept
 }
 
 /// <summary>
-/// ‚±‚ÌƒŠƒ\[ƒX‚ðì¬‚µ‚½ƒOƒ‰ƒtƒBƒbƒNƒX ƒfƒoƒCƒX‚ðŽæ“¾‚µ‚Ü‚·B
+/// ã“ã®ãƒªã‚½ãƒ¼ã‚¹ã‚’ä½œæˆã—ãŸã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã‚¹ ãƒ‡ãƒã‚¤ã‚¹ã‚’å–å¾—ã—ã¾ã™ã€‚
 /// </summary>
-/// <returns>ƒOƒ‰ƒtƒBƒbƒNƒX ƒfƒoƒCƒX</returns>
+/// <returns>ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã‚¹ ãƒ‡ãƒã‚¤ã‚¹</returns>
 ID3D11Device5* GraphicsResource::GetDevice() noexcept
 {
 	return graphicsDevice.Get();

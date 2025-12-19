@@ -1,8 +1,8 @@
-#pragma once
+ï»¿#pragma once
 
 namespace GameLibrary
 {
-	// ŠÔ‚ğŒv‘ª‚µ‚Ü‚·B
+	// æ™‚é–“ã‚’è¨ˆæ¸¬ã—ã¾ã™ã€‚
 	class Time
 	{
 	public:
