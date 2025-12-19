@@ -1,18 +1,18 @@
-ï»¿#include "SampleGame.h"
+#include "SampleGame.h"
 
 using namespace GameLibrary;
 using namespace DirectX;
 
 namespace
 {
-	// çŸ©å½¢ï¼ˆé ‚ç‚¹ï¼‰
+	// ‹éŒ`i’¸“_j
 	constexpr Vertex_Sprite quadVertices[] = {
 		{ { -0.5f, +0.5f, +0.0f, }, { 0.0f, 0.0f, }, },
 		{ { +0.5f, +0.5f, +0.0f, }, { 1.0f, 0.0f, }, },
 		{ { -0.5f, -0.5f, +0.0f, }, { 0.0f, 1.0f, }, },
 		{ { +0.5f, -0.5f, +0.0f, }, { 1.0f, 1.0f, }, },
 	};
-	// çŸ©å½¢ï¼ˆã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ï¼‰
+	// ‹éŒ`iƒCƒ“ƒfƒbƒNƒXj
 	constexpr uint32_t quadIndices[] = {
 		0, 1, 2,
 		3, 2, 1,
@@ -71,10 +71,27 @@ namespace
 		0xFFB56300, 0xFF00F1FF, 0xFFB56300, 0xFF00F1FF,
 		0xFF00F1FF, 0xFFB56300, 0xFF00F1FF, 0xFFB56300,
 	};
+
+	// ƒXƒvƒ‰ƒCƒgê—p‚ÌÔ/‰©FƒeƒNƒXƒ`ƒƒ
+	constexpr uint32_t spriteTextureSource[] = {
+		0xFFFF0000, 0xFFFFFF00, 0xFFFF0000, 0xFFFFFF00,
+		0xFFFFFF00, 0xFFFF0000, 0xFFFFFF00, 0xFFFF0000,
+		0xFFFF0000, 0xFFFFFF00, 0xFFFF0000, 0xFFFFFF00,
+		0xFFFFFF00, 0xFFFF0000, 0xFFFFFF00, 0xFFFF0000,
+	};
+
+	// ƒXƒvƒ‰ƒCƒg—pƒŠƒ\[ƒXi‚±‚Ìƒtƒ@ƒCƒ‹“à‚Å•Ûj
+	std::unique_ptr<Mesh> spriteMesh;
+	std::unique_ptr<Material> spriteMaterial;
+	std::shared_ptr<InputLayout> spriteInputLayout;
+	XMFLOAT4 spriteColor = { 1, 1, 1, 1 };
+	XMFLOAT3 spritePosition = { -1.5f, 0.0f, 0.0f };
+	XMFLOAT4 spriteRotation = { 0, 0, 0, 1 };
+	XMVECTOR spriteScale = XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f);
 }
 
 /// <summary>
-/// ã“ã®ã‚¯ãƒ©ã‚¹ã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’åˆæœŸåŒ–ã—ã¾ã™ã€‚
+/// ‚±‚ÌƒNƒ‰ƒX‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ğ‰Šú‰»‚µ‚Ü‚·B
 /// </summary>
 SampleGame::SampleGame(const GameLibrary::ProjectSettings& settings)
 	: Game(settings)
@@ -83,14 +100,14 @@ SampleGame::SampleGame(const GameLibrary::ProjectSettings& settings)
 }
 
 /// <summary>
-/// åˆæœŸåŒ–å‡¦ç†ã‚’å®Ÿè£…ã—ã¾ã™ã€‚
+/// ‰Šú‰»ˆ—‚ğÀ‘•‚µ‚Ü‚·B
 /// </summary>
 void SampleGame::OnInitialize()
 {
-	// å®šæ•°ãƒãƒƒãƒ•ã‚¡ãƒ¼
+	// ’è”ƒoƒbƒtƒ@[
 	constantBufferManager = std::make_shared<ConstantBufferManager>(device.Get());
 
-	// å¹³è¡Œãƒ©ã‚¤ãƒˆ
+	// •½sƒ‰ƒCƒg
 	XMStoreFloat4(&lightRotation, XMQuaternionRotationRollPitchYaw(
 		XMConvertToRadians(50),
 		XMConvertToRadians(-30),
@@ -109,30 +126,54 @@ void SampleGame::OnInitialize()
 		static_cast<UINT>(sizeof constantsPerDraw));
 	constantBufferManager->Add("ConstantBufferPerDraw", constantBufferPerDraw);
 
-	// ãƒãƒ†ãƒªã‚¢ãƒ«
+	// ƒ}ƒeƒŠƒAƒ‹i3Dj
 	albedoColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-	// ãƒ¡ãƒƒã‚·ãƒ¥
+	// ƒƒbƒVƒ…i3DƒIƒuƒWƒFƒNƒgFƒLƒ…[ƒuj
 	mesh = std::make_unique<Mesh>(device.Get());
 	mesh->SetVertexBuffer(Vertex_Base::GetSize(), static_cast<UINT>(std::size(cubeVertices)), cubeVertices);
 	mesh->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	mesh->SetIndexBuffer(IndexFormat::UInt32, static_cast<UINT>(std::size(cubeIndices)), cubeIndices);
 
-	// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
+	// ƒVƒF[ƒ_[i3Dj
 	auto shader = shaderManager->Find(L"Shader/Standard");
-	// ãƒãƒ†ãƒªã‚¢ãƒ«
+	// ƒ}ƒeƒŠƒAƒ‹i3Dj
 	material = std::make_unique<Material>(device.Get(), constantBufferManager, shader);
 	material->SetColor("AlbedoColor", albedoColor);
-	// ãƒ†ã‚¯ã‚¹ãƒãƒ£
+	// ƒeƒNƒXƒ`ƒƒi3Dj
 	auto mainTexture = std::make_shared<Texture2D>(device.Get(), 4, 4, DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, textureSource);
 	material->SetTexture("MainTexture", mainTexture);
 
-	// å…¥åŠ›ãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆ
+	// “ü—ÍƒŒƒCƒAƒEƒgi3Dj
 	inputLayout = std::make_shared<InputLayout_Base>(device.Get());
+
+	// ===== ƒXƒvƒ‰ƒCƒg‚Ì€”õ =====
+	// ƒƒbƒVƒ…iƒXƒvƒ‰ƒCƒgF‹éŒ`j
+	spriteMesh = std::make_unique<Mesh>(device.Get());
+	spriteMesh->SetVertexBuffer(Vertex_Sprite::GetSize(), static_cast<UINT>(std::size(quadVertices)), quadVertices);
+	spriteMesh->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	spriteMesh->SetIndexBuffer(IndexFormat::UInt32, static_cast<UINT>(std::size(quadIndices)), quadIndices);
+
+	// ƒVƒF[ƒ_[iƒXƒvƒ‰ƒCƒgj
+	auto spriteShader = shaderManager->Find(L"Shader/Sprite");
+	// ƒ}ƒeƒŠƒAƒ‹iƒXƒvƒ‰ƒCƒgj
+	spriteMaterial = std::make_unique<Material>(device.Get(), constantBufferManager, spriteShader);
+	spriteMaterial->SetColor("AlbedoColor", spriteColor);
+	// ƒeƒNƒXƒ`ƒƒiƒXƒvƒ‰ƒCƒgFÔ/‰©Fj
+	// ƒtƒH[ƒ}ƒbƒg‚ğ BGRA ‚É•ÏX‚µ‚Ä 0xAARRGGBB ‚ğ³‚µ‚­•\¦
+	auto spriteTexture = std::make_shared<Texture2D>(
+		device.Get(),
+		4, 4,
+		DXGI_FORMAT::DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, // © ‚±‚±‚ğ•ÏX
+		spriteTextureSource);
+	spriteMaterial->SetTexture("MainTexture", spriteTexture);
+
+	// “ü—ÍƒŒƒCƒAƒEƒgiƒXƒvƒ‰ƒCƒgj
+	spriteInputLayout = std::make_shared<InputLayout_Sprite>(device.Get());
 }
 
 /// <summary>
-/// ãƒ•ãƒ¬ãƒ¼ãƒ ã®æ›´æ–°å‡¦ç†ã‚’å®Ÿè£…ã—ã¾ã™ã€‚
+/// ƒtƒŒ[ƒ€‚ÌXVˆ—‚ğÀ‘•‚µ‚Ü‚·B
 /// </summary>
 void SampleGame::OnUpdate()
 {
@@ -141,23 +182,23 @@ void SampleGame::OnUpdate()
 }
 
 /// <summary>
-/// ãƒ•ãƒ¬ãƒ¼ãƒ ã®æç”»å‡¦ç†ã‚’å®Ÿè£…ã—ã¾ã™ã€‚
+/// ƒtƒŒ[ƒ€‚Ì•`‰æˆ—‚ğÀ‘•‚µ‚Ü‚·B
 /// </summary>
 void SampleGame::OnRender()
 {
-	// å¹³è¡Œãƒ©ã‚¤ãƒˆ
+	// •½sƒ‰ƒCƒg
 	const auto lightWorldMatrix = XMMatrixRotationQuaternion(XMLoadFloat4(&lightRotation));
 	const auto lightForward = lightWorldMatrix.r[2];
 	XMStoreFloat4(&constantsPerLighting.LightDirection, lightForward);
 	XMStoreFloat4(&constantsPerLighting.LightColor, XMColorSRGBToRGB(XMLoadFloat4(&lightColor)));
 	constantBufferPerLighting->UpdateSubresource(&constantsPerLighting);
-	// ãƒ¡ã‚¤ãƒ³ ã‚«ãƒ¡ãƒ©
+	// ƒƒCƒ“ ƒJƒƒ‰
 	const auto cameraWorldMatrix = XMMatrixRotationQuaternion(XMLoadFloat4(&cameraRotation));
 	const auto cameraForward = cameraWorldMatrix.r[2];
 	const auto cameraUp = cameraWorldMatrix.r[1];
 	auto matrixView = XMMatrixLookToLH(XMLoadFloat3(&cameraPosition), cameraForward, cameraUp);
 	XMStoreFloat4x4(&constantsPerFrame.MatrixView, XMMatrixTranspose(matrixView));
-	// ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³
+	// ƒvƒƒWƒFƒNƒVƒ‡ƒ“
 	const auto aspectRatio = GetWidth() / static_cast<float>(GetHeight());
 	auto matrixProjection = XMMatrixIdentity();
 	if (orthographic) {
@@ -173,26 +214,48 @@ void SampleGame::OnRender()
 	XMStoreFloat4x4(&constantsPerFrame.MatrixViewProjection, XMMatrixTranspose(matrixView * matrixProjection));
 	constantBufferPerFrame->UpdateSubresource(&constantsPerFrame);
 
-	// ã‚²ãƒ¼ãƒ  ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
-	const auto matrixWorld = XMMatrixTransformation(
-		XMVectorZero(), XMQuaternionIdentity(), localScale,
-		XMVectorZero(), localRotation,
-		localPosition);
-	XMStoreFloat4x4(&constantsPerDraw.MatrixWorld, XMMatrixTranspose(matrixWorld));
-	constantBufferPerDraw->UpdateSubresource(&constantsPerDraw);
+	// ===== 3DƒIƒuƒWƒFƒNƒg‚Ì•`‰æiƒLƒ…[ƒuj =====
+	{
+		const auto matrixWorld = XMMatrixTransformation(
+			XMVectorZero(), XMQuaternionIdentity(), localScale,
+			XMVectorZero(), localRotation,
+			localPosition);
+		XMStoreFloat4x4(&constantsPerDraw.MatrixWorld, XMMatrixTranspose(matrixWorld));
+		constantBufferPerDraw->UpdateSubresource(&constantsPerDraw);
 
-	// Mesh
-	const auto vertexBuffer = mesh->GetVertexBuffer();
-	ID3D11Buffer* const vertexBuffers[] = { vertexBuffer->GetNativePointer(), };
-	const UINT strides[] = { vertexBuffer->GetStride(), };
-	const UINT offsets[] = { mesh->GetVertexOffset(), };
-	deviceContext->IASetVertexBuffers(0, static_cast<UINT>(std::size(vertexBuffers)), vertexBuffers, strides, offsets);
-	deviceContext->IASetInputLayout(inputLayout->GetNativePointer());
-	const auto indexBuffer = mesh->GetIndexBuffer();
-	deviceContext->IASetIndexBuffer(indexBuffer->GetNativePointer(), indexBuffer->GetFormat(), mesh->GetIndexOffset());
-	deviceContext->IASetPrimitiveTopology(mesh->GetPrimitiveTopology());
-	// ãƒãƒ†ãƒªã‚¢ãƒ«
-	material->Apply(deviceContext.Get());
+		const auto vertexBuffer = mesh->GetVertexBuffer();
+		ID3D11Buffer* const vertexBuffers[] = { vertexBuffer->GetNativePointer(), };
+		const UINT strides[] = { vertexBuffer->GetStride(), };
+		const UINT offsets[] = { mesh->GetVertexOffset(), };
+		deviceContext->IASetVertexBuffers(0, static_cast<UINT>(std::size(vertexBuffers)), vertexBuffers, strides, offsets);
+		deviceContext->IASetInputLayout(inputLayout->GetNativePointer());
+		const auto indexBuffer = mesh->GetIndexBuffer();
+		deviceContext->IASetIndexBuffer(indexBuffer->GetNativePointer(), indexBuffer->GetFormat(), mesh->GetIndexOffset());
+		deviceContext->IASetPrimitiveTopology(mesh->GetPrimitiveTopology());
+		material->Apply(deviceContext.Get());
+		deviceContext->DrawIndexed(indexBuffer->GetCount(), mesh->GetStartIndexLocation(), mesh->GetBaseVertexLocation());
+	}
 
-	deviceContext->DrawIndexed(indexBuffer->GetCount(), mesh->GetStartIndexLocation(), mesh->GetBaseVertexLocation());
+	// ===== ƒXƒvƒ‰ƒCƒg‚Ì•`‰æi‹éŒ`j =====
+	{
+		// ƒXƒvƒ‰ƒCƒg—p‚Ìƒ[ƒ‹ƒhs—ñiˆÊ’u‚¾‚¯•ÏXj
+		const auto spriteWorld = XMMatrixTransformation(
+			XMVectorZero(), XMQuaternionIdentity(), spriteScale,
+			XMVectorZero(), XMLoadFloat4(&spriteRotation),
+			XMLoadFloat3(&spritePosition));
+		XMStoreFloat4x4(&constantsPerDraw.MatrixWorld, XMMatrixTranspose(spriteWorld));
+		constantBufferPerDraw->UpdateSubresource(&constantsPerDraw);
+
+		const auto vertexBuffer = spriteMesh->GetVertexBuffer();
+		ID3D11Buffer* const vertexBuffers[] = { vertexBuffer->GetNativePointer(), };
+		const UINT strides[] = { vertexBuffer->GetStride(), };
+		const UINT offsets[] = { spriteMesh->GetVertexOffset(), };
+		deviceContext->IASetVertexBuffers(0, static_cast<UINT>(std::size(vertexBuffers)), vertexBuffers, strides, offsets);
+		deviceContext->IASetInputLayout(spriteInputLayout->GetNativePointer());
+		const auto indexBuffer = spriteMesh->GetIndexBuffer();
+		deviceContext->IASetIndexBuffer(indexBuffer->GetNativePointer(), indexBuffer->GetFormat(), spriteMesh->GetIndexOffset());
+		deviceContext->IASetPrimitiveTopology(spriteMesh->GetPrimitiveTopology());
+		spriteMaterial->Apply(deviceContext.Get());
+		deviceContext->DrawIndexed(indexBuffer->GetCount(), spriteMesh->GetStartIndexLocation(), spriteMesh->GetBaseVertexLocation());
+	}
 }
