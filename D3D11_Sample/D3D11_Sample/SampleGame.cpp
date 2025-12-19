@@ -177,8 +177,56 @@ void SampleGame::OnInitialize()
 /// </summary>
 void SampleGame::OnUpdate()
 {
+	// 既存の回転
 	const auto rotationVelocity = XMQuaternionRotationRollPitchYaw(0, XMConvertToRadians(90), 0);
 	localRotation = XMQuaternionSlerp(localRotation, XMQuaternionMultiply(localRotation, rotationVelocity), Time::GetDeltaTime());
+
+	// ===== 入力による移動 =====
+	const float dt = Time::GetDeltaTime();
+	const float moveSpeed3D = 2.0f;     // キューブの移動速度（units/秒）
+	const float moveSpeed2D = 2.5f;     // スプライトの移動速度（units/秒）
+
+	// キューブ（WASD + Space/Ctrl + ゲームパッド左スティック）
+	float moveX = 0.0f, moveY = 0.0f, moveZ = 0.0f;
+	if (Input::GetButton(DigitalInput::A)) moveX -= 1.0f;
+	if (Input::GetButton(DigitalInput::D)) moveX += 1.0f;
+	if (Input::GetButton(DigitalInput::W)) moveZ += 1.0f;  // 左手系 (+Z が前)
+	if (Input::GetButton(DigitalInput::S)) moveZ -= 1.0f;
+	if (Input::GetButton(DigitalInput::Space)) moveY += 1.0f;
+	if (Input::GetButton(DigitalInput::LeftCtrl)) moveY -= 1.0f;
+
+	// ゲームパッド左スティック
+	moveX += Input::GetAxis(AnalogInput::LeftStickX);
+	// スティックは上が負値のことが多いので反転なしで下記のとおり合わせる
+	moveZ += Input::GetAxis(AnalogInput::LeftStickY);
+
+	if (moveX != 0.0f || moveY != 0.0f || moveZ != 0.0f) {
+		// 正規化して斜め移動の速度過大を防ぐ
+		const XMVECTOR moveDir = XMVector3Normalize(XMVectorSet(moveX, moveY, moveZ, 0.0f));
+		const XMVECTOR delta = XMVectorScale(moveDir, moveSpeed3D * dt);
+		localPosition = XMVectorAdd(localPosition, delta);
+	}
+
+	// スプライト（矢印キー + マウスホイールで Z）
+	float spriteMoveX = 0.0f, spriteMoveY = 0.0f, spriteMoveZ = 0.0f;
+	if (Input::GetButton(DigitalInput::LeftArrow))  spriteMoveX -= 1.0f;
+	if (Input::GetButton(DigitalInput::RightArrow)) spriteMoveX += 1.0f;
+	if (Input::GetButton(DigitalInput::UpArrow))    spriteMoveY += 1.0f;
+	if (Input::GetButton(DigitalInput::DownArrow))  spriteMoveY -= 1.0f;
+
+	// マウスホイールで前後
+	spriteMoveZ += Input::GetAxis(AnalogInput::MouseScroll) * 0.25f;
+
+	if (spriteMoveX != 0.0f || spriteMoveY != 0.0f || spriteMoveZ != 0.0f) {
+		// 斜め移動の速度調整
+		const XMVECTOR dir = XMVector3Normalize(XMVectorSet(spriteMoveX, spriteMoveY, spriteMoveZ, 0.0f));
+		const XMVECTOR delta = XMVectorScale(dir, moveSpeed2D * dt);
+		XMFLOAT3 d;
+		XMStoreFloat3(&d, delta);
+		spritePosition.x += d.x;
+		spritePosition.y += d.y;
+		spritePosition.z += d.z;
+	}
 }
 
 /// <summary>
