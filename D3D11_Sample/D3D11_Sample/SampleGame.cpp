@@ -186,28 +186,60 @@ void SampleGame::OnUpdate()
 	const float moveSpeed3D = 2.0f;     // キューブの移動速度（units/秒）
 	const float moveSpeed2D = 2.5f;     // スプライトの移動速度（units/秒）
 
-	// キューブ（WASD + Space/Ctrl + ゲームパッド左スティック）
-	float moveX = 0.0f, moveY = 0.0f, moveZ = 0.0f;
-	if (Input::GetButton(DigitalInput::A)) moveX -= 1.0f;
-	if (Input::GetButton(DigitalInput::D)) moveX += 1.0f;
-	if (Input::GetButton(DigitalInput::W)) moveZ += 1.0f;  // 左手系 (+Z が前)
-	if (Input::GetButton(DigitalInput::S)) moveZ -= 1.0f;
-	if (Input::GetButton(DigitalInput::Space)) moveY += 1.0f;
-	if (Input::GetButton(DigitalInput::LeftCtrl)) moveY -= 1.0f;
+	// ---- キューブ（WASD + Space/Ctrl + ゲームパッド左スティック） ----
+	// ローカル移動入力（カメラ基準で変換するための raw 入力）
+	float rawX = 0.0f; // 右方向が正
+	float rawY = 0.0f; // 上方向が正
+	float rawZ = 0.0f; // 前方向が正
 
-	// ゲームパッド左スティック
-	moveX += Input::GetAxis(AnalogInput::LeftStickX);
-	// スティックは上が負値のことが多いので反転なしで下記のとおり合わせる
-	moveZ += Input::GetAxis(AnalogInput::LeftStickY);
+	if (Input::GetButton(DigitalInput::A)) rawX -= 1.0f;
+	if (Input::GetButton(DigitalInput::D)) rawX += 1.0f;
+	if (Input::GetButton(DigitalInput::W)) rawZ += 1.0f;
+	if (Input::GetButton(DigitalInput::S)) rawZ -= 1.0f;
+	if (Input::GetButton(DigitalInput::Space)) rawY += 1.0f;
+	if (Input::GetButton(DigitalInput::LeftCtrl)) rawY -= 1.0f;
 
-	if (moveX != 0.0f || moveY != 0.0f || moveZ != 0.0f) {
-		// 正規化して斜め移動の速度過大を防ぐ
-		const XMVECTOR moveDir = XMVector3Normalize(XMVectorSet(moveX, moveY, moveZ, 0.0f));
-		const XMVECTOR delta = XMVectorScale(moveDir, moveSpeed3D * dt);
+	// ゲームパッド左スティック（X: 左右, Y: 前後）
+	rawX += Input::GetAxis(AnalogInput::LeftStickX);
+	// スティックは上が負値のことが多いので、左スティックY をそのまま加えると
+	// 上が負になる設計の場合は符号反転しない現状コードに合わせる
+	rawZ += Input::GetAxis(AnalogInput::LeftStickY);
+
+	if (rawX != 0.0f || rawY != 0.0f || rawZ != 0.0f) {
+		// カメラの向きから前方向と右方向を計算（Y成分はゼロにして水平移動にする）
+		const auto cameraWorldMatrix = XMMatrixRotationQuaternion(XMLoadFloat4(&cameraRotation));
+		XMVECTOR camForward = cameraWorldMatrix.r[2]; // カメラの前方向（右手系では -Z になることがあるが、このプロジェクトでは r[2] を使用）
+		XMVECTOR camRight = cameraWorldMatrix.r[0];
+
+		// Y 成分を除去して水平成分だけで移動させる（必要に応じて Y を許可）
+		camForward = XMVectorSet(XMVectorGetX(camForward), 0.0f, XMVectorGetZ(camForward), 0.0f);
+		camRight   = XMVectorSet(XMVectorGetX(camRight),   0.0f, XMVectorGetZ(camRight),   0.0f);
+
+		// 正規化（ゼロベクトル対策）
+		if (XMVector3Equal(XMVector3LengthSq(camForward), XMVectorZero())) {
+			camForward = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+		}
+		if (XMVector3Equal(XMVector3LengthSq(camRight), XMVectorZero())) {
+			camRight = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
+		}
+		camForward = XMVector3Normalize(camForward);
+		camRight = XMVector3Normalize(camRight);
+
+		// 合成（右 * rawX + 前 * rawZ + 上 * rawY）
+		const XMVECTOR worldMoveDir = XMVectorAdd(
+			XMVectorScale(camRight, rawX),
+			XMVectorAdd(XMVectorScale(camForward, rawZ), XMVectorSet(0.0f, rawY, 0.0f, 0.0f))
+		);
+
+		// 正規化して速度一定に
+		const XMVECTOR normDir = XMVector3Normalize(worldMoveDir);
+		const XMVECTOR delta = XMVectorScale(normDir, moveSpeed3D * dt);
+
+		// localPosition は XMVECTOR と想定されるため加算
 		localPosition = XMVectorAdd(localPosition, delta);
 	}
 
-	// スプライト（矢印キー + マウスホイールで Z）
+	// ---- スプライト（矢印キー + マウスホイールで Z） ----
 	float spriteMoveX = 0.0f, spriteMoveY = 0.0f, spriteMoveZ = 0.0f;
 	if (Input::GetButton(DigitalInput::LeftArrow))  spriteMoveX -= 1.0f;
 	if (Input::GetButton(DigitalInput::RightArrow)) spriteMoveX += 1.0f;
