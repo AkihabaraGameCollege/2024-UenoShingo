@@ -10,11 +10,7 @@ void main(
     {
         GeometryShaderOutput_Base element;
         element.worldPosition = mul(input[i].position, matrixWorld);
-        
-        float3 worldNormal = mul(input[i].normal.xyz, (float3x3) matrixWorld);
-        worldNormal = normalize(worldNormal);
-        element.worldNormal = float4(worldNormal, 0);
-        
+        element.worldNormal = normalize(mul(input[i].normal, (float3x3) matrixWorld));
         element.position = mul(input[i].position, matrixWorldViewProjection);
         element.texCoord = input[i].texCoord;
         output.Append(element);

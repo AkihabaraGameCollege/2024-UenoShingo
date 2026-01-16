@@ -1,6 +1,9 @@
 ﻿#pragma once
 
 #include <GameLibrary.h>
+#include <vector>
+#include "Player.h"
+#include "Sprite.h"
 
 /// <summary>
 /// サンプルのゲームを表します。
@@ -16,6 +19,12 @@ protected:
 	void OnRender() override;
 
 private:
+	// 弾の発射と敵の生成
+	void SpawnBullet();
+	void SpawnEnemy();
+	// 衝突判定
+	bool CheckCollision(const GameObject& a, const GameObject& b);
+
 	std::shared_ptr<GameLibrary::ConstantBufferManager> constantBufferManager;
 
 	// ライト
@@ -31,8 +40,9 @@ private:
 	std::shared_ptr<GameLibrary::ConstantBuffer> constantBufferPerLighting;
 
 	// メイン カメラ
-	DirectX::XMFLOAT3 cameraPosition = { 0, 1, -10 };
+	DirectX::XMFLOAT3 cameraPosition = { 0, 0, -15 }; // カメラ位置調整
 	DirectX::XMFLOAT4 cameraRotation = { 0, 0, 0, 1 };
+
 	// プロジェクション
 	float fieldOfView = 60.0f;
 	float clipPlaneNear = 0.3f;
@@ -49,11 +59,26 @@ private:
 	ConstantsPerFrame constantsPerFrame = {};
 	std::shared_ptr<GameLibrary::ConstantBuffer> constantBufferPerFrame;
 
-	// オブジェクト
-	DirectX::XMVECTOR localScale = { 1, 1, 1, };
-	DirectX::XMVECTOR localRotation = DirectX::XMQuaternionIdentity();
-	DirectX::XMVECTOR localPosition = { 0, 0, 0, };
-	DirectX::XMFLOAT4 albedoColor = { 1, 1, 1, 1 };
+	// --- ゲームオブジェクト管理 ---
+	std::unique_ptr<Player> player;
+
+	// 弾と敵のリスト
+	std::vector<std::shared_ptr<Sprite>> bullets;
+	std::vector<std::shared_ptr<GameObject>> enemies;
+
+	// リソース共有
+	std::shared_ptr<GameLibrary::Mesh> meshCube;
+	std::shared_ptr<GameLibrary::Mesh> meshQuad;
+	std::shared_ptr<GameLibrary::Material> matPlayer;
+	std::shared_ptr<GameLibrary::Material> matEnemy;
+	std::shared_ptr<GameLibrary::Material> matBullet;
+	std::shared_ptr<GameLibrary::InputLayout> inputLayout3D;
+	std::shared_ptr<GameLibrary::InputLayout> inputLayoutSprite;
+
+	// ゲーム進行管理
+	float enemySpawnTimer = 0.0f;
+	float shotCooldown = 0.0f;
+	bool isGameOver = false;
 
 	struct ConstantsPerDraw
 	{
@@ -61,11 +86,4 @@ private:
 	};
 	ConstantsPerDraw constantsPerDraw = {};
 	std::shared_ptr<GameLibrary::ConstantBuffer> constantBufferPerDraw;
-
-	// マテリアル
-	std::unique_ptr<GameLibrary::Material> material;
-	// メッシュ
-	std::unique_ptr<GameLibrary::Mesh> mesh;
-
-	std::shared_ptr<GameLibrary::InputLayout> inputLayout;
 };

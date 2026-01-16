@@ -1,18 +1,19 @@
-#include "SampleGame.h"
+ï»¿#include "SampleGame.h"
+#include <random>
 
 using namespace GameLibrary;
 using namespace DirectX;
 
 namespace
 {
-	// ‹éŒ`i’¸“_j
+	// çŸ©å½¢ï¼ˆé ‚ç‚¹ï¼‰
 	constexpr Vertex_Sprite quadVertices[] = {
 		{ { -0.5f, +0.5f, +0.0f, }, { 0.0f, 0.0f, }, },
 		{ { +0.5f, +0.5f, +0.0f, }, { 1.0f, 0.0f, }, },
 		{ { -0.5f, -0.5f, +0.0f, }, { 0.0f, 1.0f, }, },
 		{ { +0.5f, -0.5f, +0.0f, }, { 1.0f, 1.0f, }, },
 	};
-	// ‹éŒ`iƒCƒ“ƒfƒbƒNƒXj
+	// çŸ©å½¢ï¼ˆã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ï¼‰
 	constexpr uint32_t quadIndices[] = {
 		0, 1, 2,
 		3, 2, 1,
@@ -66,32 +67,15 @@ namespace
 	};
 
 	constexpr uint32_t textureSource[] = {
-		0xFFB56300, 0xFF00F1FF, 0xFFB56300, 0xFF00F1FF,
-		0xFF00F1FF, 0xFFB56300, 0xFF00F1FF, 0xFFB56300,
-		0xFFB56300, 0xFF00F1FF, 0xFFB56300, 0xFF00F1FF,
-		0xFF00F1FF, 0xFFB56300, 0xFF00F1FF, 0xFFB56300,
+		0xFFFFFFFF, 0xFFCCCCCC, 0xFFFFFFFF, 0xFFCCCCCC,
+		0xFFCCCCCC, 0xFFFFFFFF, 0xFFCCCCCC, 0xFFFFFFFF,
+		0xFFFFFFFF, 0xFFCCCCCC, 0xFFFFFFFF, 0xFFCCCCCC,
+		0xFFCCCCCC, 0xFFFFFFFF, 0xFFCCCCCC, 0xFFFFFFFF,
 	};
-
-	// ƒXƒvƒ‰ƒCƒgê—p‚ÌÔ/‰©FƒeƒNƒXƒ`ƒƒ
-	constexpr uint32_t spriteTextureSource[] = {
-		0xFFFF0000, 0xFFFFFF00, 0xFFFF0000, 0xFFFFFF00,
-		0xFFFFFF00, 0xFFFF0000, 0xFFFFFF00, 0xFFFF0000,
-		0xFFFF0000, 0xFFFFFF00, 0xFFFF0000, 0xFFFFFF00,
-		0xFFFFFF00, 0xFFFF0000, 0xFFFFFF00, 0xFFFF0000,
-	};
-
-	// ƒXƒvƒ‰ƒCƒg—pƒŠƒ\[ƒXi‚±‚Ìƒtƒ@ƒCƒ‹“à‚Å•Ûj
-	std::unique_ptr<Mesh> spriteMesh;
-	std::unique_ptr<Material> spriteMaterial;
-	std::shared_ptr<InputLayout> spriteInputLayout;
-	XMFLOAT4 spriteColor = { 1, 1, 1, 1 };
-	XMFLOAT3 spritePosition = { -1.5f, 0.0f, 0.0f };
-	XMFLOAT4 spriteRotation = { 0, 0, 0, 1 };
-	XMVECTOR spriteScale = XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f);
 }
 
 /// <summary>
-/// ‚±‚ÌƒNƒ‰ƒX‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ğ‰Šú‰»‚µ‚Ü‚·B
+/// ã“ã®ã‚¯ãƒ©ã‚¹ã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’åˆæœŸåŒ–ã—ã¾ã™ã€‚
 /// </summary>
 SampleGame::SampleGame(const GameLibrary::ProjectSettings& settings)
 	: Game(settings)
@@ -100,14 +84,14 @@ SampleGame::SampleGame(const GameLibrary::ProjectSettings& settings)
 }
 
 /// <summary>
-/// ‰Šú‰»ˆ—‚ğÀ‘•‚µ‚Ü‚·B
+/// åˆæœŸåŒ–å‡¦ç†ã‚’å®Ÿè£…ã—ã¾ã™ã€‚
 /// </summary>
 void SampleGame::OnInitialize()
 {
-	// ’è”ƒoƒbƒtƒ@[
+	// å®šæ•°ãƒãƒƒãƒ•ã‚¡ãƒ¼
 	constantBufferManager = std::make_shared<ConstantBufferManager>(device.Get());
 
-	// •½sƒ‰ƒCƒg
+	// å¹³è¡Œãƒ©ã‚¤ãƒˆ
 	XMStoreFloat4(&lightRotation, XMQuaternionRotationRollPitchYaw(
 		XMConvertToRadians(50),
 		XMConvertToRadians(-30),
@@ -126,159 +110,219 @@ void SampleGame::OnInitialize()
 		static_cast<UINT>(sizeof constantsPerDraw));
 	constantBufferManager->Add("ConstantBufferPerDraw", constantBufferPerDraw);
 
-	// ƒ}ƒeƒŠƒAƒ‹i3Dj
-	albedoColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+	// --- ãƒªã‚½ãƒ¼ã‚¹ã®ãƒ­ãƒ¼ãƒ‰ï¼ˆå†åˆ©ç”¨ã™ã‚‹ãŸã‚å¤‰æ•°ã«ä¿æŒï¼‰ ---
 
-	// ƒƒbƒVƒ…i3DƒIƒuƒWƒFƒNƒgFƒLƒ…[ƒuj
-	mesh = std::make_unique<Mesh>(device.Get());
-	mesh->SetVertexBuffer(Vertex_Base::GetSize(), static_cast<UINT>(std::size(cubeVertices)), cubeVertices);
-	mesh->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	mesh->SetIndexBuffer(IndexFormat::UInt32, static_cast<UINT>(std::size(cubeIndices)), cubeIndices);
+	// 3Dç”¨ãƒ¡ãƒƒã‚·ãƒ¥ (Cube)
+	meshCube = std::make_shared<Mesh>(device.Get());
+	meshCube->SetVertexBuffer(Vertex_Base::GetSize(), static_cast<UINT>(std::size(cubeVertices)), cubeVertices);
+	meshCube->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	meshCube->SetIndexBuffer(IndexFormat::UInt32, static_cast<UINT>(std::size(cubeIndices)), cubeIndices);
 
-	// ƒVƒF[ƒ_[i3Dj
-	auto shader = shaderManager->Find(L"Shader/Standard");
-	// ƒ}ƒeƒŠƒAƒ‹i3Dj
-	material = std::make_unique<Material>(device.Get(), constantBufferManager, shader);
-	material->SetColor("AlbedoColor", albedoColor);
-	// ƒeƒNƒXƒ`ƒƒi3Dj
+	// Spriteç”¨ãƒ¡ãƒƒã‚·ãƒ¥ (Quad)
+	meshQuad = std::make_shared<Mesh>(device.Get());
+	meshQuad->SetVertexBuffer(Vertex_Sprite::GetSize(), static_cast<UINT>(std::size(quadVertices)), quadVertices);
+	meshQuad->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	meshQuad->SetIndexBuffer(IndexFormat::UInt32, static_cast<UINT>(std::size(quadIndices)), quadIndices);
+
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£
 	auto mainTexture = std::make_shared<Texture2D>(device.Get(), 4, 4, DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, textureSource);
-	material->SetTexture("MainTexture", mainTexture);
 
-	// “ü—ÍƒŒƒCƒAƒEƒgi3Dj
-	inputLayout = std::make_shared<InputLayout_Base>(device.Get());
+	// ãƒãƒ†ãƒªã‚¢ãƒ« & ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ (3Dç”¨)
+	{
+		auto shader = shaderManager->Find(L"Shader/Standard");
+		matPlayer = std::make_shared<Material>(device.Get(), constantBufferManager, shader);
+		matPlayer->SetTexture("MainTexture", mainTexture);
 
-	// ===== ƒXƒvƒ‰ƒCƒg‚Ì€”õ =====
-	// ƒƒbƒVƒ…iƒXƒvƒ‰ƒCƒgF‹éŒ`j
-	spriteMesh = std::make_unique<Mesh>(device.Get());
-	spriteMesh->SetVertexBuffer(Vertex_Sprite::GetSize(), static_cast<UINT>(std::size(quadVertices)), quadVertices);
-	spriteMesh->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	spriteMesh->SetIndexBuffer(IndexFormat::UInt32, static_cast<UINT>(std::size(quadIndices)), quadIndices);
+		matEnemy = std::make_shared<Material>(device.Get(), constantBufferManager, shader);
+		matEnemy->SetTexture("MainTexture", mainTexture);
+		matEnemy->SetColor("AlbedoColor", XMFLOAT4{ 1.0f, 0.2f, 0.2f, 1.0f }); // èµ¤è‰²
+	}
+	// ãƒãƒ†ãƒªã‚¢ãƒ« & ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ (Spriteç”¨)
+	{
+		auto shader = shaderManager->Find(L"Shader/Sprite");
+		matBullet = std::make_shared<Material>(device.Get(), constantBufferManager, shader);
+		matBullet->SetTexture("MainTexture", mainTexture);
+		matBullet->SetColor("AlbedoColor", XMFLOAT4{ 1.0f, 1.0f, 0.0f, 1.0f }); // é»„è‰²
+	}
 
-	// ƒVƒF[ƒ_[iƒXƒvƒ‰ƒCƒgj
-	auto spriteShader = shaderManager->Find(L"Shader/Sprite");
-	// ƒ}ƒeƒŠƒAƒ‹iƒXƒvƒ‰ƒCƒgj
-	spriteMaterial = std::make_unique<Material>(device.Get(), constantBufferManager, spriteShader);
-	spriteMaterial->SetColor("AlbedoColor", spriteColor);
-	// ƒeƒNƒXƒ`ƒƒiƒXƒvƒ‰ƒCƒgFÔ/‰©Fj
-	// ƒtƒH[ƒ}ƒbƒg‚ğ BGRA ‚É•ÏX‚µ‚Ä 0xAARRGGBB ‚ğ³‚µ‚­•\¦
-	auto spriteTexture = std::make_shared<Texture2D>(
-		device.Get(),
-		4, 4,
-		DXGI_FORMAT::DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, // © ‚±‚±‚ğ•ÏX
-		spriteTextureSource);
-	spriteMaterial->SetTexture("MainTexture", spriteTexture);
+	// å…¥åŠ›ãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆ
+	inputLayout3D = std::make_shared<InputLayout_Base>(device.Get());
+	inputLayoutSprite = std::make_shared<InputLayout_Sprite>(device.Get());
 
-	// “ü—ÍƒŒƒCƒAƒEƒgiƒXƒvƒ‰ƒCƒgj
-	spriteInputLayout = std::make_shared<InputLayout_Sprite>(device.Get());
+	// --- ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®åˆæœŸåŒ– ---
+	player = std::make_unique<Player>();
+	player->mesh = meshCube;
+	player->material = matPlayer;
+	player->inputLayout = inputLayout3D;
+	player->Initialize();
 }
 
 /// <summary>
-/// ƒtƒŒ[ƒ€‚ÌXVˆ—‚ğÀ‘•‚µ‚Ü‚·B
+/// ãƒ•ãƒ¬ãƒ¼ãƒ ã®æ›´æ–°å‡¦ç†ã‚’å®Ÿè£…ã—ã¾ã™ã€‚
 /// </summary>
 void SampleGame::OnUpdate()
 {
-	// Šù‘¶‚Ì‰ñ“]
-	const auto rotationVelocity = XMQuaternionRotationRollPitchYaw(0, XMConvertToRadians(90), 0);
-	localRotation = XMQuaternionSlerp(localRotation, XMQuaternionMultiply(localRotation, rotationVelocity), Time::GetDeltaTime());
-
-	// ===== “ü—Í‚É‚æ‚éˆÚ“® =====
-	const float dt = Time::GetDeltaTime();
-	const float moveSpeed3D = 2.0f;     // ƒLƒ…[ƒu‚ÌˆÚ“®‘¬“xiunits/•bj
-	const float moveSpeed2D = 2.5f;     // ƒXƒvƒ‰ƒCƒg‚ÌˆÚ“®‘¬“xiunits/•bj
-
-	// ---- ƒLƒ…[ƒuiWASD + Space/Ctrl + ƒQ[ƒ€ƒpƒbƒh¶ƒXƒeƒBƒbƒNj ----
-	// ƒ[ƒJƒ‹ˆÚ“®“ü—ÍiƒJƒƒ‰Šî€‚Å•ÏŠ·‚·‚é‚½‚ß‚Ì raw “ü—Íj
-	float rawX = 0.0f; // ‰E•ûŒü‚ª³
-	float rawY = 0.0f; // ã•ûŒü‚ª³
-	float rawZ = 0.0f; // ‘O•ûŒü‚ª³
-
-	if (Input::GetButton(DigitalInput::A)) rawX -= 1.0f;
-	if (Input::GetButton(DigitalInput::D)) rawX += 1.0f;
-	if (Input::GetButton(DigitalInput::W)) rawZ += 1.0f;
-	if (Input::GetButton(DigitalInput::S)) rawZ -= 1.0f;
-	if (Input::GetButton(DigitalInput::Space)) rawY += 1.0f;
-	if (Input::GetButton(DigitalInput::LeftCtrl)) rawY -= 1.0f;
-
-	// ƒQ[ƒ€ƒpƒbƒh¶ƒXƒeƒBƒbƒNiX: ¶‰E, Y: ‘OŒãj
-	rawX += Input::GetAxis(AnalogInput::LeftStickX);
-	// ƒXƒeƒBƒbƒN‚Íã‚ª•‰’l‚Ì‚±‚Æ‚ª‘½‚¢‚Ì‚ÅA¶ƒXƒeƒBƒbƒNY ‚ğ‚»‚Ì‚Ü‚Ü‰Á‚¦‚é‚Æ
-	// ã‚ª•‰‚É‚È‚éİŒv‚Ìê‡‚Í•„†”½“]‚µ‚È‚¢Œ»óƒR[ƒh‚É‡‚í‚¹‚é
-	rawZ += Input::GetAxis(AnalogInput::LeftStickY);
-
-	if (rawX != 0.0f || rawY != 0.0f || rawZ != 0.0f) {
-		// ƒJƒƒ‰‚ÌŒü‚«‚©‚ç‘O•ûŒü‚Æ‰E•ûŒü‚ğŒvZiY¬•ª‚Íƒ[ƒ‚É‚µ‚Ä…•½ˆÚ“®‚É‚·‚éj
-		const auto cameraWorldMatrix = XMMatrixRotationQuaternion(XMLoadFloat4(&cameraRotation));
-		XMVECTOR camForward = cameraWorldMatrix.r[2]; // ƒJƒƒ‰‚Ì‘O•ûŒüi‰EèŒn‚Å‚Í -Z ‚É‚È‚é‚±‚Æ‚ª‚ ‚é‚ªA‚±‚ÌƒvƒƒWƒFƒNƒg‚Å‚Í r[2] ‚ğg—pj
-		XMVECTOR camRight = cameraWorldMatrix.r[0];
-
-		// Y ¬•ª‚ğœ‹‚µ‚Ä…•½¬•ª‚¾‚¯‚ÅˆÚ“®‚³‚¹‚éi•K—v‚É‰‚¶‚Ä Y ‚ğ‹–‰Âj
-		camForward = XMVectorSet(XMVectorGetX(camForward), 0.0f, XMVectorGetZ(camForward), 0.0f);
-		camRight   = XMVectorSet(XMVectorGetX(camRight),   0.0f, XMVectorGetZ(camRight),   0.0f);
-
-		// ³‹K‰»iƒ[ƒƒxƒNƒgƒ‹‘Îôj
-		if (XMVector3Equal(XMVector3LengthSq(camForward), XMVectorZero())) {
-			camForward = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+	if (isGameOver) {
+		// ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼æ™‚ã®å‡¦ç†ï¼ˆãƒªã‚»ãƒƒãƒˆãªã©ï¼‰ã‚’å…¥ã‚Œã‚‹ãªã‚‰ã“ã“
+		if (Input::GetButton(DigitalInput::Space)) {
+			// ãƒªã‚»ãƒƒãƒˆå‡¦ç†
+			isGameOver = false;
+			bullets.clear();
+			enemies.clear();
+			player->localPosition = { 0, 0, 0 };
 		}
-		if (XMVector3Equal(XMVector3LengthSq(camRight), XMVectorZero())) {
-			camRight = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
-		}
-		camForward = XMVector3Normalize(camForward);
-		camRight = XMVector3Normalize(camRight);
-
-		// ‡¬i‰E * rawX + ‘O * rawZ + ã * rawYj
-		const XMVECTOR worldMoveDir = XMVectorAdd(
-			XMVectorScale(camRight, rawX),
-			XMVectorAdd(XMVectorScale(camForward, rawZ), XMVectorSet(0.0f, rawY, 0.0f, 0.0f))
-		);
-
-		// ³‹K‰»‚µ‚Ä‘¬“xˆê’è‚É
-		const XMVECTOR normDir = XMVector3Normalize(worldMoveDir);
-		const XMVECTOR delta = XMVectorScale(normDir, moveSpeed3D * dt);
-
-		// localPosition ‚Í XMVECTOR ‚Æ‘z’è‚³‚ê‚é‚½‚ß‰ÁZ
-		localPosition = XMVectorAdd(localPosition, delta);
+		return;
 	}
 
-	// ---- ƒXƒvƒ‰ƒCƒgi–îˆóƒL[ + ƒ}ƒEƒXƒzƒC[ƒ‹‚Å Zj ----
-	float spriteMoveX = 0.0f, spriteMoveY = 0.0f, spriteMoveZ = 0.0f;
-	if (Input::GetButton(DigitalInput::LeftArrow))  spriteMoveX -= 1.0f;
-	if (Input::GetButton(DigitalInput::RightArrow)) spriteMoveX += 1.0f;
-	if (Input::GetButton(DigitalInput::UpArrow))    spriteMoveY += 1.0f;
-	if (Input::GetButton(DigitalInput::DownArrow))  spriteMoveY -= 1.0f;
+	// 1. ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼æ›´æ–°
+	player->Update();
 
-	// ƒ}ƒEƒXƒzƒC[ƒ‹‚Å‘OŒã
-	spriteMoveZ += Input::GetAxis(AnalogInput::MouseScroll) * 0.25f;
+	// 2. å¼¾ã®ç™ºå°„ï¼ˆSpaceã‚­ãƒ¼ï¼‰
+	if (shotCooldown > 0) shotCooldown -= Time::GetDeltaTime();
+	if (Input::GetButton(DigitalInput::Space) && shotCooldown <= 0) { // å…¥åŠ›è¨­å®šã«ã‚ˆã£ã¦ã‚­ãƒ¼ã‚’å¤‰æ›´ã—ã¦ãã ã•ã„
+		SpawnBullet();
+		shotCooldown = 0.2f; // é€£å°„é€Ÿåº¦
+	}
 
-	if (spriteMoveX != 0.0f || spriteMoveY != 0.0f || spriteMoveZ != 0.0f) {
-		// Î‚ßˆÚ“®‚Ì‘¬“x’²®
-		const XMVECTOR dir = XMVector3Normalize(XMVectorSet(spriteMoveX, spriteMoveY, spriteMoveZ, 0.0f));
-		const XMVECTOR delta = XMVectorScale(dir, moveSpeed2D * dt);
-		XMFLOAT3 d;
-		XMStoreFloat3(&d, delta);
-		spritePosition.x += d.x;
-		spritePosition.y += d.y;
-		spritePosition.z += d.z;
+	// 3. æ•µã®å‡ºç¾ï¼ˆã‚¿ã‚¤ãƒãƒ¼ï¼‰
+	enemySpawnTimer += Time::GetDeltaTime();
+	if (enemySpawnTimer > 2.0f) { // 2ç§’ã”ã¨ã«ç”Ÿæˆ
+		SpawnEnemy();
+		enemySpawnTimer = 0.0f;
+	}
+
+	// 4. å¼¾ã®æ›´æ–°ã¨å‰Šé™¤
+	for (auto it = bullets.begin(); it != bullets.end(); ) {
+		(*it)->Update();
+		// ç”»é¢å¤–ã«å‡ºãŸã‚‰æ¶ˆã™
+		if ((*it)->localPosition.y > 15.0f) {
+			it = bullets.erase(it);
+		}
+		else if (!(*it)->isActive) {
+			it = bullets.erase(it);
+		}
+		else {
+			++it;
+		}
+	}
+
+	// 5. æ•µã®æ›´æ–°ã¨å‰Šé™¤
+	for (auto it = enemies.begin(); it != enemies.end(); ) {
+		// å˜ç´”ãªç§»å‹•ï¼šä¸‹ã«é™ã‚Šã¦ãã‚‹
+		auto pos = XMLoadFloat3(&(*it)->localPosition);
+		pos += XMVectorSet(0, -3.0f, 0, 0) * Time::GetDeltaTime();
+		XMStoreFloat3(&(*it)->localPosition, pos);
+
+		(*it)->Update();
+
+		// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã¨ã®è¡çª
+		if (CheckCollision(*player, **it)) {
+			isGameOver = true; // è¡çªã—ãŸã‚‰ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼
+		}
+
+		// ç”»é¢å¤–ã«å‡ºãŸã‚‰æ¶ˆã™
+		if ((*it)->localPosition.y < -15.0f) {
+			it = enemies.erase(it);
+		}
+		else if (!(*it)->isActive) {
+			it = enemies.erase(it);
+		}
+		else {
+			++it;
+		}
+	}
+
+	// 6. å¼¾ã¨æ•µã®è¡çªåˆ¤å®š
+	for (auto& bullet : bullets) {
+		if (!bullet->isActive) continue;
+		for (auto& enemy : enemies) {
+			if (!enemy->isActive) continue;
+
+			if (CheckCollision(*bullet, *enemy)) {
+				bullet->isActive = false; // å¼¾æ¶ˆæ»…
+				enemy->isActive = false;  // æ•µæ¶ˆæ»…
+				break; // å¼¾ã¯1ã¤ã«ã¤ã1ä½“ã®æ•µã®ã¿å€’ã™
+			}
+		}
 	}
 }
 
 /// <summary>
-/// ƒtƒŒ[ƒ€‚Ì•`‰æˆ—‚ğÀ‘•‚µ‚Ü‚·B
+/// å¼¾ã‚’ç”Ÿæˆã—ã¾ã™ã€‚
+/// </summary>
+void SampleGame::SpawnBullet()
+{
+	auto bullet = std::make_shared<Sprite>();
+	bullet->mesh = meshQuad;
+	bullet->material = matBullet;
+	bullet->inputLayout = inputLayoutSprite;
+	bullet->Initialize();
+
+	// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ä½ç½®ã‹ã‚‰å°‘ã—ä¸Šã«ç™ºå°„
+	bullet->localPosition = player->localPosition;
+	bullet->localPosition.y += 0.8f;
+	bullet->localScale = { 0.5f, 0.5f, 0.5f };
+	// ä¸Šæ–¹å‘ã«é£›ã¶
+	bullet->velocity = { 0, 15.0f, 0 };
+
+	bullets.push_back(bullet);
+}
+
+/// <summary>
+/// æ•µã‚’ç”Ÿæˆã—ã¾ã™ã€‚
+/// </summary>
+void SampleGame::SpawnEnemy()
+{
+	auto enemy = std::make_shared<GameObject>();
+	enemy->mesh = meshCube;
+	enemy->material = matEnemy;
+	enemy->inputLayout = inputLayout3D;
+	enemy->Initialize();
+
+	// ç”»é¢ä¸Šéƒ¨ã®ãƒ©ãƒ³ãƒ€ãƒ ãªä½ç½®ã«å‡ºç¾
+	float randX = (float)(rand() % 200 - 100) / 10.0f; // -10 to 10
+	enemy->localPosition = { randX, 10.0f, 0 };
+
+	enemies.push_back(enemy);
+}
+
+/// <summary>
+/// 2ã¤ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆé–“ã®è¡çªã‚’åˆ¤å®šã—ã¾ã™ï¼ˆå††åˆ¤å®šï¼‰ã€‚
+/// </summary>
+bool SampleGame::CheckCollision(const GameObject& a, const GameObject& b)
+{
+	XMVECTOR posA = XMLoadFloat3(&a.localPosition);
+	XMVECTOR posB = XMLoadFloat3(&b.localPosition);
+
+	// è·é›¢ã®äºŒä¹—ã‚’è¨ˆç®—ï¼ˆé«˜é€ŸåŒ–ã®ãŸã‚å¹³æ–¹æ ¹ã¯å–ã‚‰ãªã„ï¼‰
+	XMVECTOR distSqVec = XMVector3LengthSq(posA - posB);
+	float distSq;
+	XMStoreFloat(&distSq, distSqVec);
+
+	float radiusSum = a.radius + b.radius;
+	return distSq < (radiusSum * radiusSum);
+}
+
+/// <summary>
+/// ãƒ•ãƒ¬ãƒ¼ãƒ ã®æç”»å‡¦ç†ã‚’å®Ÿè£…ã—ã¾ã™ã€‚
 /// </summary>
 void SampleGame::OnRender()
 {
-	// •½sƒ‰ƒCƒg
+	// å¹³è¡Œãƒ©ã‚¤ãƒˆ
 	const auto lightWorldMatrix = XMMatrixRotationQuaternion(XMLoadFloat4(&lightRotation));
 	const auto lightForward = lightWorldMatrix.r[2];
 	XMStoreFloat4(&constantsPerLighting.LightDirection, lightForward);
 	XMStoreFloat4(&constantsPerLighting.LightColor, XMColorSRGBToRGB(XMLoadFloat4(&lightColor)));
 	constantBufferPerLighting->UpdateSubresource(&constantsPerLighting);
-	// ƒƒCƒ“ ƒJƒƒ‰
+
+	// ãƒ¡ã‚¤ãƒ³ ã‚«ãƒ¡ãƒ©
 	const auto cameraWorldMatrix = XMMatrixRotationQuaternion(XMLoadFloat4(&cameraRotation));
 	const auto cameraForward = cameraWorldMatrix.r[2];
 	const auto cameraUp = cameraWorldMatrix.r[1];
 	auto matrixView = XMMatrixLookToLH(XMLoadFloat3(&cameraPosition), cameraForward, cameraUp);
 	XMStoreFloat4x4(&constantsPerFrame.MatrixView, XMMatrixTranspose(matrixView));
-	// ƒvƒƒWƒFƒNƒVƒ‡ƒ“
+
+	// ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³
 	const auto aspectRatio = GetWidth() / static_cast<float>(GetHeight());
 	auto matrixProjection = XMMatrixIdentity();
 	if (orthographic) {
@@ -294,48 +338,26 @@ void SampleGame::OnRender()
 	XMStoreFloat4x4(&constantsPerFrame.MatrixViewProjection, XMMatrixTranspose(matrixView * matrixProjection));
 	constantBufferPerFrame->UpdateSubresource(&constantsPerFrame);
 
-	// ===== 3DƒIƒuƒWƒFƒNƒg‚Ì•`‰æiƒLƒ…[ƒuj =====
-	{
-		const auto matrixWorld = XMMatrixTransformation(
-			XMVectorZero(), XMQuaternionIdentity(), localScale,
-			XMVectorZero(), localRotation,
-			localPosition);
-		XMStoreFloat4x4(&constantsPerDraw.MatrixWorld, XMMatrixTranspose(matrixWorld));
-		constantBufferPerDraw->UpdateSubresource(&constantsPerDraw);
+	// --- æç”»å®Ÿè¡Œ ---
 
-		const auto vertexBuffer = mesh->GetVertexBuffer();
-		ID3D11Buffer* const vertexBuffers[] = { vertexBuffer->GetNativePointer(), };
-		const UINT strides[] = { vertexBuffer->GetStride(), };
-		const UINT offsets[] = { mesh->GetVertexOffset(), };
-		deviceContext->IASetVertexBuffers(0, static_cast<UINT>(std::size(vertexBuffers)), vertexBuffers, strides, offsets);
-		deviceContext->IASetInputLayout(inputLayout->GetNativePointer());
-		const auto indexBuffer = mesh->GetIndexBuffer();
-		deviceContext->IASetIndexBuffer(indexBuffer->GetNativePointer(), indexBuffer->GetFormat(), mesh->GetIndexOffset());
-		deviceContext->IASetPrimitiveTopology(mesh->GetPrimitiveTopology());
-		material->Apply(deviceContext.Get());
-		deviceContext->DrawIndexed(indexBuffer->GetCount(), mesh->GetStartIndexLocation(), mesh->GetBaseVertexLocation());
+	// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼
+	if (!isGameOver) {
+		XMStoreFloat4x4(&constantsPerDraw.MatrixWorld, XMMatrixTranspose(player->GetLocalToWorldMatrix()));
+		constantBufferPerDraw->UpdateSubresource(&constantsPerDraw);
+		player->Render(deviceContext.Get());
 	}
 
-	// ===== ƒXƒvƒ‰ƒCƒg‚Ì•`‰æi‹éŒ`j =====
-	{
-		// ƒXƒvƒ‰ƒCƒg—p‚Ìƒ[ƒ‹ƒhs—ñiˆÊ’u‚¾‚¯•ÏXj
-		const auto spriteWorld = XMMatrixTransformation(
-			XMVectorZero(), XMQuaternionIdentity(), spriteScale,
-			XMVectorZero(), XMLoadFloat4(&spriteRotation),
-			XMLoadFloat3(&spritePosition));
-		XMStoreFloat4x4(&constantsPerDraw.MatrixWorld, XMMatrixTranspose(spriteWorld));
+	// æ•µ
+	for (const auto& enemy : enemies) {
+		XMStoreFloat4x4(&constantsPerDraw.MatrixWorld, XMMatrixTranspose(enemy->GetLocalToWorldMatrix()));
 		constantBufferPerDraw->UpdateSubresource(&constantsPerDraw);
+		enemy->Render(deviceContext.Get());
+	}
 
-		const auto vertexBuffer = spriteMesh->GetVertexBuffer();
-		ID3D11Buffer* const vertexBuffers[] = { vertexBuffer->GetNativePointer(), };
-		const UINT strides[] = { vertexBuffer->GetStride(), };
-		const UINT offsets[] = { spriteMesh->GetVertexOffset(), };
-		deviceContext->IASetVertexBuffers(0, static_cast<UINT>(std::size(vertexBuffers)), vertexBuffers, strides, offsets);
-		deviceContext->IASetInputLayout(spriteInputLayout->GetNativePointer());
-		const auto indexBuffer = spriteMesh->GetIndexBuffer();
-		deviceContext->IASetIndexBuffer(indexBuffer->GetNativePointer(), indexBuffer->GetFormat(), spriteMesh->GetIndexOffset());
-		deviceContext->IASetPrimitiveTopology(spriteMesh->GetPrimitiveTopology());
-		spriteMaterial->Apply(deviceContext.Get());
-		deviceContext->DrawIndexed(indexBuffer->GetCount(), spriteMesh->GetStartIndexLocation(), spriteMesh->GetBaseVertexLocation());
+	// å¼¾ (Sprite)
+	for (const auto& bullet : bullets) {
+		XMStoreFloat4x4(&constantsPerDraw.MatrixWorld, XMMatrixTranspose(bullet->GetLocalToWorldMatrix()));
+		constantBufferPerDraw->UpdateSubresource(&constantsPerDraw);
+		bullet->Render(deviceContext.Get());
 	}
 }
